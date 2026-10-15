@@ -1,0 +1,1409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>R Quest</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  /* Layout: indigo adire header band, then a three-column studio (quest list | code bench | R's answer) that stacks on phones. */
+  :root {
+    --indigo: #1E2A78;
+    --indigo-2: #2E3FA3;
+    --sun: #FFC233;
+    --coral: #F0563A;
+    --leaf: #1F9D63;
+    --ink: #1A1D33;
+    --muted: #565C80;
+    --paper: #F3F5FC;
+    --card: #FFFFFF;
+    --line: #D8DDF0;
+    --soft: #E9ECFA;
+    --code-bg: #14183A;
+    --code-fg: #E8EAF7;
+    --t-comment: #8A92C4;
+    --t-string: #FFD27A;
+    --t-number: #7CE0B0;
+    --t-key: #FF9C85;
+    --t-fn: #8FC1FF;
+    --t-op: #FFC233;
+    --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+    --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+    --font-code: "JetBrains Mono", ui-monospace, "Courier New", monospace;
+    --r-lg: 18px;
+    --r-md: 12px;
+    --r-sm: 8px;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  /* ---------- Header band ---------- */
+  .band {
+    background-color: var(--indigo);
+    background-image:
+      radial-gradient(circle at 12px 12px, rgba(255,255,255,0.16) 3px, transparent 4px),
+      radial-gradient(circle at 36px 36px, transparent 7px, rgba(255,255,255,0.10) 8px, rgba(255,255,255,0.10) 9px, transparent 10px);
+    background-size: 48px 48px;
+    color: #fff;
+  }
+  .band-inner {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 12px 0;
+  }
+  .top {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+    justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .owl { font-size: 34px; line-height: 1; display: inline-block; }
+  .owl.happy { animation: bounce .55s; }
+  .owl.sad { animation: shake .5s; }
+  @keyframes bounce { 50% { transform: translateY(-9px) rotate(-10deg); } }
+  @keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  .brand h1 {
+    margin: 0; font-family: var(--font-display); font-weight: 800;
+    font-size: 30px; line-height: 1; letter-spacing: .3px;
+  }
+  .brand h1 span { color: var(--sun); }
+  .who { font-size: 13px; opacity: .85; margin-top: 2px; }
+  .hud { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22);
+    border-radius: 999px; padding: 5px 12px; font-weight: 800; font-size: 14px;
+    font-variant-numeric: tabular-nums; color: #fff;
+  }
+  button.pill:hover { background: rgba(255,255,255,.24); }
+  .level-pill { gap: 8px; }
+  .level-bar { width: 64px; height: 8px; border-radius: 99px; background: rgba(255,255,255,.22); overflow: hidden; }
+  .level-bar i { display: block; height: 100%; width: 0; background: var(--sun); border-radius: 99px; transition: width .5s; }
+
+  .tabs { display: flex; gap: 4px; margin-top: 12px; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 0 0 auto; border: 0; background: rgba(255,255,255,.12); color: #fff;
+    padding: 10px 16px; border-radius: 14px 14px 0 0; font-weight: 800; font-size: 14px;
+  }
+  .tab:hover { background: rgba(255,255,255,.22); }
+  .tab[aria-selected="true"] { background: var(--paper); color: var(--indigo); }
+
+  /* ---------- Studio ---------- */
+  .studio {
+    display: grid; grid-template-columns: 270px minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 16px 24px;
+    align-items: start;
+  }
+  .panel {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg);
+    padding: 14px; min-width: 0; display: flex; flex-direction: column; gap: 12px;
+  }
+  .panel-title {
+    margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 18px;
+    color: var(--indigo); line-height: 1.2; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .count { font-family: var(--font-body); font-size: 12px; font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .track-bar { height: 8px; border-radius: 99px; background: var(--soft); overflow: hidden; }
+  .track-bar i { display: block; height: 100%; background: var(--leaf); width: 0; transition: width .5s; }
+
+  .list { display: flex; flex-direction: column; gap: 6px; max-height: calc(100vh - 230px); overflow-y: auto; padding-right: 2px; }
+  .item {
+    display: grid; grid-template-columns: 28px minmax(0,1fr) auto; align-items: center; gap: 8px;
+    width: 100%; text-align: left; border: 2px solid transparent; background: var(--soft);
+    border-radius: var(--r-md); padding: 8px 10px; font-weight: 700; font-size: 14px; color: var(--ink);
+  }
+  .item:hover { border-color: var(--indigo-2); }
+  .item[aria-current="true"] { background: #FFF3CF; border-color: var(--sun); }
+  .item .ic { font-size: 19px; text-align: center; }
+  .item .nm { min-width: 0; overflow-wrap: anywhere; }
+  .item .tag { font-size: 11px; font-weight: 800; border-radius: 99px; padding: 2px 7px; white-space: nowrap; }
+  .tag.pts { background: #E7E3FF; color: #4A33B5; }
+  .tag.done { background: #D6F3E4; color: #11663F; }
+  .tag.num { background: transparent; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .prompt {
+    background: #EEF1FF; border-radius: var(--r-md); padding: 12px 14px; font-size: 15px;
+    border: 1px solid #D5DBFA;
+  }
+  .prompt.challenge { background: #F4EEFF; border-color: #DCCFFB; }
+  .prompt .goal { display: block; margin-top: 6px; font-weight: 800; color: #4A33B5; font-size: 14px; }
+  .prompt .pretend { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 800; color: var(--muted); }
+  .hint-box {
+    background: #FFF6DA; border: 1px dashed #E2B23A; border-radius: var(--r-md);
+    padding: 10px 12px; font-size: 14px;
+  }
+  .hint-box code { font-family: var(--font-code); font-size: 13px; overflow-wrap: anywhere; }
+
+  .mode { display: inline-flex; background: var(--soft); border-radius: 99px; padding: 3px; gap: 2px; align-self: flex-start; }
+  .mode button { border: 0; background: transparent; padding: 6px 14px; border-radius: 99px; font-weight: 800; font-size: 13px; color: var(--muted); }
+  .mode button[aria-pressed="true"] { background: var(--card); color: var(--indigo); box-shadow: 0 1px 0 var(--line); }
+
+  /* game inputs */
+  .play-bar {
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px;
+    background: #FFF8E6; border: 1px solid #F3DFA6; border-radius: var(--r-md); padding: 10px 12px;
+  }
+  .field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .field label { font-size: 12px; font-weight: 800; color: var(--muted); }
+  .field input {
+    border: 2px solid var(--line); border-radius: var(--r-sm); padding: 6px 9px; width: 130px;
+    max-width: 100%; background: var(--card); font-weight: 700;
+  }
+  .field input[type="number"] { width: 90px; }
+  .choice { border: 2px solid var(--line); background: var(--card); border-radius: 99px; padding: 6px 14px; font-weight: 800; }
+  .choice:hover { border-color: var(--coral); }
+  .tries { font-size: 13px; font-weight: 800; color: var(--muted); align-self: center; font-variant-numeric: tabular-nums; }
+
+  /* editor */
+  .editor {
+    display: grid; grid-template-columns: 40px minmax(0,1fr); background: var(--code-bg);
+    border-radius: var(--r-md); overflow: hidden; height: 300px; min-height: 200px;
+  }
+  .gutter {
+    background: rgba(255,255,255,.04); color: #5E6699; font-family: var(--font-code); font-size: 14px;
+    line-height: 22px; padding: 12px 8px 12px 0; text-align: right; overflow: hidden; user-select: none; white-space: pre;
+    font-variant-numeric: tabular-nums;
+  }
+  .code-area { position: relative; min-width: 0; }
+  .code-area pre, .code-area textarea {
+    position: absolute; inset: 0; margin: 0; padding: 12px; border: 0;
+    font-family: var(--font-code); font-size: 14px; line-height: 22px; tab-size: 2;
+    white-space: pre; overflow: auto; background: transparent;
+  }
+  .code-area pre { color: var(--code-fg); pointer-events: none; }
+  .code-area textarea {
+    color: transparent; caret-color: var(--sun); resize: none; outline: none; -webkit-text-fill-color: transparent;
+  }
+  .code-area textarea::selection { background: rgba(255,194,51,.35); }
+  .t-c { color: var(--t-comment); font-style: italic; }
+  .t-s { color: var(--t-string); }
+  .t-n { color: var(--t-number); }
+  .t-k { color: var(--t-key); font-weight: 600; }
+  .t-f { color: var(--t-fn); }
+  .t-o { color: var(--t-op); font-weight: 600; }
+
+  .keys { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; padding-bottom: 2px; }
+  .keys button {
+    flex: 0 0 auto; font-family: var(--font-code); font-weight: 600; font-size: 14px;
+    min-width: 38px; height: 36px; padding: 0 10px; border-radius: var(--r-sm);
+    border: 1px solid var(--line); background: var(--soft); color: var(--indigo);
+  }
+  .keys button:hover { background: #DDE2FA; }
+
+  /* blocks */
+  .blocks { background: #F7F8FE; border: 1px solid var(--line); border-radius: var(--r-md); padding: 10px; display: flex; flex-direction: column; gap: 10px; min-height: 240px; }
+  .palette { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 10px; border-bottom: 2px dashed var(--line); }
+  .blk { border: 0; color: #fff; font-weight: 800; font-size: 13px; padding: 7px 12px; border-radius: var(--r-sm); }
+  .blk:hover { filter: brightness(1.08); }
+  .b-print { background: #2E6FD8; } .b-math { background: #1F9D63; } .b-var { background: #D9860B; }
+  .b-plot { background: #D9412A; } .b-loop { background: #7B4BD1; }
+  .stack { display: flex; flex-direction: column; gap: 6px; }
+  .stack .empty { color: var(--muted); text-align: center; padding: 22px 8px; font-size: 14px; }
+  .brow { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 8px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 6px 8px; }
+  .brow .lab { color: #fff; font-weight: 800; font-size: 12px; border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
+  .brow input { min-width: 0; width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font-family: var(--font-code); font-size: 13px; }
+  .brow .x { border: 0; background: transparent; color: var(--coral); font-weight: 800; font-size: 16px; padding: 2px 6px; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn {
+    border: 0; border-radius: var(--r-md); padding: 10px 18px; font-weight: 800; font-size: 15px;
+    display: inline-flex; align-items: center; gap: 6px; transition: transform .08s;
+  }
+  .btn:active { transform: translateY(2px); }
+  .btn-run { background: var(--leaf); color: #fff; box-shadow: 0 3px 0 #13744A; }
+  .btn-run[aria-busy="true"] { opacity: .75; }
+  .btn-2 { background: var(--soft); color: var(--indigo); box-shadow: 0 3px 0 var(--line); }
+  .btn-hint { background: #FFE7A6; color: #6A4A00; box-shadow: 0 3px 0 #E6C35E; }
+  .kbd { font-size: 12px; color: var(--muted); align-self: center; }
+
+  /* output */
+  .status { border-radius: var(--r-sm); padding: 7px 10px; font-size: 13px; font-weight: 800; }
+  .status.loading { background: #FFF4D1; color: #7A5600; }
+  .status.ready { background: #D6F3E4; color: #11663F; }
+  .status.down { background: #FFE3DC; color: #9A2C14; }
+  .loading-bar { height: 4px; border-radius: 99px; background: #FBE6A6; overflow: hidden; margin-top: 6px; }
+  .loading-bar i { display: block; height: 100%; width: 35%; background: #E2A600; border-radius: 99px; animation: slide 1.3s ease-in-out infinite; }
+  @keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
+  .out {
+    background: var(--code-bg); color: var(--code-fg); border-radius: var(--r-md); padding: 12px;
+    font-family: var(--font-code); font-size: 13.5px; line-height: 1.55; white-space: pre-wrap;
+    overflow-wrap: anywhere; min-height: 120px; max-height: 300px; overflow: auto;
+  }
+  .oops {
+    background: #FFF0EC; border: 1px solid #F8C6B8; border-radius: var(--r-md); padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .oops strong { color: #A3341B; font-family: var(--font-display); font-size: 17px; line-height: 1.2; }
+  .oops p { margin: 0; }
+  .oops code { font-family: var(--font-code); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+  .down-card { background: #FFF0EC; border: 1px solid #F8C6B8; border-radius: var(--r-md); padding: 12px 14px; font-size: 14px; }
+  .down-card p { margin: 0 0 6px; }
+  .down-card p:last-child { margin: 0; }
+  .plots { display: flex; flex-direction: column; gap: 10px; }
+  .plot-wrap { display: flex; flex-direction: column; gap: 8px; }
+  .plot-wrap canvas { width: 100%; height: auto; border-radius: var(--r-md); border: 1px solid var(--line); background: #fff; }
+  .plot-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn-sm { padding: 7px 12px; font-size: 13px; }
+  a.btn { text-decoration: none; }
+
+  /* ---------- My stuff ---------- */
+  .stuff {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 16px 28px;
+    display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 16px; align-items: start;
+  }
+  .profile { align-items: center; text-align: center; }
+  .big-ava { font-size: 64px; line-height: 1; }
+  .profile h2 { margin: 0; font-family: var(--font-display); font-size: 26px; color: var(--indigo); line-height: 1.1; }
+  .lvl-name { font-weight: 800; color: var(--coral); }
+  .stat-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; width: 100%; }
+  .stat { background: var(--soft); border-radius: var(--r-md); padding: 10px 6px; }
+  .stat b { display: block; font-family: var(--font-display); font-size: 24px; line-height: 1.1; color: var(--indigo); font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 12px; font-weight: 800; color: var(--muted); }
+  .badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .badge { border-radius: var(--r-md); padding: 12px; background: var(--soft); text-align: center; display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .badge .bi { font-size: 32px; line-height: 1; }
+  .badge b { font-size: 14px; line-height: 1.2; }
+  .badge small { font-size: 12px; color: var(--muted); line-height: 1.3; }
+  .badge.locked .bi { filter: grayscale(1); opacity: .35; }
+  .badge.locked b { color: var(--muted); }
+  .badge.got { background: #FFF3CF; border: 1px solid #F3D477; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .gallery figure { margin: 0; background: var(--soft); border-radius: var(--r-md); padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .gallery img { width: 100%; border-radius: var(--r-sm); background: #fff; display: block; }
+  .gallery figcaption { font-size: 12px; font-weight: 800; color: var(--muted); display: flex; justify-content: space-between; gap: 6px; }
+  .gallery figcaption button { border: 0; background: transparent; color: var(--coral); font-weight: 800; padding: 0 4px; }
+  .empty-note { color: var(--muted); font-size: 14px; margin: 0; }
+  .danger { background: transparent; border: 1px solid #F1B5A6; color: #A3341B; border-radius: var(--r-md); padding: 8px 14px; font-weight: 800; }
+  .confirm { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; font-size: 14px; }
+
+  /* ---------- Overlays ---------- */
+  .scrim {
+    position: fixed; inset: 0; z-index: 50; background: rgba(20,24,58,.55);
+    display: flex; align-items: center; justify-content: center;
+    padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  }
+  .sheet {
+    background: var(--card); border-radius: 22px; padding: 22px; width: 100%; max-width: 440px;
+    display: flex; flex-direction: column; gap: 14px; max-height: 100%; overflow-y: auto;
+  }
+  .sheet h2 { margin: 0; font-family: var(--font-display); font-size: 28px; line-height: 1.1; color: var(--indigo); text-wrap: balance; }
+  .sheet p { margin: 0; color: var(--muted); }
+  .sheet label.lbl { font-weight: 800; font-size: 14px; }
+  .sheet input[type="text"] { width: 100%; border: 2px solid var(--line); border-radius: var(--r-md); padding: 10px 12px; font-weight: 700; font-size: 16px; }
+  .err-text { color: #B3341B; font-size: 13px; font-weight: 800; }
+  .avas { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
+  .avas button { font-size: 30px; border: 2px solid var(--line); background: var(--soft); border-radius: var(--r-md); padding: 6px 0; }
+  .avas button[aria-pressed="true"] { border-color: var(--sun); background: #FFF3CF; }
+  .langs { display: flex; gap: 8px; }
+  .langs button { flex: 1; border: 2px solid var(--line); background: var(--soft); border-radius: var(--r-md); padding: 8px; font-weight: 800; }
+  .langs button[aria-pressed="true"] { border-color: var(--indigo-2); background: #E4E8FF; color: var(--indigo); }
+
+  .celebrate { position: fixed; inset: 0; z-index: 60; pointer-events: none; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .cbox { background: var(--card); border: 4px solid var(--sun); border-radius: 24px; padding: 22px 34px; text-align: center; animation: pop .4s; }
+  @keyframes pop { 0% { transform: scale(0); } 80% { transform: scale(1.08); } }
+  .cbox .big { font-size: 52px; line-height: 1; }
+  .cbox .msg { font-family: var(--font-display); font-size: 24px; font-weight: 800; color: var(--coral); margin-top: 6px; }
+  .cbox .pts { font-weight: 800; color: var(--leaf); font-size: 18px; }
+  .confetti { position: absolute; top: -12px; width: 10px; height: 10px; animation: fall 2.1s linear forwards; }
+  @keyframes fall { to { transform: translateY(105vh) rotate(720deg); } }
+  .toast {
+    position: fixed; z-index: 70; left: 50%; transform: translateX(-50%);
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    background: var(--indigo); color: #fff; border-radius: 16px; padding: 10px 16px; font-weight: 800;
+    display: flex; align-items: center; gap: 10px; max-width: calc(100% - 32px); animation: rise .35s;
+  }
+  .toast .bi { font-size: 28px; }
+  @keyframes rise { from { transform: translate(-50%, 20px); opacity: 0; } }
+
+  @media (max-width: 1100px) {
+    .studio { grid-template-columns: 240px minmax(0,1fr); }
+    .studio .output { grid-column: 1 / -1; }
+  }
+  @media (max-width: 760px) {
+    .studio { grid-template-columns: minmax(0,1fr); }
+    .list { flex-direction: row; max-height: none; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
+    .item { width: auto; flex: 0 0 auto; grid-template-columns: 24px auto auto; }
+    .item .nm { white-space: nowrap; }
+    .stuff { grid-template-columns: minmax(0,1fr); }
+    .brand h1 { font-size: 26px; }
+    .editor { height: 260px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+
+<header class="band">
+  <div class="band-inner">
+    <div class="top">
+      <div class="brand">
+        <span class="owl" id="owl" aria-hidden="true">🦉</span>
+        <div>
+          <h1 id="brand">R <span>Quest</span></h1>
+          <div class="who" id="who"></div>
+        </div>
+      </div>
+      <div class="hud">
+        <span class="pill level-pill" title="Level"><span id="lvl-label">Lv 1</span><span class="level-bar"><i id="lvl-bar"></i></span></span>
+        <span class="pill" title="Stars">⭐ <span id="stars">0</span></span>
+        <span class="pill" title="Streak">🔥 <span id="streak">0</span></span>
+        <button class="pill" id="sound-btn" type="button" aria-label="Sound on or off">🔊</button>
+        <button class="pill" id="lang-btn" type="button">Yorùbá</button>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" data-tab="learn" aria-selected="true">📚 Learn</button>
+      <button class="tab" role="tab" data-tab="challenge" aria-selected="false">🎯 Challenges</button>
+      <button class="tab" role="tab" data-tab="games" aria-selected="false">🎮 Games</button>
+      <button class="tab" role="tab" data-tab="free" aria-selected="false">🎨 Free play</button>
+      <button class="tab" role="tab" data-tab="stuff" aria-selected="false">🏅 My stuff</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="studio" id="studio">
+    <aside class="panel">
+      <h2 class="panel-title"><span id="list-title">Lessons</span><span class="count" id="track-count">0/0</span></h2>
+      <div class="track-bar"><i id="track-bar"></i></div>
+      <div class="list" id="list"></div>
+    </aside>
+
+    <section class="panel">
+      <div class="mode" role="group" aria-label="Coding mode">
+        <button type="button" data-mode="code" aria-pressed="true" id="mode-code">⌨️ Code</button>
+        <button type="button" data-mode="blocks" aria-pressed="false" id="mode-blocks">🧱 Blocks</button>
+      </div>
+      <div class="prompt" id="prompt"></div>
+      <div class="hint-box" id="hint-box" hidden></div>
+      <div class="play-bar" id="play-bar" hidden></div>
+
+      <div id="code-wrap">
+        <div class="editor">
+          <div class="gutter" id="gutter" aria-hidden="true">1</div>
+          <div class="code-area">
+            <pre aria-hidden="true"><code id="hl"></code></pre>
+            <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="R code"></textarea>
+          </div>
+        </div>
+        <div class="keys" id="keys" aria-label="Quick symbols" style="margin-top:8px"></div>
+      </div>
+
+      <div class="blocks" id="blocks-wrap" hidden>
+        <div class="palette" id="palette"></div>
+        <div class="stack" id="stack"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-run" id="run" type="button">▶ Run</button>
+        <button class="btn btn-2" id="reset" type="button">↺ Reset</button>
+        <button class="btn btn-hint" id="hint" type="button" hidden>💡 Hint</button>
+        <span class="kbd" id="kbd">Ctrl + Enter runs</span>
+      </div>
+    </section>
+
+    <section class="panel output">
+      <h2 class="panel-title" id="out-title">R says</h2>
+      <div>
+        <div class="status loading" id="status">Loading R…</div>
+        <div class="loading-bar" id="loading-bar"><i></i></div>
+      </div>
+      <div class="down-card" id="down-card" hidden></div>
+      <div class="oops" id="oops" hidden></div>
+      <div class="out" id="out" aria-live="polite"></div>
+      <div class="plots" id="plots"></div>
+    </section>
+  </section>
+
+  <section class="stuff" id="stuff" hidden>
+    <div class="panel profile">
+      <div class="big-ava" id="p-ava">🦉</div>
+      <h2 id="p-name">Friend</h2>
+      <div class="lvl-name" id="p-level">Seedling</div>
+      <div class="track-bar" style="width:100%"><i id="p-lvlbar"></i></div>
+      <div class="stat-row">
+        <div class="stat"><b id="p-stars">0</b><span id="p-stars-l">stars</span></div>
+        <div class="stat"><b id="p-done">0</b><span id="p-done-l">finished</span></div>
+        <div class="stat"><b id="p-badges">0</b><span id="p-badges-l">badges</span></div>
+      </div>
+      <button class="btn btn-2" id="edit-profile" type="button">✏️ Edit</button>
+      <div id="reset-area">
+        <button class="danger" id="reset-progress" type="button">Start over</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h2 class="panel-title" id="badges-title">Badges</h2>
+      <div class="badges" id="badges"></div>
+      <h2 class="panel-title" id="gallery-title" style="margin-top:8px">My gallery</h2>
+      <div class="gallery" id="gallery"></div>
+    </div>
+  </section>
+</main>
+
+<div class="scrim" id="onboard" hidden>
+  <form class="sheet" id="onboard-form" novalidate>
+    <h2 id="ob-title">Welcome to R Quest!</h2>
+    <p id="ob-sub">You will learn to code in R by drawing, playing games and solving puzzles.</p>
+    <label class="lbl" for="ob-name" id="ob-name-l">What is your name?</label>
+    <input type="text" id="ob-name" maxlength="20" autocomplete="off">
+    <span class="err-text" id="ob-err" hidden></span>
+    <span class="lbl" id="ob-ava-l">Pick your animal</span>
+    <div class="avas" id="ob-avas"></div>
+    <span class="lbl" id="ob-lang-l">Language</span>
+    <div class="langs">
+      <button type="button" data-lang="en" id="ob-en">English</button>
+      <button type="button" data-lang="yo" id="ob-yo">Yorùbá</button>
+    </div>
+    <button class="btn btn-run" type="submit" id="ob-go" style="justify-content:center">Let's go!</button>
+  </form>
+</div>
+
+<div class="celebrate" id="celebrate" hidden>
+  <div class="cbox"><div class="big" id="c-emoji">🎉</div><div class="msg" id="c-msg"></div><div class="pts" id="c-pts"></div></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script type="module">
+/* =========================================================
+   R Quest — learn R by playing. R runs in the browser via webR.
+   ========================================================= */
+const WEBR_BASE = window.RQ_WEBR_BASE || 'https://webr.r-wasm.org/v0.5.8/';
+
+/* ---------- safe storage ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+};
+
+/* ---------- text ---------- */
+const I18N = {
+  en: {
+    tab_learn: '📚 Learn', tab_challenge: '🎯 Challenges', tab_games: '🎮 Games', tab_free: '🎨 Free play', tab_stuff: '🏅 My stuff',
+    title_learn: 'Lessons', title_challenge: 'Challenges', title_games: 'Games', title_free: 'Free play',
+    mode_code: '⌨️ Code', mode_blocks: '🧱 Blocks',
+    run: '▶ Run', play: '▶ Play', check: '▶ Check', running: 'Running…', reset: '↺ Reset', hint: '💡 Hint', hide_hint: '💡 Hide hint',
+    kbd: 'Ctrl + Enter runs', out_title: 'R says',
+    loading: 'Loading R… the first time takes about 20 seconds',
+    ready: 'R is ready. Press ▶ Run!',
+    down: 'R could not start here',
+    down_1: 'This preview window cannot download the R engine.',
+    down_2: 'Open the downloaded R Quest file in Chrome or Edge with internet on, or put it on a free website such as GitHub Pages. R will start there.',
+    down_3: 'You can still look around, read the lessons and switch languages.',
+    not_ready: 'R is still waking up. Try again in a few seconds.',
+    welcome: 'Welcome! Pick something on the left, then press ▶ Run.',
+    no_code: 'There is no code to run yet.',
+    no_output: '(R ran your code. It had nothing to print.)',
+    lesson_done: 'Lesson done!', challenge_done: 'Challenge complete!', game_done: 'New game played!',
+    not_yet: 'Not yet! Read the goal again and try once more.',
+    oops_title: 'Oops! R got stuck',
+    r_said: 'What R said:',
+    save_pic: '💾 Save to my gallery', saved_pic: '✓ Saved', download_pic: '⬇ Download',
+    tries: 'Tries', new_secret: '🔄 New secret', new_map: '🔄 New map',
+    click_block: 'Tap a block above to add it.',
+    pretend: 'Pretend numbers, made up for practice',
+    level: 'Level', stars_l: 'stars', done_l: 'finished', badges_l: 'badges',
+    badges_title: 'Badges', gallery_title: 'My gallery',
+    gallery_empty: 'Draw a picture, then press “Save to my gallery”. Your art shows up here.',
+    edit: '✏️ Edit', start_over: 'Start over', sure: 'Delete all stars, badges and pictures?', yes_delete: 'Yes, delete', cancel: 'Cancel',
+    ob_title: 'Welcome to R Quest!', ob_sub: 'You will learn to code in R by drawing, playing games and solving puzzles.',
+    ob_name: 'What is your name?', ob_ava: 'Pick your animal', ob_lang: 'Language', ob_go: "Let's go!", ob_err: 'Type your name first.',
+    hello: 'Hi', badge_new: 'New badge!',
+    lvl_names: ['Seedling', 'Explorer', 'Builder', 'Inventor', 'R Wizard'],
+    b_print: '+ print', b_math: '+ math', b_var: '+ box', b_plot: '+ chart', b_loop: '+ repeat',
+  },
+  yo: {
+    tab_learn: '📚 Ẹ̀kọ́', tab_challenge: '🎯 Ìdíje', tab_games: '🎮 Eré', tab_free: '🎨 Eré ọ̀fẹ́', tab_stuff: '🏅 Tèmi',
+    title_learn: 'Àwọn Ẹ̀kọ́', title_challenge: 'Àwọn Ìdíje', title_games: 'Àwọn Eré', title_free: 'Eré ọ̀fẹ́',
+    mode_code: '⌨️ Kóòdù', mode_blocks: '🧱 Bulọ́ọ̀kù',
+    run: '▶ Ṣe é', play: '▶ Ṣeré', check: '▶ Ṣàyẹ̀wò', running: 'Ó ń ṣiṣẹ́…', reset: '↺ Tún bẹ̀rẹ̀', hint: '💡 Ìmọ̀ràn', hide_hint: '💡 Pa ìmọ̀ràn mọ́',
+    kbd: 'Ctrl + Enter ń ṣe é', out_title: 'R sọ pé',
+    loading: 'R ń jí… nígbà àkọ́kọ́ ó máa ń gba ìṣẹ́jú-àáyá 20',
+    ready: 'R ti ṣetán. Tẹ ▶ Ṣe é!',
+    down: 'R kò lè bẹ̀rẹ̀ níbí',
+    down_1: 'Fèrèsé àyẹ̀wò yìí kò lè gba ẹ̀rọ R wọlé.',
+    down_2: 'Ṣí fáìlì R Quest tí o gbà sílẹ̀ nínú Chrome tàbí Edge pẹ̀lú íntánẹ́ẹ̀tì, tàbí fi sí orí ìkànnì ọ̀fẹ́ bíi GitHub Pages. R yóò bẹ̀rẹ̀ níbẹ̀.',
+    down_3: 'O ṣì lè wo àyíká, ka àwọn ẹ̀kọ́, kí o sì yí èdè padà.',
+    not_ready: 'R ṣì ń jí. Gbìyànjú lẹ́ẹ̀kan sí ní ìṣẹ́jú-àáyá díẹ̀.',
+    welcome: 'Káàbọ̀! Yan nǹkan kan ní apá òsì, lẹ́yìn náà tẹ ▶ Ṣe é.',
+    no_code: 'Kò sí kóòdù láti ṣe síbẹ̀.',
+    no_output: '(R ti ṣe kóòdù rẹ. Kò ní nǹkan láti tẹ̀ jáde.)',
+    lesson_done: 'Ẹ̀kọ́ parí!', challenge_done: 'Ìdíje parí!', game_done: 'O ṣe eré tuntun!',
+    not_yet: 'Kò tíì tó! Ka àfojúsùn náà lẹ́ẹ̀kan sí, kí o sì gbìyànjú.',
+    oops_title: 'Yéè! R dúró',
+    r_said: 'Ohun tí R sọ:',
+    save_pic: '💾 Fi pamọ́ sí àkójọ mi', saved_pic: '✓ Ó ti wà ní ìpamọ́', download_pic: '⬇ Gbà á sílẹ̀',
+    tries: 'Ìgbìyànjú', new_secret: '🔄 Àṣírí tuntun', new_map: '🔄 Máàpù tuntun',
+    click_block: 'Tẹ bulọ́ọ̀kù kan lókè láti fi kún un.',
+    pretend: 'Nọ́mbà àròsọ, fún ìdánrawò nìkan',
+    level: 'Ìpele', stars_l: 'ìràwọ̀', done_l: 'tí ó parí', badges_l: 'àmì-ẹ̀yẹ',
+    badges_title: 'Àwọn àmì-ẹ̀yẹ', gallery_title: 'Àkójọ àwòrán mi',
+    gallery_empty: 'Ya àwòrán kan, lẹ́yìn náà tẹ “Fi pamọ́ sí àkójọ mi”. Iṣẹ́ ọnà rẹ yóò hàn níbí.',
+    edit: '✏️ Ṣàtúnṣe', start_over: 'Bẹ̀rẹ̀ láti ìbẹ̀rẹ̀', sure: 'Pa gbogbo ìràwọ̀, àmì-ẹ̀yẹ àti àwòrán rẹ́?', yes_delete: 'Bẹ́ẹ̀ni, pa á rẹ́', cancel: 'Rárá',
+    ob_title: 'Káàbọ̀ sí R Quest!', ob_sub: 'O máa kọ́ kóòdù R nípa yíya àwòrán, ṣíṣe eré àti yíyanjú àdìtú.',
+    ob_name: 'Kí ni orúkọ rẹ?', ob_ava: 'Yan ẹranko rẹ', ob_lang: 'Èdè', ob_go: 'Ẹ jẹ́ ká lọ!', ob_err: 'Kọ orúkọ rẹ ní àkọ́kọ́.',
+    hello: 'Báwo ni', badge_new: 'Àmì-ẹ̀yẹ tuntun!',
+    lvl_names: ['Irúgbìn', 'Aṣàwárí', 'Akọ́lé', 'Olùdásílẹ̀', 'Oṣó R'],
+    b_print: '+ tẹ̀ jáde', b_math: '+ ìṣirò', b_var: '+ àpótí', b_plot: '+ àwòrán', b_loop: '+ àtúnṣe',
+  }
+};
+
+/* ---------- content ---------- */
+const CONTENT = {
+  learn: [
+    { id: 'L1', icon: '👋', title: 'Say hello', title_yo: 'Kí àwọn ènìyàn',
+      prompt: 'R can talk! Change the words inside the quotes and run it again.',
+      prompt_yo: 'R lè sọ̀rọ̀! Yí àwọn ọ̀rọ̀ tí ó wà nínú àmì ọ̀rọ̀ padà, kí o sì ṣe é lẹ́ẹ̀kan sí.',
+      code: `print("Hello from R!")\nprint("Ẹ káàárọ̀!")` },
+    { id: 'L2', icon: '🔢', title: 'Super calculator', title_yo: 'Ẹ̀rọ ìṣirò alágbára',
+      prompt: 'R is a calculator. ^ means "to the power of". Try giant numbers!',
+      prompt_yo: 'R jẹ́ ẹ̀rọ ìṣirò. ^ túmọ̀ sí "agbára". Gbìyànjú àwọn nọ́mbà ńláńlá!',
+      code: `2 + 2\n100 * 50\n2^10\n1000000 / 8` },
+    { id: 'L3', icon: '📦', title: 'Variables', title_yo: 'Àwọn àpótí',
+      prompt: 'A variable is a box with a name. The arrow <- puts something inside the box.',
+      prompt_yo: 'Variable jẹ́ àpótí tí ó ní orúkọ. Ọfà <- ń fi nǹkan sínú àpótí náà.',
+      code: `age <- 10\nname <- "Ada"\ncat("Hi", name, "- you are", age, "years old!\\n")\ncat("Next year you will be", age + 1, "\\n")` },
+    { id: 'L4', icon: '📋', title: 'Make a list', title_yo: 'Ṣe àkọsílẹ̀',
+      prompt: 'A vector is a list of numbers. c() means "combine". R can add them all at once.',
+      prompt_yo: 'Vector jẹ́ àkọsílẹ̀ nọ́mbà. c() túmọ̀ sí "kó wọn jọ". R lè ṣe àròpọ̀ gbogbo wọn lẹ́ẹ̀kan.',
+      code: `my_numbers <- c(3, 7, 12, 5, 9)\nprint(my_numbers)\nsum(my_numbers)\nmax(my_numbers)` },
+    { id: 'L5', icon: '💬', title: 'Words too!', title_yo: 'Ọ̀rọ̀ pẹ̀lú!',
+      prompt: "Vectors can hold words. Add your friends' names and run it.",
+      prompt_yo: 'Vector lè gba ọ̀rọ̀ pẹ̀lú. Fi orúkọ àwọn ọ̀rẹ́ rẹ kún un, kí o sì ṣe é.',
+      code: `friends <- c("Tolu", "Chidi", "Musa", "Ada")\nprint(friends)\ncat("You have", length(friends), "friends!\\n")` },
+    { id: 'L6', icon: '🎨', title: 'Draw dots', title_yo: 'Ya àwọn ààmì',
+      prompt: 'Make a scatter plot. Change the numbers and watch the dots move!',
+      prompt_yo: 'Ṣe àwòrán ààmì. Yí àwọn nọ́mbà padà kí o sì wo bí àwọn ààmì ṣe ń gbé!',
+      code: `x <- 1:10\ny <- c(2, 4, 3, 8, 7, 5, 9, 6, 10, 8)\nplot(x, y, col = "red", pch = 19, cex = 2,\n     main = "My first chart!")` },
+    { id: 'L7', icon: '📊', title: 'Bar chart', title_yo: 'Àwòrán ọ̀pá',
+      prompt: 'Favourite snacks! Change the numbers for your own class poll.',
+      prompt_yo: 'Oúnjẹ ìpanu àyànfẹ́! Yí àwọn nọ́mbà padà fún ìdìbò kíláàsì rẹ.',
+      pretend: true,
+      code: `snacks <- c(PufPuf = 9, Chinchin = 6, Plantain = 11, Biscuit = 4)\nbarplot(snacks, col = c("orange", "gold", "darkgreen", "brown"),\n        main = "Favourite snacks")` },
+    { id: 'L8', icon: '🥧', title: 'Pie chart', title_yo: 'Àwòrán àkàrà',
+      prompt: 'A pie chart shows the parts of a whole. Change the numbers!',
+      prompt_yo: 'Àwòrán àkàrà ń fi àwọn ìpín odindi hàn. Yí àwọn nọ́mbà padà!',
+      pretend: true,
+      code: `pets <- c(Dogs = 12, Cats = 8, Fish = 5, Birds = 3)\npie(pets, col = c("brown", "orange", "skyblue", "yellow"),\n    main = "Class pets")` },
+    { id: 'L9', icon: '📈', title: 'Line chart', title_yo: 'Àwòrán ìlà',
+      prompt: 'Line charts show how something changes over time.',
+      prompt_yo: 'Àwòrán ìlà ń fi bí nǹkan ṣe ń yí padà ní àsìkò hàn.',
+      pretend: true,
+      code: `days <- 1:7\ntemperature <- c(31, 32, 29, 33, 34, 30, 31)\nplot(days, temperature, type = "o",\n     col = "orange", lwd = 3, pch = 19,\n     main = "A hot week in Ibadan", ylab = "Degrees (°C)")` },
+    { id: 'L10', icon: '🤔', title: 'If / else', title_yo: 'Bí / bí kò ṣe',
+      prompt: 'Teach R to make decisions. Change age and run it again.',
+      prompt_yo: 'Kọ́ R láti ṣe ìpinnu. Yí age padà, kí o sì ṣe é lẹ́ẹ̀kan sí.',
+      code: `age <- 10\nif (age >= 13) {\n  print("Teenager!")\n} else if (age >= 6) {\n  print("Kid!")\n} else {\n  print("Little one!")\n}` },
+    { id: 'L11', icon: '🔁', title: 'Loops', title_yo: 'Ìyípo',
+      prompt: 'A for-loop repeats something. Change 1:5 to 1:10!',
+      prompt_yo: 'For-loop ń tún nǹkan ṣe. Yí 1:5 padà sí 1:10!',
+      code: `for (i in 1:5) {\n  print(paste("Round", i, "- go!"))\n}` },
+    { id: 'L12', icon: '⏳', title: 'While loops', title_yo: 'Ìyípo “nígbà tí”',
+      prompt: 'A while-loop keeps going until its rule stops being true.',
+      prompt_yo: 'While-loop máa ń lọ títí òfin rẹ̀ kò fi ní jẹ́ òtítọ́ mọ́.',
+      code: `count <- 10\nwhile (count > 0) {\n  cat(count, "... ")\n  count <- count - 1\n}\ncat("Blast off! 🚀\\n")` },
+    { id: 'L13', icon: '🛠️', title: 'Functions', title_yo: 'Àwọn iṣẹ́ (function)',
+      prompt: 'Make your own command! Then use it as many times as you like.',
+      prompt_yo: 'Ṣe àṣẹ tìrẹ! Lẹ́yìn náà lò ó ní iye ìgbà tí o bá fẹ́.',
+      code: `greet <- function(name) {\n  cat("Hello,", name, "! 👋\\n")\n}\n\ngreet("Bisi")\ngreet("Emeka")\ngreet("You")` },
+    { id: 'L14', icon: '🎲', title: 'Random stuff', title_yo: 'Nǹkan láìròtẹ́lẹ̀',
+      prompt: 'sample() picks things at random. Run it a few times.',
+      prompt_yo: 'sample() ń yan nǹkan láìròtẹ́lẹ̀. Ṣe é ní ìgbà mélòó kan.',
+      code: `n <- sample(1:100, 1)\ncat("Lucky number:", n, "\\n")\n\nanimals <- c("tortoise", "lion", "owl", "elephant", "parrot")\ncat("Your spirit animal:", sample(animals, 1), "🐾\\n")` },
+    { id: 'L15', icon: '🧮', title: 'Math on lists', title_yo: 'Ìṣirò lórí àkọsílẹ̀',
+      prompt: 'Do math on a whole list at once!',
+      prompt_yo: 'Ṣe ìṣirò lórí gbogbo àkọsílẹ̀ ní ẹ̀ẹ̀kan!',
+      code: `scores <- c(85, 92, 78, 95, 88)\ncat("Average:", mean(scores), "\\n")\ncat("Highest:", max(scores), "\\n")\ncat("Lowest:", min(scores), "\\n")\ncat("Doubled:", scores * 2, "\\n")` },
+    { id: 'L16', icon: '🔃', title: 'Sorting', title_yo: 'Títò',
+      prompt: 'sort() puts things in order, smallest first or biggest first.',
+      prompt_yo: 'sort() ń tò nǹkan, láti kékeré sí ńlá tàbí láti ńlá sí kékeré.',
+      code: `numbers <- c(42, 7, 99, 23, 15, 68)\ncat("Original:", numbers, "\\n")\ncat("Sorted:", sort(numbers), "\\n")\ncat("Backwards:", sort(numbers, decreasing = TRUE), "\\n")` },
+    { id: 'L17', icon: '👉', title: 'Pick from a list', title_yo: 'Yan nínú àkọsílẹ̀',
+      prompt: 'Grab one item with [ ]. R starts counting at 1, not 0!',
+      prompt_yo: 'Mú nǹkan kan pẹ̀lú [ ]. R ń bẹ̀rẹ̀ kíkà láti 1, kì í ṣe 0!',
+      code: `fruits <- c("mango", "orange", "pawpaw", "banana", "guava")\ncat("First:", fruits[1], "\\n")\ncat("Third:", fruits[3], "\\n")\ncat("Last:", fruits[length(fruits)], "\\n")\ncat("First three:", fruits[1:3], "\\n")` },
+    { id: 'L18', icon: '✅', title: 'TRUE or FALSE', title_yo: 'Òtítọ́ tàbí Èké',
+      prompt: 'R can check if something is true. == means "is equal to".',
+      prompt_yo: 'R lè ṣàyẹ̀wò bóyá nǹkan jẹ́ òtítọ́. == túmọ̀ sí "dọ́gba pẹ̀lú".',
+      code: `10 > 5\n3 == 4\n"cat" == "cat"\n\nages <- c(5, 12, 8, 15, 10)\nages >= 13` },
+    { id: 'L19', icon: '🧺', title: 'Market day', title_yo: 'Ọjọ́ ọjà',
+      prompt: 'A data frame is a table, like a market list. Each column has a name.',
+      prompt_yo: 'Data frame jẹ́ tábìlì, bí àkọsílẹ̀ ọjà. Gbogbo òpó ní orúkọ tirẹ̀.',
+      pretend: true,
+      code: `market <- data.frame(\n  item  = c("Tomatoes", "Pepper", "Onions", "Yam", "Garri"),\n  price = c(1500, 800, 600, 2500, 1200)\n)\nprint(market)\n\ncat("Total cost: ₦", sum(market$price), "\\n")\n\n# Only the items above ₦1000\nmarket[market$price > 1000, ]\n\nbarplot(market$price, names.arg = market$item,\n        col = "#2E3FA3", main = "Market prices (Naira)")` },
+    { id: 'L20', icon: '🐷', title: 'Piggy bank', title_yo: 'Àpò ìfowópamọ́',
+      prompt: 'cumsum() adds up as it goes. Watch your savings grow week by week!',
+      prompt_yo: 'cumsum() ń ṣe àròpọ̀ bí ó ti ń lọ. Wo bí owó rẹ ṣe ń pọ̀ sí i lọ́sẹ̀ọ̀sẹ̀!',
+      code: `weekly <- 500\nsavings <- cumsum(rep(weekly, 10))\ncat("After 10 weeks you have ₦", savings[10], "\\n")\n\nbarplot(savings, names.arg = 1:10, col = "#1F9D63",\n        main = "My piggy bank (Naira)", xlab = "Week")` },
+  ],
+  challenge: [
+    { id: 'C1', icon: '🎯', points: 10, title: 'Print your name', title_yo: 'Tẹ orúkọ rẹ jáde',
+      prompt: 'Make R print your own name.', prompt_yo: 'Jẹ́ kí R tẹ orúkọ ara rẹ jáde.',
+      goal: 'R prints a name with at least 2 letters', goal_yo: 'R tẹ orúkọ tí ó ní lẹ́tà méjì ó kéré jù jáde',
+      hint: 'print("Ada")', hint_yo: 'print("Ada")',
+      starter: `print("")`,
+      check: (out) => /"[^"\s][^"]+"|\w{2,}/.test(out.replace(/\[1\]/g, '')) },
+    { id: 'C2', icon: '➕', points: 15, title: 'Make 100', title_yo: 'Ṣe 100',
+      prompt: 'Write any math that equals exactly 100.', prompt_yo: 'Kọ ìṣirò èyíkéyìí tí ó dọ́gba pẹ̀lú 100 gẹ́lẹ́.',
+      goal: 'The answer must be 100', goal_yo: 'Ìdáhùn gbọ́dọ̀ jẹ́ 100',
+      hint: 'Try 50 + 50 or 25 * 4', hint_yo: 'Gbìyànjú 50 + 50 tàbí 25 * 4',
+      starter: `# Make this equal 100\n`,
+      check: (out, code) => /\b100\b/.test(out) && /[+\-*/^]/.test(code) },
+    { id: 'C3', icon: '🔵', points: 20, title: 'Make it blue', title_yo: 'Sọ ọ́ di búlúù',
+      prompt: 'Change the plot so the dots are blue instead of red.', prompt_yo: 'Yí àwòrán náà padà kí àwọn ààmì jẹ́ búlúù dípò pupa.',
+      goal: 'Use col = "blue" and draw the plot', goal_yo: 'Lo col = "blue" kí o sì ya àwòrán náà',
+      hint: 'Change "red" to "blue"', hint_yo: 'Yí "red" padà sí "blue"',
+      starter: `x <- 1:5\ny <- c(2, 4, 1, 5, 3)\nplot(x, y, col = "red", pch = 19, cex = 3)`,
+      check: (out, code, ctx) => /col\s*=\s*["']blue["']/.test(code) && ctx.images > 0 },
+    { id: 'C4', icon: '🔟', points: 20, title: 'Count to ten', title_yo: 'Kà dé mẹ́wàá',
+      prompt: 'Use a for-loop to print the numbers 1 to 10.', prompt_yo: 'Lo for-loop láti tẹ nọ́mbà 1 dé 10 jáde.',
+      goal: 'All numbers from 1 to 10 appear, using for', goal_yo: 'Gbogbo nọ́mbà 1 dé 10 hàn, pẹ̀lú for',
+      hint: 'for (i in 1:10) { print(i) }', hint_yo: 'for (i in 1:10) { print(i) }',
+      starter: `# Print 1 to 10\n`,
+      check: (out, code) => /\bfor\s*\(/.test(code) && [1,2,3,4,5,6,7,8,9,10].every(n => new RegExp(`\\b${n}\\b`).test(out)) },
+    { id: 'C5', icon: '🌈', points: 25, title: 'Three colours', title_yo: 'Àwọ̀ mẹ́ta',
+      prompt: 'Make a bar chart where every bar has a different colour.', prompt_yo: 'Ṣe àwòrán ọ̀pá tí gbogbo ọ̀pá ní àwọ̀ tirẹ̀.',
+      goal: 'A barplot with 3 or more colours', goal_yo: 'Barplot pẹ̀lú àwọ̀ mẹ́ta tàbí jù bẹ́ẹ̀ lọ',
+      hint: 'col = c("red", "green", "blue")', hint_yo: 'col = c("red", "green", "blue")',
+      starter: `data <- c(5, 8, 3)\nbarplot(data, col = c("red"))`,
+      check: (out, code, ctx) => { const m = code.match(/col\s*=\s*c\(([^)]+)\)/); return !!m && m[1].split(',').length >= 3 && ctx.images > 0; } },
+    { id: 'C6', icon: '📈', points: 30, title: 'Big average', title_yo: 'Ìpíndọ́gba ńlá',
+      prompt: 'Make a list of 5 numbers whose average (mean) is bigger than 50.', prompt_yo: 'Ṣe àkọsílẹ̀ nọ́mbà márùn-ún tí ìpíndọ́gba (mean) wọn ju 50 lọ.',
+      goal: 'Keep the name nums. mean(nums) must be over 50', goal_yo: 'Má yí orúkọ nums padà. mean(nums) gbọ́dọ̀ ju 50 lọ',
+      hint: 'nums <- c(60, 70, 80, 90, 100)', hint_yo: 'nums <- c(60, 70, 80, 90, 100)',
+      starter: `nums <- c(1, 2, 3, 4, 5)\nmean(nums)`,
+      rcheck: `exists("nums", envir = globalenv(), inherits = FALSE) && is.numeric(nums) && length(nums) == 5 && mean(nums) > 50` },
+    { id: 'C7', icon: '⭕', points: 15, title: 'Giant dots', title_yo: 'Ààmì ràbàtà',
+      prompt: 'Make the dots huge: size 6 or bigger.', prompt_yo: 'Sọ àwọn ààmì di ràbàtà: ìwọ̀n 6 tàbí jù bẹ́ẹ̀ lọ.',
+      goal: 'cex of 6 or more, and the plot is drawn', goal_yo: 'cex tí ó jẹ́ 6 tàbí jù bẹ́ẹ̀ lọ, kí àwòrán sì hàn',
+      hint: 'Change cex = 2 to cex = 6', hint_yo: 'Yí cex = 2 padà sí cex = 6',
+      starter: `plot(1:5, c(2, 4, 1, 5, 3), col = "purple", pch = 19, cex = 2)`,
+      check: (out, code, ctx) => { const m = code.match(/cex\s*=\s*(\d+\.?\d*)/); return !!m && parseFloat(m[1]) >= 6 && ctx.images > 0; } },
+    { id: 'C8', icon: '🗣️', points: 20, title: 'Say it 3 times', title_yo: 'Sọ ọ́ lẹ́ẹ̀mẹta',
+      prompt: 'Use a loop to print the word "yes" three times.', prompt_yo: 'Lo loop láti tẹ ọ̀rọ̀ "yes" jáde lẹ́ẹ̀mẹta.',
+      goal: '"yes" appears 3 times, using a loop', goal_yo: '"yes" hàn lẹ́ẹ̀mẹta, pẹ̀lú loop',
+      hint: 'for (i in 1:3) print("yes")', hint_yo: 'for (i in 1:3) print("yes")',
+      starter: `# Print "yes" 3 times\n`,
+      check: (out, code) => /\b(for|while|repeat)\b/.test(code) && (out.toLowerCase().match(/yes/g) || []).length >= 3 },
+    { id: 'C9', icon: '7️⃣', points: 25, title: 'Lucky seven', title_yo: 'Méje olóríire',
+      prompt: 'Pick 7 random numbers between 1 and 100 and add them up.', prompt_yo: 'Yan nọ́mbà méje láìròtẹ́lẹ̀ láàrin 1 àti 100, kí o sì ṣe àròpọ̀ wọn.',
+      goal: 'Use sample() and sum()', goal_yo: 'Lo sample() àti sum()',
+      hint: 'nums <- sample(1:100, 7)\nsum(nums)', hint_yo: 'nums <- sample(1:100, 7)\nsum(nums)',
+      starter: `# Pick 7 numbers and add them\n`,
+      check: (out, code) => /sample\s*\(/.test(code) && /sum\s*\(/.test(code) && /\d/.test(out) },
+    { id: 'C10', icon: '🔐', points: 30, title: 'Doubling machine', title_yo: 'Ẹ̀rọ ìlọ́po méjì',
+      prompt: 'Write a function called double that doubles any number.', prompt_yo: 'Kọ function kan tí a ń pè ní double tí ó ń sọ nọ́mbà èyíkéyìí di ìlọ́po méjì.',
+      goal: 'double(21) gives 42', goal_yo: 'double(21) fún wa ní 42',
+      hint: 'double <- function(x) {\n  x * 2\n}\ndouble(21)', hint_yo: 'double <- function(x) {\n  x * 2\n}\ndouble(21)',
+      starter: `# Make a function that doubles a number\n`,
+      rcheck: `exists("double", envir = globalenv(), inherits = FALSE) && is.function(get("double", envir = globalenv())) && isTRUE(all.equal(get("double", envir = globalenv())(21), 42)) && isTRUE(all.equal(get("double", envir = globalenv())(5), 10))` },
+    { id: 'C11', icon: '📏', points: 25, title: 'Big and small', title_yo: 'Ńlá àti kékeré',
+      prompt: 'Print the biggest and the smallest number in the list.', prompt_yo: 'Tẹ nọ́mbà tí ó tóbi jù àti èyí tí ó kéré jù nínú àkọsílẹ̀ náà jáde.',
+      goal: 'Both 99 and 2 appear, using max() and min()', goal_yo: '99 àti 2 hàn, pẹ̀lú max() àti min()',
+      hint: 'max(nums)\nmin(nums)', hint_yo: 'max(nums)\nmin(nums)',
+      starter: `nums <- c(5, 99, 2, 47, 23)\n`,
+      check: (out, code) => /max\s*\(/.test(code) && /min\s*\(/.test(code) && /\b99\b/.test(out) && /\b2\b/.test(out) },
+    { id: 'C12', icon: '〰️', points: 30, title: 'Line it up', title_yo: 'Sọ ọ́ di ìlà',
+      prompt: 'Turn the dots into a line with type = "l" or type = "o".', prompt_yo: 'Sọ àwọn ààmì di ìlà pẹ̀lú type = "l" tàbí type = "o".',
+      goal: 'A plot with type "l" or "o"', goal_yo: 'Àwòrán pẹ̀lú type "l" tàbí "o"',
+      hint: 'plot(x, y, type = "l", col = "purple", lwd = 4)', hint_yo: 'plot(x, y, type = "l", col = "purple", lwd = 4)',
+      starter: `x <- 1:10\ny <- c(1, 4, 2, 8, 5, 7, 3, 9, 6, 10)\nplot(x, y)`,
+      check: (out, code, ctx) => /type\s*=\s*["'][lo]["']/.test(code) && ctx.images > 0 },
+    { id: 'C13', icon: '2️⃣', points: 30, title: 'Even numbers', title_yo: 'Nọ́mbà onípín-méjì',
+      prompt: 'Print only the even numbers from 2 to 20.', prompt_yo: 'Tẹ àwọn nọ́mbà onípín-méjì nìkan láti 2 dé 20 jáde.',
+      goal: '2, 4, 6 … 20 appear, and no odd numbers', goal_yo: '2, 4, 6 … 20 hàn, láìsí nọ́mbà aláìpín',
+      hint: 'seq(2, 20, by = 2)', hint_yo: 'seq(2, 20, by = 2)',
+      starter: `# Print the even numbers 2 to 20\n`,
+      check: (out) => { const nums = (out.replace(/\[\d+\]/g, '').match(/\b\d+\b/g) || []).map(Number); return [2,4,6,8,10,12,14,16,18,20].every(n => nums.includes(n)) && !nums.some(n => n % 2 === 1); } },
+    { id: 'C14', icon: '🍛', points: 25, title: 'Jollof wins', title_yo: 'Jollof borí',
+      prompt: 'Change the votes so Jollof gets the tallest bar.', prompt_yo: 'Yí ìbò padà kí Jollof ní ọ̀pá tí ó ga jù.',
+      goal: 'Jollof has the most votes and the chart is drawn', goal_yo: 'Jollof ní ìbò tí ó pọ̀ jù, àwòrán sì hàn',
+      hint: 'Make the number after Jollof = the biggest', hint_yo: 'Sọ nọ́mbà lẹ́yìn Jollof = di èyí tí ó tóbi jù',
+      pretend: true,
+      starter: `votes <- c(Jollof = 5, FriedRice = 9, Amala = 7)\nbarplot(votes, col = c("orangered", "gold", "sienna"),\n        main = "Class food vote")`,
+      check: (out, code, ctx) => ctx.images > 0,
+      rcheck: `exists("votes", envir = globalenv(), inherits = FALSE) && is.numeric(votes) && names(votes)[which.max(votes)] == "Jollof" && sum(votes == max(votes)) == 1` },
+    { id: 'C15', icon: '💰', points: 30, title: 'Saving ₦10,000', title_yo: 'Fífi ₦10,000 pamọ́',
+      prompt: 'You save ₦700 every week. How many weeks until you have ₦10,000? Make R work it out.', prompt_yo: 'O ń fi ₦700 pamọ́ lọ́sẹ̀ọ̀sẹ̀. Ọ̀sẹ̀ mélòó ni yóò gbà kí o tó ní ₦10,000? Jẹ́ kí R ṣírò rẹ̀.',
+      goal: 'R prints the right number of weeks, using a loop or ceiling()', goal_yo: 'R tẹ iye ọ̀sẹ̀ tí ó tọ́ jáde, pẹ̀lú loop tàbí ceiling()',
+      hint: 'ceiling(10000 / 700)  rounds up to a whole week', hint_yo: 'ceiling(10000 / 700)  ń ka ọ̀sẹ̀ sí odindi',
+      starter: `weekly <- 700\ngoal <- 10000\n# How many weeks?\n`,
+      check: (out, code) => /\b15\b/.test(out) && /(ceiling|while|for|cumsum|repeat)/.test(code) },
+  ],
+  games: [
+    { id: 'G1', icon: '🎲', title: 'Guess the number', title_yo: 'Mọ nọ́mbà náà',
+      prompt: 'R hides a secret number from 1 to 20. Type a guess and press Play. R tells you higher or lower!',
+      prompt_yo: 'R fi nọ́mbà àṣírí kan pamọ́ láti 1 dé 20. Kọ ìfojúsùn rẹ kí o sì tẹ Ṣeré. R máa sọ fún ọ bóyá kí o lọ sókè tàbí ìsàlẹ̀!',
+      inputs: [{ type: 'number', name: 'my_guess', min: 1, max: 20, label: 'My guess', label_yo: 'Ìfojúsùn mi' }, { type: 'seed', label: 'new_secret' }, { type: 'tries' }],
+      code: `set.seed(42)\nsecret <- sample(1:20, 1)   # shh! R hides it\nmy_guess <- 10\n\nif (my_guess == secret) {\n  cat("🎉 YES! The secret number was", secret, "\\n")\n} else if (my_guess < secret) {\n  cat("⬆️  Higher! Try a bigger number.\\n")\n} else {\n  cat("⬇️  Lower! Try a smaller number.\\n")\n}` },
+    { id: 'G2', icon: '✊', title: 'Rock Paper Scissors', title_yo: 'Òkúta, Bébà, Sísọ̀',
+      prompt: 'Pick rock, paper or scissors. R picks too. Who wins?',
+      prompt_yo: 'Yan òkúta, bébà tàbí sísọ̀. R náà yóò yan. Ta ni yóò borí?',
+      inputs: [{ type: 'choice', name: 'your_choice', options: [
+        { v: 'rock', l: '✊ Rock', l_yo: '✊ Òkúta' }, { v: 'paper', l: '✋ Paper', l_yo: '✋ Bébà' }, { v: 'scissors', l: '✌️ Scissors', l_yo: '✌️ Sísọ̀' }] }],
+      code: `your_choice <- "rock"\nr_choice <- sample(c("rock", "paper", "scissors"), 1)\ncat("You:", your_choice, "\\n")\ncat("R:  ", r_choice, "\\n")\n\nif (your_choice == r_choice) {\n  cat("🤝 It's a tie!\\n")\n} else if ((your_choice == "rock"     && r_choice == "scissors") ||\n           (your_choice == "paper"    && r_choice == "rock") ||\n           (your_choice == "scissors" && r_choice == "paper")) {\n  cat("🏆 You win!\\n")\n} else {\n  cat("🤖 R wins this time!\\n")\n}` },
+    { id: 'G3', icon: '🎰', title: 'Dice roller', title_yo: 'Ìlẹ̀kẹ̀ dídán',
+      prompt: 'How many dice will you roll? A total above 20 is an awesome roll!',
+      prompt_yo: 'Ìlẹ̀kẹ̀ mélòó ni o fẹ́ dán? Àròpọ̀ tí ó ju 20 lọ jẹ́ ìdán àrà!',
+      inputs: [{ type: 'number', name: 'how_many', min: 1, max: 20, label: 'Dice', label_yo: 'Ìlẹ̀kẹ̀' }],
+      code: `how_many <- 5\ndice <- sample(1:6, how_many, replace = TRUE)\ncat("🎲 You rolled:", dice, "\\n")\ncat("Total:", sum(dice), "\\n")\nif (sum(dice) > 20) cat("🔥 Awesome roll!\\n")\n\nbarplot(table(factor(dice, levels = 1:6)), col = "#FFC233",\n        main = "How many of each number?")` },
+    { id: 'G4', icon: '🏁', title: 'Ludo race', title_yo: 'Eré-ìje Ludo',
+      prompt: 'Two players roll a dice 10 times. Whose counter moves furthest?',
+      prompt_yo: 'Àwọn òṣèré méjì dán ìlẹ̀kẹ̀ lẹ́ẹ̀mẹ́wàá. Ta ni ẹ̀rọ rẹ̀ yóò lọ jìnnà jù?',
+      inputs: [{ type: 'text', name: 'player1', label: 'Player 1', label_yo: 'Òṣèré 1' }, { type: 'text', name: 'player2', label: 'Player 2', label_yo: 'Òṣèré 2' }],
+      code: `player1 <- "Tunde"\nplayer2 <- "Amaka"\npos1 <- cumsum(sample(1:6, 10, replace = TRUE))\npos2 <- cumsum(sample(1:6, 10, replace = TRUE))\n\nplot(1:10, pos1, type = "o", col = "#F0563A", lwd = 3, pch = 19,\n     ylim = c(0, 60), xlab = "Turn", ylab = "Squares moved",\n     main = "Ludo race!")\nlines(1:10, pos2, type = "o", col = "#2E3FA3", lwd = 3, pch = 19)\nlegend("topleft", legend = c(player1, player2),\n       col = c("#F0563A", "#2E3FA3"), lwd = 3)\n\ncat(player1, "moved", pos1[10], "squares\\n")\ncat(player2, "moved", pos2[10], "squares\\n")\nif (pos1[10] > pos2[10]) cat("🏆", player1, "wins!\\n")\nif (pos2[10] > pos1[10]) cat("🏆", player2, "wins!\\n")\nif (pos1[10] == pos2[10]) cat("🤝 Tie!\\n")` },
+    { id: 'G5', icon: '🗺️', title: 'Treasure hunt', title_yo: 'Ìwákiri ìṣúra',
+      prompt: 'Treasure is buried on a 10 × 10 map. Pick a spot. Hot means close!',
+      prompt_yo: 'A sin ìṣúra sí orí máàpù 10 × 10. Yan ibì kan. Gbóná túmọ̀ sí pé o ti súnmọ́!',
+      inputs: [{ type: 'number', name: 'my_x', min: 1, max: 10, label: 'Across (x)', label_yo: 'Ìbú (x)' }, { type: 'number', name: 'my_y', min: 1, max: 10, label: 'Up (y)', label_yo: 'Òkè (y)' }, { type: 'seed', label: 'new_map' }, { type: 'tries' }],
+      code: `set.seed(3)\ntreasure_x <- sample(1:10, 1)\ntreasure_y <- sample(1:10, 1)\nmy_x <- 5\nmy_y <- 5\n\ndist <- sqrt((treasure_x - my_x)^2 + (treasure_y - my_y)^2)\ncat("You dug at", my_x, my_y, "\\n")\nif (dist == 0) {\n  cat("🏆 TREASURE FOUND!\\n")\n} else if (dist < 2) {\n  cat("🔥 Burning hot!\\n")\n} else if (dist < 4) {\n  cat("🌡️ Warm…\\n")\n} else {\n  cat("❄️ Cold. Try far away.\\n")\n}\n\nplot(my_x, my_y, xlim = c(1, 10), ylim = c(1, 10), pch = 4, cex = 3,\n     lwd = 4, col = "#F0563A", xlab = "x", ylab = "y", main = "Treasure map")\ngrid()\nif (dist == 0) points(treasure_x, treasure_y, pch = 8, cex = 4, col = "gold", lwd = 3)` },
+    { id: 'G6', icon: '🔮', title: 'Fortune teller', title_yo: 'Aláfọ̀ṣẹ',
+      prompt: 'Type your name and ask R about your future!',
+      prompt_yo: 'Kọ orúkọ rẹ kí o sì bi R nípa ọjọ́ iwájú rẹ!',
+      inputs: [{ type: 'text', name: 'your_name', label: 'Your name', label_yo: 'Orúkọ rẹ' }],
+      code: `your_name <- "Ada"\nfortunes <- c(\n  "you will find hidden treasure! 💎",\n  "a new friend is coming your way! 🤝",\n  "jollof is in your future! 🍛",\n  "you will win your next game! 🏆",\n  "something amazing will happen this week! ✨",\n  "you will become an R wizard! ⚡"\n)\ncat("🔮", your_name, "…", sample(fortunes, 1), "\\n")` },
+    { id: 'G7', icon: '🪙', title: 'Coin flip', title_yo: 'Owó jíjù',
+      prompt: 'Flip coins and count heads and tails. Try 100 flips!',
+      prompt_yo: 'Ju owó sókè kí o sì ka orí àti ìrù. Gbìyànjú ìgbà ọgọ́rùn-ún!',
+      inputs: [{ type: 'number', name: 'flips', min: 1, max: 1000, label: 'Flips', label_yo: 'Ìjù' }],
+      code: `flips <- 10\ncoins <- sample(c("Heads", "Tails"), flips, replace = TRUE)\nheads <- sum(coins == "Heads")\ntails <- sum(coins == "Tails")\ncat("Heads:", heads, " Tails:", tails, "\\n")\nif (heads > tails) cat("👑 Heads wins!\\n")\nif (tails > heads) cat("🪙 Tails wins!\\n")\nif (heads == tails) cat("🤝 Perfect tie!\\n")\n\nbarplot(c(Heads = heads, Tails = tails), col = c("gold", "grey60"),\n        main = paste(flips, "coin flips"))` },
+    { id: 'G8', icon: '📝', title: 'Silly story', title_yo: 'Ìtàn apanilẹ́rìn-ín',
+      prompt: 'Fill in the words and R writes a silly story!',
+      prompt_yo: 'Kọ àwọn ọ̀rọ̀ náà, R yóò sì kọ ìtàn apanilẹ́rìn-ín!',
+      inputs: [{ type: 'text', name: 'animal', label: 'Animal', label_yo: 'Ẹranko' }, { type: 'text', name: 'place', label: 'Place', label_yo: 'Ibì kan' }, { type: 'text', name: 'food', label: 'Food', label_yo: 'Oúnjẹ' }],
+      code: `animal <- "tortoise"\nplace <- "Lagos"\nfood <- "suya"\n\nstory <- paste("One day, a", animal, "took a bus to", place,\n               "and ate so much", food, "that it started to dance! 💃")\ncat(story, "\\n")` },
+    { id: 'G9', icon: '🧙', title: 'Wizard names', title_yo: 'Orúkọ oṣó',
+      prompt: 'Press Play again and again for a new silly wizard name.',
+      prompt_yo: 'Máa tẹ Ṣeré léraléra fún orúkọ oṣó apanilẹ́rìn-ín tuntun.',
+      inputs: [],
+      code: `first  <- c("Gloomy", "Sparkly", "Grumpy", "Zappy", "Bubbly", "Mystic")\nmiddle <- c("the Magnificent", "the Wise", "the Mighty", "the Fluffy")\nlast   <- c("Pickle", "Whisker", "Thunderpants", "Noodle", "Agbado")\n\nname <- paste(sample(first, 1), sample(middle, 1), sample(last, 1))\ncat("🧙 Your wizard name is:\\n✨", name, "✨\\n")` },
+    { id: 'G10', icon: '🔐', title: 'Secret code', title_yo: 'Kóòdù àṣírí',
+      prompt: 'Hide a message by shifting every letter. Share the code with a friend!',
+      prompt_yo: 'Fi ìránṣẹ́ pamọ́ nípa yíyí gbogbo lẹ́tà sí iwájú. Pín kóòdù náà pẹ̀lú ọ̀rẹ́ rẹ!',
+      inputs: [{ type: 'text', name: 'message', label: 'Message', label_yo: 'Ìránṣẹ́' }, { type: 'number', name: 'shift', min: 1, max: 25, label: 'Shift', label_yo: 'Ìyísí' }],
+      code: `message <- "MEET ME AT BREAK"\nshift <- 3\n\nletters_in <- strsplit(toupper(message), "")[[1]]\npos <- match(letters_in, LETTERS)\nnew_letters <- ifelse(is.na(pos), letters_in,\n                      LETTERS[((pos - 1 + shift) %% 26) + 1])\ncat("Message:", toupper(message), "\\n")\ncat("Secret: ", paste(new_letters, collapse = ""), "\\n")` },
+    { id: 'G11', icon: '🌀', title: 'Spiral art', title_yo: 'Àwòrán ìyípo',
+      prompt: 'Draw a spiral. More turns make it bigger!',
+      prompt_yo: 'Ya ìyípo kan. Ìyípo púpọ̀ sí i máa sọ ọ́ di ńlá!',
+      inputs: [{ type: 'number', name: 'turns', min: 1, max: 60, label: 'Turns', label_yo: 'Ìyípo' }],
+      code: `turns <- 20\nt <- seq(0, turns, length.out = 600)\nplot(t * cos(t), t * sin(t), type = "l", col = "purple", lwd = 3,\n     axes = FALSE, xlab = "", ylab = "", main = "My spiral", asp = 1)` },
+    { id: 'G12', icon: '🌸', title: 'Flower maths', title_yo: 'Òdòdó ìṣirò',
+      prompt: 'A maths formula grows a flower. Try different petal numbers!',
+      prompt_yo: 'Ìlànà ìṣirò kan ń hu òdòdó. Gbìyànjú iye ewé òdòdó mìíràn!',
+      inputs: [{ type: 'number', name: 'k', min: 2, max: 12, label: 'Petal number', label_yo: 'Iye ewé' }],
+      code: `k <- 7\nt <- seq(0, 2 * pi, length.out = 600)\nr <- cos(k * t)\nplot(r * cos(t), r * sin(t), type = "l", col = "deeppink", lwd = 3,\n     axes = FALSE, xlab = "", ylab = "", main = "Flower maths", asp = 1)` },
+    { id: 'G13', icon: '❤️', title: 'Heart shape', title_yo: 'Àwòrán ọkàn',
+      prompt: 'Maths magic: this formula draws a perfect heart.',
+      prompt_yo: 'Idán ìṣirò: ìlànà yìí ń ya ọkàn pípé.',
+      inputs: [],
+      code: `t <- seq(0, 2 * pi, length.out = 300)\nx <- 16 * sin(t)^3\ny <- 13 * cos(t) - 5 * cos(2 * t) - 2 * cos(3 * t) - cos(4 * t)\nplot(x, y, type = "l", col = "red", lwd = 4, axes = FALSE,\n     xlab = "", ylab = "", main = "Made with R")\npolygon(x, y, col = "pink", border = "red")` },
+    { id: 'G14', icon: '✨', title: 'Starry night', title_yo: 'Òru ìràwọ̀',
+      prompt: 'Fill the night sky with stars. How many can you fit?',
+      prompt_yo: 'Fi ìràwọ̀ kún ojú ọ̀run òru. Mélòó ni o lè fi síbẹ̀?',
+      inputs: [{ type: 'number', name: 'n', min: 1, max: 500, label: 'Stars', label_yo: 'Ìràwọ̀' }],
+      code: `n <- 80\npar(bg = "midnightblue")\nplot(runif(n, 0, 10), runif(n, 0, 10), pch = 8, col = "white",\n     cex = runif(n, 0.4, 2.4), axes = FALSE, xlab = "", ylab = "",\n     main = "Starry night", col.main = "white")\nsymbols(8.5, 8.5, circles = 0.8, inches = FALSE, add = TRUE,\n        bg = "lightyellow", fg = "lightyellow")` },
+    { id: 'G15', icon: '🌈', title: 'Rainbow dots', title_yo: 'Ààmì òṣùmàrè',
+      prompt: 'A colourful explosion of dots, different every time!',
+      prompt_yo: 'Ìbúgbàù ààmì aláwọ̀ mèremère, ó yàtọ̀ ní gbogbo ìgbà!',
+      inputs: [{ type: 'number', name: 'n', min: 5, max: 500, label: 'Dots', label_yo: 'Ààmì' }],
+      code: `n <- 60\nplot(runif(n, 0, 10), runif(n, 0, 10), pch = 19,\n     cex = runif(n, 1, 5), col = rainbow(n),\n     axes = FALSE, xlab = "", ylab = "", main = "Rainbow explosion!")` },
+    { id: 'G16', icon: '🧵', title: 'Adire cloth', title_yo: 'Aṣọ àdìrẹ',
+      prompt: 'Adire is the indigo tie-dye cloth from Abẹ́òkúta. Loops can weave a pattern like it! Change the size or the symbols.',
+      prompt_yo: 'Àdìrẹ ni aṣọ aró láti Abẹ́òkúta. Loop lè hun àpẹẹrẹ bíi rẹ̀! Yí ìwọ̀n tàbí àwọn àmì padà.',
+      inputs: [{ type: 'number', name: 'size', min: 4, max: 16, label: 'Grid size', label_yo: 'Ìwọ̀n' }],
+      code: `size <- 8\npar(bg = "#1E2A78", mar = c(0, 0, 2, 0))\nplot(NULL, xlim = c(0, size), ylim = c(0, size), axes = FALSE,\n     xlab = "", ylab = "", main = "My adire cloth", col.main = "white", asp = 1)\n\nfor (i in 0:(size - 1)) {\n  for (j in 0:(size - 1)) {\n    if ((i + j) %% 2 == 0) {\n      symbols(i + 0.5, j + 0.5, circles = 0.35, inches = FALSE,\n              add = TRUE, fg = "white", lwd = 2)\n      points(i + 0.5, j + 0.5, pch = 20, col = "white")\n    } else {\n      points(i + 0.5, j + 0.5, pch = sample(c(3, 4, 8), 1),\n             col = "#BFD0FF", cex = 1.6, lwd = 2)\n    }\n  }\n}` },
+    { id: 'G17', icon: '🎟️', title: 'Lucky ticket', title_yo: 'Tíkẹ́ẹ̀tì olóríire',
+      prompt: 'Change your 6 numbers in the code. R draws 6 winners from 1 to 50.',
+      prompt_yo: 'Yí nọ́mbà mẹ́fà rẹ padà nínú kóòdù. R yóò fa mẹ́fà tí ó borí láti 1 dé 50.',
+      inputs: [],
+      code: `my_ticket <- c(7, 14, 21, 28, 35, 42)\nwinning <- sample(1:50, 6)\ncat("Your ticket:", sort(my_ticket), "\\n")\ncat("Winners:    ", sort(winning), "\\n")\nmatches <- sum(my_ticket %in% winning)\ncat("You matched", matches, "numbers!\\n")\nif (matches >= 3) cat("🎉 You won a prize!\\n")` },
+  ],
+  free: [
+    { id: 'F1', icon: '📄', title: 'Blank page', title_yo: 'Ojú-ìwé òfo', saved: true,
+      prompt: 'Your own space. Write anything you like. R remembers it for next time.',
+      prompt_yo: 'Àyè tìrẹ. Kọ ohunkóhun tí o bá fẹ́. R yóò rántí rẹ̀ fún ìgbà mìíràn.',
+      code: `# Write your own R code here\n` },
+    { id: 'F2', icon: '📊', title: 'My own chart', title_yo: 'Àwòrán mi', saved: true,
+      prompt: 'Collect real data from your family or class and chart it.',
+      prompt_yo: 'Gba dátà gidi láti ọ̀dọ̀ ìdílé tàbí kíláàsì rẹ kí o sì yà á ní àwòrán.',
+      code: `# What did you count? Put it here.\nmy_data <- c(Mum = 3, Dad = 5, Me = 7)\nbarplot(my_data, col = "#2E3FA3", main = "My survey")` },
+    { id: 'F3', icon: '🖌️', title: 'Art studio', title_yo: 'Ilé iṣẹ́ ọnà', saved: true,
+      prompt: 'Mix shapes, colours and loops into your own picture.',
+      prompt_yo: 'Da àwọn ìrísí, àwọ̀ àti loop pọ̀ sínú àwòrán tìrẹ.',
+      code: `plot(NULL, xlim = c(0, 10), ylim = c(0, 10), asp = 1,\n     axes = FALSE, xlab = "", ylab = "", main = "My art")\nfor (i in 1:12) {\n  symbols(5, 5, circles = i * 0.4, inches = FALSE, add = TRUE,\n          fg = rainbow(12)[i], lwd = 3)\n}` },
+  ]
+};
+
+const BADGES = [
+  { id: 'first_run', icon: '🚀', en: ['First steps', 'Run any code'], yo: ['Ìgbésẹ̀ àkọ́kọ́', 'Ṣe kóòdù èyíkéyìí'] },
+  { id: 'first_plot', icon: '🎨', en: ['Artist', 'Draw your first picture'], yo: ['Ayàwòrán', 'Ya àwòrán àkọ́kọ́ rẹ'] },
+  { id: 'fixer', icon: '🔧', en: ['Bug fixer', 'Fix code after an error'], yo: ['Olùtúnṣe', 'Tún kóòdù ṣe lẹ́yìn àṣìṣe'] },
+  { id: 'five_lessons', icon: '📚', en: ['Learner', 'Finish 5 lessons'], yo: ['Akẹ́kọ̀ọ́', 'Parí ẹ̀kọ́ márùn-ún'] },
+  { id: 'all_lessons', icon: '🎓', en: ['Scholar', 'Finish every lesson'], yo: ['Ọ̀mọ̀wé', 'Parí gbogbo ẹ̀kọ́'] },
+  { id: 'three_ch', icon: '🧩', en: ['Problem solver', 'Win 3 challenges'], yo: ['Olùyanjú', 'Borí ìdíje mẹ́ta'] },
+  { id: 'all_ch', icon: '🏆', en: ['Champion', 'Win every challenge'], yo: ['Akọni', 'Borí gbogbo ìdíje'] },
+  { id: 'five_games', icon: '🎮', en: ['Player', 'Play 5 different games'], yo: ['Òṣèré', 'Ṣe eré márùn-ún'] },
+  { id: 'streak3', icon: '🔥', en: ['On fire', 'Code 3 days in a row'], yo: ['Iná ń jó', 'Ṣe kóòdù ọjọ́ mẹ́ta léraléra'] },
+  { id: 'gallery3', icon: '🖼️', en: ['Gallery owner', 'Save 3 pictures'], yo: ['Olùní àkójọ', 'Fi àwòrán mẹ́ta pamọ́'] },
+  { id: 'yoruba', icon: '🗣️', en: ['Two languages', 'Use R Quest in Yorùbá'], yo: ['Èdè méjì', 'Lo R Quest ní Yorùbá'] },
+  { id: 'blocks', icon: '🧱', en: ['Block builder', 'Run code made of blocks'], yo: ['Akọ́lé bulọ́ọ̀kù', 'Ṣe kóòdù tí a fi bulọ́ọ̀kù ṣe'] },
+];
+
+const AVATARS = ['🦉', '🐢', '🦁', '🐘', '🦒', '🐆', '🦜', '🐊'];
+
+/* ---------- state ---------- */
+const S = store.get('rq2-state', null) || {};
+S.stars ??= 0; S.streak ??= 0; S.lastDay ??= null; S.done ??= {}; S.badges ??= {};
+S.name ??= ''; S.avatar ??= '🦉'; S.sound ??= true;
+S.lang ??= store.get('rquest-lang', 'en');
+S.free ??= {};
+let gallery = store.get('rq2-gallery', []);
+const today = new Date().toDateString();
+if (S.lastDay && S.lastDay !== today && S.lastDay !== new Date(Date.now() - 864e5).toDateString()) S.streak = 0;
+const save = () => store.set('rq2-state', S);
+
+const tr = (k) => (I18N[S.lang] && I18N[S.lang][k] !== undefined) ? I18N[S.lang][k] : I18N.en[k];
+const pick = (obj, key) => (S.lang === 'yo' && obj[key + '_yo']) ? obj[key + '_yo'] : obj[key];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+let tab = 'learn';
+let item = null;
+let mode = 'code';
+let tries = 0;
+let lastRunFailed = false;
+
+/* ---------- sound ---------- */
+let actx = null;
+function tone(freqs, dur = 0.12, type = 'triangle', gap = 0.09) {
+  if (!S.sound) return;
+  try {
+    actx ||= new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach((f, i) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.value = f;
+      const t0 = actx.currentTime + i * gap;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.18, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g).connect(actx.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+    });
+  } catch {}
+}
+const sfx = {
+  win: () => tone([523, 659, 784, 1047], 0.18),
+  ok: () => tone([660, 880], 0.1),
+  bad: () => tone([300, 220], 0.18, 'sine', 0.12),
+  tap: () => tone([880], 0.05, 'sine'),
+};
+
+/* ---------- editor ---------- */
+const ta = $('code'), hl = $('hl'), gutter = $('gutter');
+function highlight(src) {
+  const re = /(#[^\n]*)|("(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?)|(\b\d+(?:\.\d+)?\b)|(\b(?:if|else|for|while|repeat|function|in|break|next|return|TRUE|FALSE|NULL|NA)\b)|([A-Za-z_.][A-Za-z0-9_.]*)(?=\s*\()|(<-|->|%%|%in%|==|!=|>=|<=|&&|\|\|)/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    const c = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : m[4] ? 'k' : m[5] ? 'f' : 'o';
+    out += `<span class="t-${c}">${esc(m[0])}</span>`;
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last)) + '\n';
+}
+function paint() {
+  hl.innerHTML = highlight(ta.value);
+  const n = ta.value.split('\n').length;
+  gutter.textContent = Array.from({ length: n }, (_, i) => i + 1).join('\n');
+  syncScroll();
+}
+function syncScroll() {
+  hl.parentElement.scrollTop = ta.scrollTop; hl.parentElement.scrollLeft = ta.scrollLeft;
+  gutter.scrollTop = ta.scrollTop;
+}
+function setCode(v) { ta.value = v; paint(); }
+ta.addEventListener('input', () => { paint(); if (tab === 'free' && item) { S.free[item.id] = ta.value; save(); } });
+ta.addEventListener('scroll', syncScroll);
+ta.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(); return; }
+  if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); insertAtCursor('  '); }
+});
+function insertAtCursor(text, back = 0) {
+  ta.focus();
+  ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, 'end');
+  if (back) { const p = ta.selectionStart - back; ta.setSelectionRange(p, p); }
+  ta.dispatchEvent(new Event('input'));
+}
+const KEYS = [['<-', ' <- '], ['(', '('], [')', ')'], ['" "', '""', 1], ['c( )', 'c()', 1], [',', ', '], ['{', '{'], ['}', '}'], ['[', '['], [']', ']'], ['+', ' + '], ['*', ' * '], ['==', ' == '], ['#', '# '], ['$', '$']];
+$('keys').innerHTML = KEYS.map((k, i) => `<button type="button" data-k="${i}">${esc(k[0])}</button>`).join('');
+$('keys').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  const k = KEYS[+b.dataset.k]; insertAtCursor(k[1], k[2] || 0);
+});
+
+/* ---------- blocks ---------- */
+let blocks = [];
+const BT = {
+  print: { cls: 'b-print', lab: 'print', def: 'Hello!', code: v => `print("${v.replace(/["\\]/g, '')}")` },
+  math: { cls: 'b-math', lab: 'math', def: '12 * 12', code: v => v },
+  var: { cls: 'b-var', lab: 'x <-', def: '42', code: v => `x <- ${v}\nprint(x)` },
+  plot: { cls: 'b-plot', lab: 'plot', def: '1, 4, 9, 16, 25', code: v => `plot(c(${v}), type = "o", col = "#2E3FA3", pch = 19, cex = 2, lwd = 3)` },
+  loop: { cls: 'b-loop', lab: 'repeat 5×', def: 'Hi!', code: v => `for (i in 1:5) print("${v.replace(/["\\]/g, '')}")` },
+};
+function renderPalette() {
+  $('palette').innerHTML = Object.keys(BT).map(k => `<button type="button" class="blk ${BT[k].cls}" data-add="${k}">${esc(tr('b_' + k))}</button>`).join('');
+}
+$('palette').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-add]'); if (!b) return;
+  blocks.push({ type: b.dataset.add, value: BT[b.dataset.add].def }); sfx.tap(); renderBlocks();
+});
+function renderBlocks() {
+  const st = $('stack');
+  if (!blocks.length) { st.innerHTML = `<div class="empty">${esc(tr('click_block'))}</div>`; return; }
+  st.innerHTML = blocks.map((b, i) => `<div class="brow"><span class="lab ${BT[b.type].cls}">${esc(BT[b.type].lab)}</span><input id="blk-${i}" data-i="${i}" value="${esc(b.value)}" aria-label="${esc(BT[b.type].lab)} value"><button type="button" class="x" data-del="${i}" aria-label="Remove">✕</button></div>`).join('');
+}
+$('stack').addEventListener('input', (e) => { if (e.target.dataset.i) blocks[+e.target.dataset.i].value = e.target.value; });
+$('stack').addEventListener('click', (e) => { const d = e.target.closest('[data-del]'); if (d) { blocks.splice(+d.dataset.del, 1); renderBlocks(); } });
+const blocksToCode = () => blocks.map(b => BT[b.type].code(b.value)).join('\n');
+
+document.querySelectorAll('.mode button').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.mode;
+  document.querySelectorAll('.mode button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  $('code-wrap').hidden = mode !== 'code';
+  $('blocks-wrap').hidden = mode !== 'blocks';
+  if (mode === 'blocks') renderBlocks();
+}));
+
+/* ---------- game inputs ---------- */
+function rLiteralFor(input, raw) {
+  if (input.type === 'number') {
+    let n = Math.round(Number(raw)); if (!Number.isFinite(n)) n = input.min ?? 1;
+    if (input.min != null) n = Math.max(input.min, n); if (input.max != null) n = Math.min(input.max, n);
+    return String(n);
+  }
+  return '"' + String(raw).replace(/["\\]/g, '').slice(0, 40) + '"';
+}
+function setVar(name, literal) {
+  const re = new RegExp('^(\\s*' + name.replace(/\./g, '\\.') + '\\s*<-\\s*)[^\\n#]*', 'm');
+  if (re.test(ta.value)) setCode(ta.value.replace(re, (_, p) => p + literal + (literal.length ? ' ' : '')).replace(/ +(\n|$)/g, '$1'));
+}
+function readVar(name) {
+  const m = ta.value.match(new RegExp('^\\s*' + name.replace(/\./g, '\\.') + '\\s*<-\\s*("([^"]*)"|[^\\n#]+)', 'm'));
+  if (!m) return '';
+  return m[2] !== undefined ? m[2] : m[1].trim();
+}
+function renderPlayBar() {
+  const bar = $('play-bar');
+  const inputs = (tab === 'games' && item && item.inputs) || [];
+  if (!inputs.length) { bar.hidden = true; bar.innerHTML = ''; return; }
+  bar.hidden = false;
+  bar.innerHTML = inputs.map((inp, i) => {
+    if (inp.type === 'number' || inp.type === 'text') {
+      const id = `in-${item.id}-${inp.name}`;
+      return `<div class="field"><label for="${id}">${esc(pick(inp, 'label'))}</label><input id="${id}" data-i="${i}" type="${inp.type === 'number' ? 'number' : 'text'}" ${inp.min != null ? `min="${inp.min}"` : ''} ${inp.max != null ? `max="${inp.max}"` : ''} value="${esc(readVar(inp.name))}"></div>`;
+    }
+    if (inp.type === 'choice') return inp.options.map(o => `<button type="button" class="choice" data-choice="${esc(o.v)}" data-i="${i}">${esc(S.lang === 'yo' ? o.l_yo : o.l)}</button>`).join('');
+    if (inp.type === 'seed') return `<button type="button" class="btn btn-2 btn-sm" data-seed="1">${esc(tr(inp.label))}</button>`;
+    if (inp.type === 'tries') return `<span class="tries" id="tries">${esc(tr('tries'))}: ${tries}</span>`;
+    return '';
+  }).join('');
+}
+$('play-bar').addEventListener('input', (e) => {
+  const i = e.target.dataset.i; if (i == null || !item?.inputs) return;
+  const inp = item.inputs[+i]; setVar(inp.name, rLiteralFor(inp, e.target.value));
+});
+$('play-bar').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); run(); } });
+$('play-bar').addEventListener('click', (e) => {
+  const c = e.target.closest('[data-choice]');
+  if (c) { const inp = item.inputs[+c.dataset.i]; setVar(inp.name, rLiteralFor(inp, c.dataset.choice)); run(); return; }
+  if (e.target.closest('[data-seed]')) {
+    setCode(ta.value.replace(/set\.seed\(\d+\)/, `set.seed(${Math.floor(Math.random() * 9000) + 100})`));
+    tries = 0; renderPlayBar(); clearOutput(); sfx.tap();
+  }
+});
+
+/* ---------- list & items ---------- */
+function trackItems() { return CONTENT[tab] || []; }
+function renderList() {
+  const items = trackItems();
+  $('list').innerHTML = items.map(it => {
+    const done = S.done[it.id];
+    let tag = '';
+    if (tab === 'challenge') tag = done ? `<span class="tag done">✓ +${it.points}</span>` : `<span class="tag pts">+${it.points}⭐</span>`;
+    else if (tab !== 'free') tag = done ? `<span class="tag done">✓</span>` : '';
+    return `<button type="button" class="item" data-id="${it.id}" aria-current="${item && item.id === it.id}"><span class="ic" aria-hidden="true">${it.icon}</span><span class="nm">${esc(pick(it, 'title'))}</span>${tag}</button>`;
+  }).join('');
+  const total = items.length, n = items.filter(i => S.done[i.id]).length;
+  $('track-count').textContent = tab === 'free' ? '' : `${n}/${total}`;
+  $('track-bar').style.width = tab === 'free' ? '0%' : `${total ? (n / total) * 100 : 0}%`;
+  $('track-bar').parentElement.hidden = tab === 'free';
+}
+$('list').addEventListener('click', (e) => {
+  const b = e.target.closest('.item'); if (!b) return;
+  const it = trackItems().find(x => x.id === b.dataset.id); if (it) { sfx.tap(); load(it); }
+});
+function load(it) {
+  item = it; tries = 0;
+  const p = $('prompt');
+  p.className = 'prompt' + (tab === 'challenge' ? ' challenge' : '');
+  let html = esc(pick(it, 'prompt'));
+  if (it.goal) html += `<span class="goal">🎯 ${esc(pick(it, 'goal'))}</span>`;
+  if (it.pretend) html += `<span class="pretend">ⓘ ${esc(tr('pretend'))}</span>`;
+  p.innerHTML = html;
+  const hb = $('hint-box'); hb.hidden = true;
+  hb.innerHTML = it.hint ? `<code>${esc(pick(it, 'hint')).replace(/\n/g, '<br>')}</code>` : '';
+  $('hint').hidden = !it.hint; $('hint').textContent = tr('hint');
+  const code = (it.saved && S.free[it.id] != null) ? S.free[it.id] : (it.starter ?? it.code ?? '');
+  setCode(code);
+  blocks = []; if (mode === 'blocks') renderBlocks();
+  renderPlayBar();
+  $('run').textContent = runLabel();
+  renderList();
+}
+const runLabel = () => tab === 'games' ? tr('play') : tab === 'challenge' ? tr('check') : tr('run');
+$('reset').addEventListener('click', () => {
+  if (!item) return;
+  if (item.saved) { delete S.free[item.id]; save(); }
+  load(item); clearOutput(); sfx.tap();
+});
+$('hint').addEventListener('click', () => {
+  const hb = $('hint-box'); hb.hidden = !hb.hidden;
+  $('hint').textContent = hb.hidden ? tr('hint') : tr('hide_hint');
+});
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+function switchTab(name) {
+  tab = name;
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', String(x.dataset.tab === name)));
+  const stuff = name === 'stuff';
+  $('studio').hidden = stuff; $('stuff').hidden = !stuff;
+  if (stuff) { renderStuff(); return; }
+  $('list-title').textContent = tr('title_' + name);
+  load(CONTENT[name][0]);
+  clearOutput();
+}
+
+/* ---------- output ---------- */
+function clearOutput() {
+  $('out').textContent = rReady ? tr('welcome') : '';
+  $('oops').hidden = true; $('plots').innerHTML = '';
+}
+const ERR = [
+  [/object '(.+?)' not found/, (m) => ({
+    en: `R doesn't know anything called “${m[1]}” yet. Check the spelling, or create it first with ${m[1]} <- something.`,
+    yo: `R kò mọ ohunkóhun tí à ń pè ní “${m[1]}” síbẹ̀. Ṣàyẹ̀wò bí o ṣe kọ ọ́, tàbí kọ́kọ́ ṣẹ̀dá rẹ̀ pẹ̀lú ${m[1]} <- nǹkan.` })],
+  [/could not find function "(.+?)"/, (m) => ({
+    en: `There is no command called ${m[1]}(). Check the spelling. R cares about capital letters, so Print is not the same as print.`,
+    yo: `Kò sí àṣẹ kan tí à ń pè ní ${m[1]}(). Ṣàyẹ̀wò bí o ṣe kọ ọ́. R ń ṣọ́ lẹ́tà ńlá, nítorí náà Print kò jọ print.` })],
+  [/unexpected end of input|INCOMPLETE|unexpected end of line/, () => ({
+    en: 'Something was opened but never closed. Count your ( ), { } and quote marks. Every opening needs a closing.',
+    yo: 'Nǹkan kan ṣí ṣùgbọ́n kò padé. Ka ( ), { } àti àmì ọ̀rọ̀ rẹ. Gbogbo ìṣí nílò ìpadé.' })],
+  [/unexpected (symbol|numeric constant|string constant)/, () => ({
+    en: 'R found two things side by side with nothing between them. You may have forgotten a comma, a + or a bracket.',
+    yo: 'R rí nǹkan méjì tí ó wà lẹ́gbẹ̀ẹ́ ara wọn láìsí nǹkan láàrin wọn. Bóyá o gbàgbé kọ́mà, + tàbí àkámọ́.' })],
+  [/unexpected '([)\],}])'|unexpected ','/, () => ({
+    en: 'There is an extra bracket or comma somewhere. Look for one that has no partner and remove it.',
+    yo: 'Àkámọ́ tàbí kọ́mà kan pọ̀ jù níbì kan. Wá èyí tí kò ní ẹnìkejì kí o sì yọ ọ́ kúrò.' })],
+  [/non-numeric argument/, () => ({
+    en: 'You tried to do maths with words. Numbers do not need quote marks: write 5, not "5".',
+    yo: 'O gbìyànjú láti ṣe ìṣirò pẹ̀lú ọ̀rọ̀. Nọ́mbà kò nílò àmì ọ̀rọ̀: kọ 5, kì í ṣe "5".' })],
+  [/argument "(.+?)" is missing/, (m) => ({
+    en: `Your command needs a value for “${m[1]}”. Put something inside the brackets.`,
+    yo: `Àṣẹ rẹ nílò iye fún “${m[1]}”. Fi nǹkan sínú àkámọ́ náà.` })],
+];
+function friendly(msg) {
+  for (const [re, fn] of ERR) { const m = msg.match(re); if (m) return fn(m)[S.lang] || fn(m).en; }
+  return S.lang === 'yo' ? 'R dúró. Ka ohun tí R sọ nísàlẹ̀, yí nǹkan kékeré kan padà, kí o sì gbìyànjú lẹ́ẹ̀kan sí.'
+    : 'R got stuck. Read what R said below, change one small thing, and try again.';
+}
+function showOops(msg) {
+  const o = $('oops'); o.hidden = false;
+  const raw = msg.replace(/^Error:?\s*(<text>:\d+:\d+:\s*)?/, '');
+  o.innerHTML = `<strong>${esc(tr('oops_title'))}</strong><p>${esc(friendly(msg))}</p><code style="white-space:pre-wrap">${esc(tr('r_said'))} ${esc(raw)}</code>`;
+}
+
+/* ---------- webR ---------- */
+let webR = null, shelter = null, rReady = false, rDown = false, running = false;
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+async function bootR() {
+  setStatus('loading');
+  try {
+    const mod = await withTimeout(import(WEBR_BASE + 'webr.mjs'), 20000);
+    webR = new mod.WebR({ baseUrl: WEBR_BASE });
+    await withTimeout(webR.init(), 120000);
+    shelter = await new webR.Shelter();
+    rReady = true; setStatus('ready'); clearOutput();
+  } catch (e) {
+    rDown = true; setStatus('down');
+  }
+}
+function setStatus(s) {
+  const st = $('status');
+  st.className = 'status ' + s;
+  st.textContent = s === 'ready' ? '✓ ' + tr('ready') : s === 'down' ? '⚠ ' + tr('down') : '⏳ ' + tr('loading');
+  $('loading-bar').hidden = s !== 'loading';
+  const dc = $('down-card');
+  dc.hidden = s !== 'down';
+  if (s === 'down') dc.innerHTML = `<p>${esc(tr('down_1'))}</p><p>${esc(tr('down_2'))}</p><p>${esc(tr('down_3'))}</p>`;
+}
+
+async function run() {
+  if (running) return;
+  if (!rReady) { $('out').textContent = rDown ? tr('down_2') : tr('not_ready'); sfx.bad(); return; }
+  const code = mode === 'blocks' ? blocksToCode() : ta.value;
+  if (!code.trim()) { $('out').textContent = tr('no_code'); return; }
+  running = true;
+  const btn = $('run'); btn.setAttribute('aria-busy', 'true'); btn.textContent = tr('running');
+  $('oops').hidden = true; $('plots').innerHTML = ''; $('out').textContent = '';
+  let text = '', images = [], err = null, rpass = true;
+  try {
+    await webR.evalRVoid('rm(list = ls(envir = globalenv(), all.names = TRUE), envir = globalenv())');
+    const res = await shelter.captureR(code, { withAutoprint: true, captureStreams: true, captureConditions: false, captureGraphics: { width: 560, height: 420 } });
+    const lines = [], errLines = [];
+    for (const o of res.output) {
+      if (o.type !== 'stdout' && o.type !== 'stderr') continue;
+      const d = String(o.data);
+      if (o.type === 'stderr' && (errLines.length || /^Error\b/.test(d))) errLines.push(d);
+      else lines.push((o.type === 'stderr' ? '⚠ ' : '') + d);
+    }
+    text = lines.join('\n');
+    if (errLines.length) err = errLines.join('\n');
+    images = res.images || [];
+    if (item?.rcheck) {
+      try { rpass = await webR.evalRBoolean(item.rcheck); } catch { rpass = false; }
+    }
+  } catch (e) {
+    err = (e && e.message) ? e.message : String(e);
+  } finally {
+    try { await shelter.purge(); } catch {}
+  }
+  $('out').textContent = text || (err ? '' : tr('no_output'));
+  images.forEach((img) => addPlot(img));
+  if (err) { showOops(err); sfx.bad(); sad(); lastRunFailed = true; }
+  else afterSuccess(code, text, images.length, rpass);
+  if (tab === 'games' && item?.inputs?.some(i => i.type === 'tries')) { tries++; const t = $('tries'); if (t) t.textContent = `${tr('tries')}: ${tries}`; }
+  btn.removeAttribute('aria-busy'); btn.textContent = runLabel();
+  running = false;
+}
+$('run').addEventListener('click', run);
+
+function addPlot(img) {
+  const wrap = document.createElement('div'); wrap.className = 'plot-wrap';
+  const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+  c.getContext('2d').drawImage(img, 0, 0);
+  const title = item ? pick(item, 'title') : 'R Quest';
+  c.setAttribute('role', 'img'); c.setAttribute('aria-label', title);
+  const acts = document.createElement('div'); acts.className = 'plot-actions';
+  const sv = document.createElement('button'); sv.type = 'button'; sv.className = 'btn btn-2 btn-sm'; sv.textContent = tr('save_pic');
+  sv.addEventListener('click', () => {
+    let url; try { url = c.toDataURL('image/png'); } catch { return; }
+    gallery.unshift({ img: url, title, date: Date.now() });
+    gallery = gallery.slice(0, 12);
+    while (!store.set('rq2-gallery', gallery) && gallery.length > 1) gallery.pop();
+    sv.textContent = tr('saved_pic'); sv.disabled = true; sfx.ok();
+    if (gallery.length >= 3) award('gallery3');
+  });
+  const dl = document.createElement('a'); dl.className = 'btn btn-2 btn-sm'; dl.textContent = tr('download_pic');
+  dl.download = (title.replace(/[^\w]+/g, '-').toLowerCase() || 'r-quest') + '.png';
+  dl.href = '#';
+  dl.addEventListener('click', () => { try { dl.href = c.toDataURL('image/png'); } catch {} });
+  acts.append(sv, dl);
+  wrap.append(c, acts);
+  $('plots').append(wrap);
+}
+
+/* ---------- rewards ---------- */
+function bumpStreak() {
+  if (S.lastDay !== today) { S.streak = (S.lastDay === new Date(Date.now() - 864e5).toDateString()) ? S.streak + 1 : 1; S.lastDay = today; }
+}
+function afterSuccess(code, out, nImages, rpass) {
+  award('first_run');
+  if (nImages) award('first_plot');
+  if (lastRunFailed) award('fixer');
+  if (mode === 'blocks') award('blocks');
+  lastRunFailed = false;
+  if (!item) return happy();
+  const first = !S.done[item.id];
+  if (tab === 'challenge') {
+    const ok = (item.check ? !!item.check(out, code, { images: nImages }) : true) && rpass;
+    if (!ok) { $('oops').hidden = false; $('oops').innerHTML = `<strong>🎯 ${esc(tr('not_yet'))}</strong><p>${esc(pick(item, 'goal'))}</p>`; sfx.bad(); sad(); return; }
+    if (first) { S.done[item.id] = true; S.stars += item.points; bumpStreak(); celebrate(`+${item.points} ⭐`, tr('challenge_done')); }
+    else { happy(); sfx.ok(); }
+  } else if (tab === 'learn' && first) {
+    S.done[item.id] = true; S.stars += 5; bumpStreak(); celebrate('+5 ⭐', tr('lesson_done'));
+  } else if (tab === 'games' && first) {
+    S.done[item.id] = true; S.stars += 3; bumpStreak(); celebrate('+3 ⭐', tr('game_done'));
+  } else { happy(); sfx.ok(); }
+  save(); checkBadges(); updateHud(); renderList();
+}
+function checkBadges() {
+  const n = (k) => CONTENT[k].filter(i => S.done[i.id]).length;
+  if (n('learn') >= 5) award('five_lessons');
+  if (n('learn') === CONTENT.learn.length) award('all_lessons');
+  if (n('challenge') >= 3) award('three_ch');
+  if (n('challenge') === CONTENT.challenge.length) award('all_ch');
+  if (n('games') >= 5) award('five_games');
+  if (S.streak >= 3) award('streak3');
+}
+let toastTimer = null;
+function award(id) {
+  if (S.badges[id]) return;
+  S.badges[id] = Date.now(); save();
+  const b = BADGES.find(x => x.id === id); if (!b) return;
+  const t = $('toast');
+  t.innerHTML = `<span class="bi" aria-hidden="true">${b.icon}</span><span>${esc(tr('badge_new'))}<br>${esc(b[S.lang][0])}</span>`;
+  t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3200);
+}
+
+/* ---------- HUD ---------- */
+function updateHud() {
+  const lvl = Math.floor(S.stars / 50) + 1;
+  $('stars').textContent = S.stars; $('streak').textContent = S.streak;
+  $('lvl-label').textContent = `${S.lang === 'yo' ? 'Ìp' : 'Lv'} ${lvl}`;
+  $('lvl-bar').style.width = `${(S.stars % 50) * 2}%`;
+  $('who').textContent = S.name ? `${tr('hello')}, ${S.name} ${S.avatar} · ${levelName()}` : '';
+  $('sound-btn').textContent = S.sound ? '🔊' : '🔇';
+  $('lang-btn').textContent = S.lang === 'en' ? 'Yorùbá' : 'English';
+}
+const levelName = () => { const names = tr('lvl_names'); return names[Math.min(Math.floor(S.stars / 50), names.length - 1)]; };
+
+/* ---------- My stuff ---------- */
+function renderStuff() {
+  $('p-ava').textContent = S.avatar; $('p-name').textContent = S.name || '—';
+  $('p-level').textContent = `${tr('level')} ${Math.floor(S.stars / 50) + 1} · ${levelName()}`;
+  $('p-lvlbar').style.width = `${(S.stars % 50) * 2}%`;
+  $('p-stars').textContent = S.stars;
+  $('p-done').textContent = Object.keys(S.done).length;
+  $('p-badges').textContent = Object.keys(S.badges).length;
+  $('p-stars-l').textContent = tr('stars_l'); $('p-done-l').textContent = tr('done_l'); $('p-badges-l').textContent = tr('badges_l');
+  $('edit-profile').textContent = tr('edit');
+  $('badges-title').textContent = tr('badges_title'); $('gallery-title').textContent = tr('gallery_title');
+  $('badges').innerHTML = BADGES.map(b => {
+    const got = !!S.badges[b.id];
+    return `<div class="badge ${got ? 'got' : 'locked'}"><span class="bi" aria-hidden="true">${b.icon}</span><b>${esc(b[S.lang][0])}</b><small>${esc(b[S.lang][1])}</small></div>`;
+  }).join('');
+  $('gallery').innerHTML = gallery.length
+    ? gallery.map((g, i) => `<figure><img src="${g.img}" alt="${esc(g.title)}"><figcaption><span>${esc(g.title)}</span><button type="button" data-delpic="${i}" aria-label="Delete picture">✕</button></figcaption></figure>`).join('')
+    : `<p class="empty-note">${esc(tr('gallery_empty'))}</p>`;
+  $('reset-area').innerHTML = `<button class="danger" id="reset-progress" type="button">${esc(tr('start_over'))}</button>`;
+}
+$('gallery').addEventListener('click', (e) => {
+  const d = e.target.closest('[data-delpic]'); if (!d) return;
+  gallery.splice(+d.dataset.delpic, 1); store.set('rq2-gallery', gallery); renderStuff();
+});
+$('reset-area').addEventListener('click', (e) => {
+  if (e.target.id === 'reset-progress') {
+    $('reset-area').innerHTML = `<div class="confirm"><span>${esc(tr('sure'))}</span><button class="danger" type="button" id="yes-reset">${esc(tr('yes_delete'))}</button><button class="btn btn-2 btn-sm" type="button" id="no-reset">${esc(tr('cancel'))}</button></div>`;
+  } else if (e.target.id === 'yes-reset') {
+    S.stars = 0; S.streak = 0; S.lastDay = null; S.done = {}; S.badges = {}; S.free = {}; gallery = [];
+    save(); store.set('rq2-gallery', gallery); updateHud(); renderStuff();
+  } else if (e.target.id === 'no-reset') renderStuff();
+});
+$('edit-profile').addEventListener('click', () => openOnboard());
+
+/* ---------- onboarding ---------- */
+let obAvatar = S.avatar, obLang = S.lang;
+function openOnboard() {
+  obAvatar = S.avatar; obLang = S.lang;
+  $('ob-name').value = S.name || '';
+  paintOnboard();
+  $('onboard').hidden = false;
+  setTimeout(() => $('ob-name').focus(), 50);
+}
+function paintOnboard() {
+  const L = I18N[obLang];
+  $('ob-title').textContent = L.ob_title; $('ob-sub').textContent = L.ob_sub;
+  $('ob-name-l').textContent = L.ob_name; $('ob-ava-l').textContent = L.ob_ava; $('ob-lang-l').textContent = L.ob_lang;
+  $('ob-go').textContent = L.ob_go;
+  $('ob-avas').innerHTML = AVATARS.map(a => `<button type="button" data-ava="${a}" aria-pressed="${a === obAvatar}">${a}</button>`).join('');
+  $('ob-en').setAttribute('aria-pressed', String(obLang === 'en'));
+  $('ob-yo').setAttribute('aria-pressed', String(obLang === 'yo'));
+}
+$('ob-avas').addEventListener('click', (e) => { const b = e.target.closest('[data-ava]'); if (b) { obAvatar = b.dataset.ava; paintOnboard(); sfx.tap(); } });
+document.querySelectorAll('.langs button').forEach(b => b.addEventListener('click', () => { obLang = b.dataset.lang; paintOnboard(); }));
+$('ob-name').addEventListener('input', () => { $('ob-err').hidden = true; });
+$('onboard-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = $('ob-name').value.trim();
+  if (!name) { $('ob-err').textContent = I18N[obLang].ob_err; $('ob-err').hidden = false; $('ob-name').focus(); return; }
+  S.name = name; S.avatar = obAvatar;
+  const langChanged = S.lang !== obLang; S.lang = obLang; save();
+  $('onboard').hidden = true; sfx.win();
+  if (langChanged) applyLang(); else { updateHud(); if (tab === 'stuff') renderStuff(); }
+});
+
+/* ---------- language ---------- */
+function applyLang() {
+  document.documentElement.lang = S.lang === 'yo' ? 'yo' : 'en';
+  document.querySelectorAll('.tab').forEach(t => { t.textContent = tr('tab_' + t.dataset.tab); });
+  $('mode-code').textContent = tr('mode_code'); $('mode-blocks').textContent = tr('mode_blocks');
+  $('reset').textContent = tr('reset'); $('kbd').textContent = tr('kbd'); $('out-title').textContent = tr('out_title');
+  renderPalette();
+  if (S.lang === 'yo') award('yoruba');
+  updateHud();
+  setStatus(rReady ? 'ready' : rDown ? 'down' : 'loading');
+  if (tab === 'stuff') { renderStuff(); return; }
+  $('list-title').textContent = tr('title_' + tab);
+  if (item) {
+    const keep = ta.value; load(item); setCode(keep); renderPlayBar();
+  }
+  if (mode === 'blocks') renderBlocks();
+}
+$('lang-btn').addEventListener('click', () => { S.lang = S.lang === 'en' ? 'yo' : 'en'; save(); applyLang(); sfx.tap(); });
+$('sound-btn').addEventListener('click', () => { S.sound = !S.sound; save(); updateHud(); sfx.tap(); });
+
+/* ---------- celebrate ---------- */
+const owl = $('owl');
+function happy() { owl.classList.remove('sad', 'happy'); void owl.offsetWidth; owl.classList.add('happy'); }
+function sad() { owl.classList.remove('sad', 'happy'); void owl.offsetWidth; owl.classList.add('sad'); }
+function celebrate(pts, msg) {
+  const box = $('celebrate');
+  $('c-emoji').textContent = ['🎉', '🌟', '🏆', '🚀', '🦉'][Math.floor(Math.random() * 5)];
+  $('c-msg').textContent = msg; $('c-pts').textContent = pts;
+  box.querySelectorAll('.confetti').forEach(c => c.remove());
+  const colors = ['#F0563A', '#FFC233', '#1F9D63', '#2E3FA3', '#9B6BFF'];
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    for (let i = 0; i < 44; i++) {
+      const c = document.createElement('i'); c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw'; c.style.background = colors[i % colors.length];
+      c.style.animationDelay = Math.random() * 0.5 + 's'; c.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
+      box.append(c);
+    }
+  }
+  box.hidden = false; happy(); sfx.win();
+  setTimeout(() => { box.hidden = true; }, 2100);
+}
+
+/* ---------- start ---------- */
+applyLang();
+switchTab('learn');
+updateHud();
+if (!S.name) openOnboard();
+bootR();
+</script>
+
+</body>
+</html>
