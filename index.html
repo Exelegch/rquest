@@ -336,6 +336,28 @@
   .toast .bi { font-size: 28px; }
   @keyframes rise { from { transform: translate(-50%, 20px); opacity: 0; } }
 
+  .seg { display: inline-flex; border: 2px solid var(--line); border-radius: 99px; overflow: hidden; background: var(--card); align-self: flex-end; }
+  .seg button { border: 0; background: transparent; padding: 7px 13px; font-weight: 800; font-size: 13px; color: var(--muted); }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"].d-easy, .tag.d-easy { background: #D6F3E4; color: #11663F; }
+  .seg button[aria-pressed="true"].d-medium, .tag.d-medium { background: #FFF0C2; color: #7A5600; }
+  .seg button[aria-pressed="true"].d-hard, .tag.d-hard { background: #FFE0D8; color: #A3341B; }
+  .prompt-row { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; }
+  .prompt-row > div { min-width: 0; }
+  .speak {
+    flex: 0 0 auto; width: 34px; height: 34px; border-radius: 99px; border: 1px solid var(--line);
+    background: var(--card); color: var(--indigo); font-size: 16px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .speak:hover { background: var(--soft); }
+  .next-btn { align-self: flex-start; }
+  .music-note { color: var(--t-op); }
+  body.big { font-size: 17px; }
+  body.big .prompt { font-size: 18px; }
+  body.big .item { font-size: 16px; }
+  body.big .out { font-size: 15.5px; }
+  body.big .code-area pre, body.big .code-area textarea, body.big .gutter { font-size: 16px; line-height: 26px; }
+  body.big .keys button { height: 42px; font-size: 16px; min-width: 44px; }
+
   @media (max-width: 1100px) {
     .studio { grid-template-columns: 240px minmax(0,1fr); }
     .studio .output { grid-column: 1 / -1; }
@@ -361,7 +383,7 @@
   <div class="band-inner">
     <div class="top">
       <div class="brand">
-        <span class="owl" id="owl" aria-hidden="true">🦉</span>
+        <span class="owl" id="owl" aria-hidden="true">🕊️</span>
         <div>
           <h1 id="brand">R <span>Quest</span></h1>
           <div class="who" id="who"></div>
@@ -372,6 +394,7 @@
         <span class="pill" title="Stars">⭐ <span id="stars">0</span></span>
         <span class="pill" title="Streak">🔥 <span id="streak">0</span></span>
         <button class="pill" id="sound-btn" type="button" aria-label="Sound on or off">🔊</button>
+        <button class="pill" id="big-btn" type="button" aria-pressed="false" aria-label="Bigger text">A+</button>
         <button class="pill" id="lang-btn" type="button">Yorùbá</button>
       </div>
     </div>
@@ -427,7 +450,7 @@
     </section>
 
     <section class="panel output">
-      <h2 class="panel-title" id="out-title">R says</h2>
+      <h2 class="panel-title"><span id="out-title">R says</span><button type="button" class="speak" id="speak-out" aria-label="Read aloud">🔈</button></h2>
       <div>
         <div class="status loading" id="status">Loading R…</div>
         <div class="loading-bar" id="loading-bar"><i></i></div>
@@ -436,12 +459,13 @@
       <div class="oops" id="oops" hidden></div>
       <div class="out" id="out" aria-live="polite"></div>
       <div class="plots" id="plots"></div>
+      <div id="next-wrap" hidden></div>
     </section>
   </section>
 
   <section class="stuff" id="stuff" hidden>
     <div class="panel profile">
-      <div class="big-ava" id="p-ava">🦉</div>
+      <div class="big-ava" id="p-ava">🕊️</div>
       <h2 id="p-name">Friend</h2>
       <div class="lvl-name" id="p-level">Seedling</div>
       <div class="track-bar" style="width:100%"><i id="p-lvlbar"></i></div>
@@ -532,8 +556,11 @@ const I18N = {
     ob_title: 'Welcome to R Quest!', ob_sub: 'You will learn to code in R by drawing, playing games and solving puzzles.',
     ob_name: 'What is your name?', ob_ava: 'Pick your animal', ob_lang: 'Language', ob_go: "Let's go!", ob_err: 'Type your name first.',
     hello: 'Hi', badge_new: 'New badge!',
-    lvl_names: ['Seedling', 'Explorer', 'Builder', 'Inventor', 'R Wizard'],
+    lvl_names: ['Seedling', 'Explorer', 'Builder', 'Inventor', 'R Champion'],
     b_print: '+ print', b_math: '+ math', b_var: '+ box', b_plot: '+ chart', b_loop: '+ repeat',
+    d_easy: 'Easy', d_medium: 'Medium', d_hard: 'Hard', difficulty: 'Difficulty', won_on: 'You won on {d}!',
+    new_question: '🔄 New question', next: 'Next', read_aloud: 'Read aloud', big_text: 'Bigger text',
+    playing: '🎵 Playing your tune…', sound_off_music: '🔇 Sound is off. Tap 🔇 at the top, then press Play to hear your tune.',
   },
   yo: {
     tab_learn: '📚 Ẹ̀kọ́', tab_challenge: '🎯 Ìdíje', tab_games: '🎮 Eré', tab_free: '🎨 Eré ọ̀fẹ́', tab_stuff: '🏅 Tèmi',
@@ -566,8 +593,11 @@ const I18N = {
     ob_title: 'Káàbọ̀ sí R Quest!', ob_sub: 'O máa kọ́ kóòdù R nípa yíya àwòrán, ṣíṣe eré àti yíyanjú àdìtú.',
     ob_name: 'Kí ni orúkọ rẹ?', ob_ava: 'Yan ẹranko rẹ', ob_lang: 'Èdè', ob_go: 'Ẹ jẹ́ ká lọ!', ob_err: 'Kọ orúkọ rẹ ní àkọ́kọ́.',
     hello: 'Báwo ni', badge_new: 'Àmì-ẹ̀yẹ tuntun!',
-    lvl_names: ['Irúgbìn', 'Aṣàwárí', 'Akọ́lé', 'Olùdásílẹ̀', 'Oṣó R'],
+    lvl_names: ['Irúgbìn', 'Aṣàwárí', 'Akọ́lé', 'Olùdásílẹ̀', 'Akọni R'],
     b_print: '+ tẹ̀ jáde', b_math: '+ ìṣirò', b_var: '+ àpótí', b_plot: '+ àwòrán', b_loop: '+ àtúnṣe',
+    d_easy: 'Rọrùn', d_medium: 'Àárín', d_hard: 'Le', difficulty: 'Ìpele ìṣòro', won_on: 'O borí ní ìpele {d}!',
+    new_question: '🔄 Ìbéèrè tuntun', next: 'Èyí tó kàn', read_aloud: 'Kà á sókè', big_text: 'Ọ̀rọ̀ ńlá',
+    playing: '🎵 Orin rẹ ń dún…', sound_off_music: '🔇 Ohùn ti wà ní pípa. Tẹ 🔇 lókè, lẹ́yìn náà tẹ Ṣeré láti gbọ́ orin rẹ.',
   }
 };
 
@@ -632,7 +662,7 @@ const CONTENT = {
     { id: 'L14', icon: '🎲', title: 'Random stuff', title_yo: 'Nǹkan láìròtẹ́lẹ̀',
       prompt: 'sample() picks things at random. Run it a few times.',
       prompt_yo: 'sample() ń yan nǹkan láìròtẹ́lẹ̀. Ṣe é ní ìgbà mélòó kan.',
-      code: `n <- sample(1:100, 1)\ncat("Lucky number:", n, "\\n")\n\nanimals <- c("tortoise", "lion", "owl", "elephant", "parrot")\ncat("Your spirit animal:", sample(animals, 1), "🐾\\n")` },
+      code: `n <- sample(1:100, 1)\ncat("Random number:", n, "\\n")\n\nanimals <- c("tortoise", "lion", "owl", "elephant", "parrot")\ncat("Animal of the day:", sample(animals, 1), "🐾\\n")` },
     { id: 'L15', icon: '🧮', title: 'Math on lists', title_yo: 'Ìṣirò lórí àkọsílẹ̀',
       prompt: 'Do math on a whole list at once!',
       prompt_yo: 'Ṣe ìṣirò lórí gbogbo àkọsílẹ̀ ní ẹ̀ẹ̀kan!',
@@ -658,6 +688,10 @@ const CONTENT = {
       prompt: 'cumsum() adds up as it goes. Watch your savings grow week by week!',
       prompt_yo: 'cumsum() ń ṣe àròpọ̀ bí ó ti ń lọ. Wo bí owó rẹ ṣe ń pọ̀ sí i lọ́sẹ̀ọ̀sẹ̀!',
       code: `weekly <- 500\nsavings <- cumsum(rep(weekly, 10))\ncat("After 10 weeks you have ₦", savings[10], "\\n")\n\nbarplot(savings, names.arg = 1:10, col = "#1F9D63",\n        main = "My piggy bank (Naira)", xlab = "Week")` },
+    { id: 'L21', icon: '🧺', bible: true, title: 'Twelve baskets', title_yo: 'Agbọ̀n méjìlá',
+      prompt: 'Jesus fed 5,000 people with 5 loaves and 2 fish, and 12 baskets were left over (John 6). Let R do the maths!',
+      prompt_yo: 'Jésù bọ́ ẹgbẹ̀rún márùn-ún ènìyàn pẹ̀lú búrẹ́dì márùn-ún àti ẹja méjì, agbọ̀n méjìlá sì ṣẹ́kù (Jòhánù 6). Jẹ́ kí R ṣe ìṣirò náà!',
+      code: `loaves <- 5\nfish <- 2\npeople <- 5000\nbaskets_left <- 12\n\ncat("Jesus fed", people, "people with", loaves, "loaves and", fish, "fish.\\n")\ncat("That is", people / loaves, "people for every loaf!\\n")\ncat("And", baskets_left, "baskets were left over. (John 6:13)\\n")\n\nbarplot(c(Loaves = loaves, Fish = fish, Baskets = baskets_left),\n        col = c("burlywood", "steelblue", "darkgoldenrod"),\n        main = "Feeding the 5,000")` },
   ],
   challenge: [
     { id: 'C1', icon: '🎯', points: 10, title: 'Print your name', title_yo: 'Tẹ orúkọ rẹ jáde',
@@ -708,12 +742,13 @@ const CONTENT = {
       hint: 'for (i in 1:3) print("yes")', hint_yo: 'for (i in 1:3) print("yes")',
       starter: `# Print "yes" 3 times\n`,
       check: (out, code) => /\b(for|while|repeat)\b/.test(code) && (out.toLowerCase().match(/yes/g) || []).length >= 3 },
-    { id: 'C9', icon: '7️⃣', points: 25, title: 'Lucky seven', title_yo: 'Méje olóríire',
-      prompt: 'Pick 7 random numbers between 1 and 100 and add them up.', prompt_yo: 'Yan nọ́mbà méje láìròtẹ́lẹ̀ láàrin 1 àti 100, kí o sì ṣe àròpọ̀ wọn.',
-      goal: 'Use sample() and sum()', goal_yo: 'Lo sample() àti sum()',
-      hint: 'nums <- sample(1:100, 7)\nsum(nums)', hint_yo: 'nums <- sample(1:100, 7)\nsum(nums)',
-      starter: `# Pick 7 numbers and add them\n`,
-      check: (out, code) => /sample\s*\(/.test(code) && /sum\s*\(/.test(code) && /\d/.test(out) },
+    { id: 'C9', icon: '🌍', points: 25, bible: true, title: 'Days of creation', title_yo: 'Ọjọ́ ìṣẹ̀dá',
+      prompt: 'God made the world in six days and rested on the seventh (Genesis 2:2). Add the seventh day to the list.',
+      prompt_yo: 'Ọlọ́run dá ayé ní ọjọ́ mẹ́fà, ó sì sinmi ní ọjọ́ keje (Jẹ́nẹ́sísì 2:2). Fi ọjọ́ keje kún àkọsílẹ̀ náà.',
+      goal: 'days has 7 items, and the last one is "Rest"', goal_yo: 'days ní nǹkan méje, èyí tó kẹ́yìn sì jẹ́ "Rest"',
+      hint: 'Add , "Rest" just before the last )', hint_yo: 'Fi , "Rest" kún un ṣáájú ) tó kẹ́yìn',
+      starter: `days <- c("Light", "Sky", "Land and plants", "Sun, moon and stars",\n          "Fish and birds", "Animals and people")\nlength(days)`,
+      rcheck: `exists("days", envir = globalenv(), inherits = FALSE) && length(days) == 7 && tolower(days[7]) == "rest"` },
     { id: 'C10', icon: '🔐', points: 30, title: 'Doubling machine', title_yo: 'Ẹ̀rọ ìlọ́po méjì',
       prompt: 'Write a function called double that doubles any number.', prompt_yo: 'Kọ function kan tí a ń pè ní double tí ó ń sọ nọ́mbà èyíkéyìí di ìlọ́po méjì.',
       goal: 'double(21) gives 42', goal_yo: 'double(21) fún wa ní 42',
@@ -755,10 +790,12 @@ const CONTENT = {
   ],
   games: [
     { id: 'G1', icon: '🎲', title: 'Guess the number', title_yo: 'Mọ nọ́mbà náà',
-      prompt: 'R hides a secret number from 1 to 20. Type a guess and press Play. R tells you higher or lower!',
-      prompt_yo: 'R fi nọ́mbà àṣírí kan pamọ́ láti 1 dé 20. Kọ ìfojúsùn rẹ kí o sì tẹ Ṣeré. R máa sọ fún ọ bóyá kí o lọ sókè tàbí ìsàlẹ̀!',
-      inputs: [{ type: 'number', name: 'my_guess', min: 1, max: 20, label: 'My guess', label_yo: 'Ìfojúsùn mi' }, { type: 'seed', label: 'new_secret' }, { type: 'tries' }],
-      code: `set.seed(42)\nsecret <- sample(1:20, 1)   # shh! R hides it\nmy_guess <- 10\n\nif (my_guess == secret) {\n  cat("🎉 YES! The secret number was", secret, "\\n")\n} else if (my_guess < secret) {\n  cat("⬆️  Higher! Try a bigger number.\\n")\n} else {\n  cat("⬇️  Lower! Try a smaller number.\\n")\n}` },
+      prompt: 'R hides a secret number. Type a guess and press Play, and R tells you to go higher or lower. Harder levels use bigger numbers.',
+      prompt_yo: 'R fi nọ́mbà àṣírí kan pamọ́. Kọ ìfojúsùn rẹ kí o sì tẹ Ṣeré, R yóò sì sọ fún ọ bóyá kí o lọ sókè tàbí ìsàlẹ̀. Ìpele tí ó le ń lo nọ́mbà ńlá.',
+      win: /YES!/, noTry: /Type your guess/,
+      inputs: [{ type: 'difficulty', sets: { easy: { max_number: '10' }, medium: { max_number: '20' }, hard: { max_number: '100' } } },
+        { type: 'number', name: 'my_guess', min: 1, max: 100, label: 'My guess', label_yo: 'Ìfojúsùn mi' }, { type: 'seed', label: 'new_secret' }, { type: 'tries' }],
+      code: `max_number <- 10\nset.seed(1)\nsecret <- sample(1:max_number, 1)   # shh! R hides it\nmy_guess <- 0\n\nif (my_guess == 0) {\n  cat("I'm thinking of a number from 1 to", max_number, "\\n")\n  cat("Type your guess in the box, then press Play.\\n")\n} else if (my_guess == secret) {\n  cat("🎉 YES! The secret number was", secret, "\\n")\n} else if (my_guess < secret) {\n  cat("⬆️  Higher! Try a bigger number.\\n")\n} else {\n  cat("⬇️  Lower! Try a smaller number.\\n")\n}` },
     { id: 'G2', icon: '✊', title: 'Rock Paper Scissors', title_yo: 'Òkúta, Bébà, Sísọ̀',
       prompt: 'Pick rock, paper or scissors. R picks too. Who wins?',
       prompt_yo: 'Yan òkúta, bébà tàbí sísọ̀. R náà yóò yan. Ta ni yóò borí?',
@@ -776,15 +813,17 @@ const CONTENT = {
       inputs: [{ type: 'text', name: 'player1', label: 'Player 1', label_yo: 'Òṣèré 1' }, { type: 'text', name: 'player2', label: 'Player 2', label_yo: 'Òṣèré 2' }],
       code: `player1 <- "Tunde"\nplayer2 <- "Amaka"\npos1 <- cumsum(sample(1:6, 10, replace = TRUE))\npos2 <- cumsum(sample(1:6, 10, replace = TRUE))\n\nplot(1:10, pos1, type = "o", col = "#F0563A", lwd = 3, pch = 19,\n     ylim = c(0, 60), xlab = "Turn", ylab = "Squares moved",\n     main = "Ludo race!")\nlines(1:10, pos2, type = "o", col = "#2E3FA3", lwd = 3, pch = 19)\nlegend("topleft", legend = c(player1, player2),\n       col = c("#F0563A", "#2E3FA3"), lwd = 3)\n\ncat(player1, "moved", pos1[10], "squares\\n")\ncat(player2, "moved", pos2[10], "squares\\n")\nif (pos1[10] > pos2[10]) cat("🏆", player1, "wins!\\n")\nif (pos2[10] > pos1[10]) cat("🏆", player2, "wins!\\n")\nif (pos1[10] == pos2[10]) cat("🤝 Tie!\\n")` },
     { id: 'G5', icon: '🗺️', title: 'Treasure hunt', title_yo: 'Ìwákiri ìṣúra',
-      prompt: 'Treasure is buried on a 10 × 10 map. Pick a spot. Hot means close!',
-      prompt_yo: 'A sin ìṣúra sí orí máàpù 10 × 10. Yan ibì kan. Gbóná túmọ̀ sí pé o ti súnmọ́!',
-      inputs: [{ type: 'number', name: 'my_x', min: 1, max: 10, label: 'Across (x)', label_yo: 'Ìbú (x)' }, { type: 'number', name: 'my_y', min: 1, max: 10, label: 'Up (y)', label_yo: 'Òkè (y)' }, { type: 'seed', label: 'new_map' }, { type: 'tries' }],
-      code: `set.seed(3)\ntreasure_x <- sample(1:10, 1)\ntreasure_y <- sample(1:10, 1)\nmy_x <- 5\nmy_y <- 5\n\ndist <- sqrt((treasure_x - my_x)^2 + (treasure_y - my_y)^2)\ncat("You dug at", my_x, my_y, "\\n")\nif (dist == 0) {\n  cat("🏆 TREASURE FOUND!\\n")\n} else if (dist < 2) {\n  cat("🔥 Burning hot!\\n")\n} else if (dist < 4) {\n  cat("🌡️ Warm…\\n")\n} else {\n  cat("❄️ Cold. Try far away.\\n")\n}\n\nplot(my_x, my_y, xlim = c(1, 10), ylim = c(1, 10), pch = 4, cex = 3,\n     lwd = 4, col = "#F0563A", xlab = "x", ylab = "y", main = "Treasure map")\ngrid()\nif (dist == 0) points(treasure_x, treasure_y, pch = 8, cex = 4, col = "gold", lwd = 3)` },
-    { id: 'G6', icon: '🔮', title: 'Fortune teller', title_yo: 'Aláfọ̀ṣẹ',
-      prompt: 'Type your name and ask R about your future!',
-      prompt_yo: 'Kọ orúkọ rẹ kí o sì bi R nípa ọjọ́ iwájú rẹ!',
+      prompt: 'Treasure is buried on a square map. Choose where to dig. Hot means close! Harder levels have a bigger map.',
+      prompt_yo: 'A sin ìṣúra sí orí máàpù onígun mẹ́rin. Yan ibi tí o fẹ́ gbẹ́. Gbóná túmọ̀ sí pé o ti súnmọ́! Ìpele tí ó le ní máàpù ńlá.',
+      win: /TREASURE FOUND/, noTry: /Type where to dig/,
+      inputs: [{ type: 'difficulty', sets: { easy: { map_size: '5' }, medium: { map_size: '10' }, hard: { map_size: '20' } } },
+        { type: 'number', name: 'my_x', min: 1, max: 20, label: 'Across (x)', label_yo: 'Ìbú (x)' }, { type: 'number', name: 'my_y', min: 1, max: 20, label: 'Up (y)', label_yo: 'Òkè (y)' }, { type: 'seed', label: 'new_map' }, { type: 'tries' }],
+      code: `map_size <- 5\nset.seed(3)\ntreasure_x <- sample(1:map_size, 1)\ntreasure_y <- sample(1:map_size, 1)\nmy_x <- 0\nmy_y <- 0\n\nif (my_x == 0 || my_y == 0) {\n  cat("The map is", map_size, "by", map_size, "squares.\\n")\n  cat("Type where to dig, then press Play.\\n")\n} else {\n  dist <- sqrt((treasure_x - my_x)^2 + (treasure_y - my_y)^2)\n  cat("You dug at", my_x, my_y, "\\n")\n  if (dist == 0) {\n    cat("🏆 TREASURE FOUND!\\n")\n  } else if (dist < max(1.5, map_size * 0.2)) {\n    cat("🔥 Burning hot!\\n")\n  } else if (dist < max(3, map_size * 0.4)) {\n    cat("🌡️ Warm…\\n")\n  } else {\n    cat("❄️ Cold. Try far away.\\n")\n  }\n  plot(my_x, my_y, xlim = c(1, map_size), ylim = c(1, map_size), pch = 4,\n       cex = 3, lwd = 4, col = "#F0563A", xlab = "x", ylab = "y",\n       main = "Treasure map")\n  grid()\n  if (dist == 0) points(treasure_x, treasure_y, pch = 8, cex = 4, col = "gold", lwd = 3)\n}` },
+    { id: 'G6', icon: '📖', bible: true, title: 'A verse for you', title_yo: 'Ẹsẹ Bíbélì fún ọ',
+      prompt: 'Type your name and R picks a Bible verse for you. Press Play again for another one.',
+      prompt_yo: 'Kọ orúkọ rẹ, R yóò sì yan ẹsẹ Bíbélì kan fún ọ. Tẹ Ṣeré lẹ́ẹ̀kan sí fún òmíràn.',
       inputs: [{ type: 'text', name: 'your_name', label: 'Your name', label_yo: 'Orúkọ rẹ' }],
-      code: `your_name <- "Ada"\nfortunes <- c(\n  "you will find hidden treasure! 💎",\n  "a new friend is coming your way! 🤝",\n  "jollof is in your future! 🍛",\n  "you will win your next game! 🏆",\n  "something amazing will happen this week! ✨",\n  "you will become an R wizard! ⚡"\n)\ncat("🔮", your_name, "…", sample(fortunes, 1), "\\n")` },
+      code: `your_name <- "Ada"\nverses <- c(\n  "The LORD is my shepherd; I shall not want. (Psalm 23:1)",\n  "I can do all things through Christ which strengtheneth me. (Philippians 4:13)",\n  "Thy word is a lamp unto my feet, and a light unto my path. (Psalm 119:105)",\n  "This is the day which the LORD hath made; we will rejoice and be glad in it. (Psalm 118:24)",\n  "Trust in the LORD with all thine heart; and lean not unto thine own understanding. (Proverbs 3:5)",\n  "Be strong and of a good courage; be not afraid. (Joshua 1:9)"\n)\ncat("📖", paste0(your_name, ","), "here is a verse for you today:\\n\\n")\ncat(sample(verses, 1), "\\n")` },
     { id: 'G7', icon: '🪙', title: 'Coin flip', title_yo: 'Owó jíjù',
       prompt: 'Flip coins and count heads and tails. Try 100 flips!',
       prompt_yo: 'Ju owó sókè kí o sì ka orí àti ìrù. Gbìyànjú ìgbà ọgọ́rùn-ún!',
@@ -795,11 +834,11 @@ const CONTENT = {
       prompt_yo: 'Kọ àwọn ọ̀rọ̀ náà, R yóò sì kọ ìtàn apanilẹ́rìn-ín!',
       inputs: [{ type: 'text', name: 'animal', label: 'Animal', label_yo: 'Ẹranko' }, { type: 'text', name: 'place', label: 'Place', label_yo: 'Ibì kan' }, { type: 'text', name: 'food', label: 'Food', label_yo: 'Oúnjẹ' }],
       code: `animal <- "tortoise"\nplace <- "Lagos"\nfood <- "suya"\n\nstory <- paste("One day, a", animal, "took a bus to", place,\n               "and ate so much", food, "that it started to dance! 💃")\ncat(story, "\\n")` },
-    { id: 'G9', icon: '🧙', title: 'Wizard names', title_yo: 'Orúkọ oṣó',
-      prompt: 'Press Play again and again for a new silly wizard name.',
-      prompt_yo: 'Máa tẹ Ṣeré léraléra fún orúkọ oṣó apanilẹ́rìn-ín tuntun.',
-      inputs: [],
-      code: `first  <- c("Gloomy", "Sparkly", "Grumpy", "Zappy", "Bubbly", "Mystic")\nmiddle <- c("the Magnificent", "the Wise", "the Mighty", "the Fluffy")\nlast   <- c("Pickle", "Whisker", "Thunderpants", "Noodle", "Agbado")\n\nname <- paste(sample(first, 1), sample(middle, 1), sample(last, 1))\ncat("🧙 Your wizard name is:\\n✨", name, "✨\\n")` },
+    { id: 'G9', icon: '🧠', bible: true, title: 'Memory verse', title_yo: 'Ẹsẹ ìrántí',
+      prompt: 'R hides some words so you can practise your memory verse. Harder levels hide more words. You can also type your own verse in the code!',
+      prompt_yo: 'R fi àwọn ọ̀rọ̀ kan pamọ́ kí o lè ṣe ìdánrawò ẹsẹ ìrántí rẹ. Ìpele tí ó le máa ń fi ọ̀rọ̀ púpọ̀ pamọ́. O tún lè kọ ẹsẹ tìrẹ sínú kóòdù!',
+      inputs: [{ type: 'difficulty', sets: { easy: { gap_every: '4' }, medium: { gap_every: '3' }, hard: { gap_every: '2' } } }],
+      code: `verse <- "Thy word is a lamp unto my feet, and a light unto my path."\nreference <- "Psalm 119:105"\ngap_every <- 3\n\nwords <- strsplit(verse, " ")[[1]]\nfor (i in seq_along(words)) {\n  if (i %% gap_every == 0) {\n    words[i] <- strrep("_", nchar(words[i]))\n  }\n}\ncat(paste(words, collapse = " "), "\\n")\ncat(paste0("(", reference, ")"), "Say it out loud and fill the gaps!\\n")` },
     { id: 'G10', icon: '🔐', title: 'Secret code', title_yo: 'Kóòdù àṣírí',
       prompt: 'Hide a message by shifting every letter. Share the code with a friend!',
       prompt_yo: 'Fi ìránṣẹ́ pamọ́ nípa yíyí gbogbo lẹ́tà sí iwájú. Pín kóòdù náà pẹ̀lú ọ̀rẹ́ rẹ!',
@@ -815,31 +854,48 @@ const CONTENT = {
       prompt_yo: 'Ìlànà ìṣirò kan ń hu òdòdó. Gbìyànjú iye ewé òdòdó mìíràn!',
       inputs: [{ type: 'number', name: 'k', min: 2, max: 12, label: 'Petal number', label_yo: 'Iye ewé' }],
       code: `k <- 7\nt <- seq(0, 2 * pi, length.out = 600)\nr <- cos(k * t)\nplot(r * cos(t), r * sin(t), type = "l", col = "deeppink", lwd = 3,\n     axes = FALSE, xlab = "", ylab = "", main = "Flower maths", asp = 1)` },
-    { id: 'G13', icon: '❤️', title: 'Heart shape', title_yo: 'Àwòrán ọkàn',
-      prompt: 'Maths magic: this formula draws a perfect heart.',
-      prompt_yo: 'Idán ìṣirò: ìlànà yìí ń ya ọkàn pípé.',
+    { id: 'G13', icon: '❤️', bible: true, title: 'Heart shape', title_yo: 'Àwòrán ọkàn',
+      prompt: 'The Bible says God is love (1 John 4:8). This maths formula draws a heart.',
+      prompt_yo: 'Bíbélì sọ pé ìfẹ́ ni Ọlọ́run (1 Jòhánù 4:8). Ìlànà ìṣirò yìí ń ya ọkàn.',
       inputs: [],
-      code: `t <- seq(0, 2 * pi, length.out = 300)\nx <- 16 * sin(t)^3\ny <- 13 * cos(t) - 5 * cos(2 * t) - 2 * cos(3 * t) - cos(4 * t)\nplot(x, y, type = "l", col = "red", lwd = 4, axes = FALSE,\n     xlab = "", ylab = "", main = "Made with R")\npolygon(x, y, col = "pink", border = "red")` },
-    { id: 'G14', icon: '✨', title: 'Starry night', title_yo: 'Òru ìràwọ̀',
-      prompt: 'Fill the night sky with stars. How many can you fit?',
-      prompt_yo: 'Fi ìràwọ̀ kún ojú ọ̀run òru. Mélòó ni o lè fi síbẹ̀?',
+      code: `t <- seq(0, 2 * pi, length.out = 300)\nx <- 16 * sin(t)^3\ny <- 13 * cos(t) - 5 * cos(2 * t) - 2 * cos(3 * t) - cos(4 * t)\nplot(x, y, type = "l", col = "red", lwd = 4, axes = FALSE,\n     xlab = "", ylab = "", main = "God is love (1 John 4:8)")\npolygon(x, y, col = "pink", border = "red")` },
+    { id: 'G14', icon: '✨', bible: true, title: 'Starry night', title_yo: 'Òru ìràwọ̀',
+      prompt: 'God told Abraham to look at the sky and count the stars, if he could (Genesis 15:5). How many can you draw?',
+      prompt_yo: 'Ọlọ́run sọ fún Ábúráhámù pé kí ó wo ojú ọ̀run kí ó sì ka àwọn ìràwọ̀ bí ó bá lè kà wọ́n (Jẹ́nẹ́sísì 15:5). Mélòó ni o lè yà?',
       inputs: [{ type: 'number', name: 'n', min: 1, max: 500, label: 'Stars', label_yo: 'Ìràwọ̀' }],
-      code: `n <- 80\npar(bg = "midnightblue")\nplot(runif(n, 0, 10), runif(n, 0, 10), pch = 8, col = "white",\n     cex = runif(n, 0.4, 2.4), axes = FALSE, xlab = "", ylab = "",\n     main = "Starry night", col.main = "white")\nsymbols(8.5, 8.5, circles = 0.8, inches = FALSE, add = TRUE,\n        bg = "lightyellow", fg = "lightyellow")` },
-    { id: 'G15', icon: '🌈', title: 'Rainbow dots', title_yo: 'Ààmì òṣùmàrè',
-      prompt: 'A colourful explosion of dots, different every time!',
-      prompt_yo: 'Ìbúgbàù ààmì aláwọ̀ mèremère, ó yàtọ̀ ní gbogbo ìgbà!',
-      inputs: [{ type: 'number', name: 'n', min: 5, max: 500, label: 'Dots', label_yo: 'Ààmì' }],
-      code: `n <- 60\nplot(runif(n, 0, 10), runif(n, 0, 10), pch = 19,\n     cex = runif(n, 1, 5), col = rainbow(n),\n     axes = FALSE, xlab = "", ylab = "", main = "Rainbow explosion!")` },
+      code: `n <- 80\npar(bg = "midnightblue")\nplot(runif(n, 0, 10), runif(n, 0, 10), pch = 8, col = "white",\n     cex = runif(n, 0.4, 2.4), axes = FALSE, xlab = "", ylab = "",\n     main = "Count the stars (Genesis 15:5)", col.main = "white")\nsymbols(8.5, 8.5, circles = 0.8, inches = FALSE, add = TRUE,\n        bg = "lightyellow", fg = "lightyellow")` },
+    { id: 'G15', icon: '🌈', bible: true, title: "Noah's rainbow", title_yo: 'Òṣùmàrè Nóà',
+      prompt: "The rainbow is God's promise to Noah (Genesis 9:13). A loop draws each colour, one band at a time.",
+      prompt_yo: 'Òṣùmàrè ni ìlérí Ọlọ́run fún Nóà (Jẹ́nẹ́sísì 9:13). Loop ń ya àwọ̀ kọ̀ọ̀kan, ọ̀kan lẹ́yìn èkejì.',
+      inputs: [{ type: 'number', name: 'thickness', min: 2, max: 30, label: 'Thickness', label_yo: 'Ìnípọn' }],
+      code: `thickness <- 14\ncolours <- c("red", "orange", "yellow", "green", "blue", "#4B0082", "violet")\nt <- seq(0, pi, length.out = 200)\n\nplot(NULL, xlim = c(-1.3, 1.3), ylim = c(0, 1.3), asp = 1, axes = FALSE,\n     xlab = "", ylab = "", main = "God's promise (Genesis 9:13)")\nfor (i in 1:7) {\n  r <- 1.2 - (i - 1) * 0.08\n  lines(r * cos(t), r * sin(t), col = colours[i], lwd = thickness)\n}` },
     { id: 'G16', icon: '🧵', title: 'Adire cloth', title_yo: 'Aṣọ àdìrẹ',
       prompt: 'Adire is the indigo tie-dye cloth from Abẹ́òkúta. Loops can weave a pattern like it! Change the size or the symbols.',
       prompt_yo: 'Àdìrẹ ni aṣọ aró láti Abẹ́òkúta. Loop lè hun àpẹẹrẹ bíi rẹ̀! Yí ìwọ̀n tàbí àwọn àmì padà.',
       inputs: [{ type: 'number', name: 'size', min: 4, max: 16, label: 'Grid size', label_yo: 'Ìwọ̀n' }],
       code: `size <- 8\npar(bg = "#1E2A78", mar = c(0, 0, 2, 0))\nplot(NULL, xlim = c(0, size), ylim = c(0, size), axes = FALSE,\n     xlab = "", ylab = "", main = "My adire cloth", col.main = "white", asp = 1)\n\nfor (i in 0:(size - 1)) {\n  for (j in 0:(size - 1)) {\n    if ((i + j) %% 2 == 0) {\n      symbols(i + 0.5, j + 0.5, circles = 0.35, inches = FALSE,\n              add = TRUE, fg = "white", lwd = 2)\n      points(i + 0.5, j + 0.5, pch = 20, col = "white")\n    } else {\n      points(i + 0.5, j + 0.5, pch = sample(c(3, 4, 8), 1),\n             col = "#BFD0FF", cex = 1.6, lwd = 2)\n    }\n  }\n}` },
-    { id: 'G17', icon: '🎟️', title: 'Lucky ticket', title_yo: 'Tíkẹ́ẹ̀tì olóríire',
-      prompt: 'Change your 6 numbers in the code. R draws 6 winners from 1 to 50.',
-      prompt_yo: 'Yí nọ́mbà mẹ́fà rẹ padà nínú kóòdù. R yóò fa mẹ́fà tí ó borí láti 1 dé 50.',
-      inputs: [],
-      code: `my_ticket <- c(7, 14, 21, 28, 35, 42)\nwinning <- sample(1:50, 6)\ncat("Your ticket:", sort(my_ticket), "\\n")\ncat("Winners:    ", sort(winning), "\\n")\nmatches <- sum(my_ticket %in% winning)\ncat("You matched", matches, "numbers!\\n")\nif (matches >= 3) cat("🎉 You won a prize!\\n")` },
+    { id: 'G17', icon: '📚', bible: true, title: 'Bible book finder', title_yo: 'Olùwá ìwé Bíbélì',
+      prompt: 'Type the name of a book of the Bible. R finds where it is and which Testament it belongs to.',
+      prompt_yo: 'Kọ orúkọ ìwé kan nínú Bíbélì. R yóò wá ibi tí ó wà àti Májẹ̀mú tí ó jẹ́ tirẹ̀.',
+      inputs: [{ type: 'text', name: 'book', label: 'Book', label_yo: 'Ìwé' }],
+      code: `book <- "Psalms"\n\nold <- c("Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy",\n  "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings",\n  "1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther", "Job",\n  "Psalms", "Proverbs", "Ecclesiastes", "Song of Solomon", "Isaiah",\n  "Jeremiah", "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel", "Amos",\n  "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai",\n  "Zechariah", "Malachi")\nnew <- c("Matthew", "Mark", "Luke", "John", "Acts", "Romans",\n  "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians",\n  "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy",\n  "2 Timothy", "Titus", "Philemon", "Hebrews", "James", "1 Peter", "2 Peter",\n  "1 John", "2 John", "3 John", "Jude", "Revelation")\nbible <- c(old, new)\n\npos <- match(tolower(book), tolower(bible))\nif (is.na(pos)) {\n  cat("Hmm, I can't find", book, "- check the spelling!\\n")\n} else if (pos <= length(old)) {\n  cat("📜", bible[pos], "is book", pos, "of 66, in the Old Testament.\\n")\n} else {\n  cat("✝️", bible[pos], "is book", pos, "of 66, in the New Testament.\\n")\n}\ncat("Old Testament:", length(old), "books. New Testament:", length(new), "books.\\n")` },
+    { id: 'G18', icon: '🚢', bible: true, title: 'Two by two', title_yo: 'Méjì-méjì',
+      prompt: "The animals went into Noah's ark two by two (Genesis 7:9). rep() with each = 2 makes the pairs!",
+      prompt_yo: 'Àwọn ẹranko wọ inú ọkọ̀ Nóà ní méjì-méjì (Jẹ́nẹ́sísì 7:9). rep() pẹ̀lú each = 2 ń ṣe àwọn méjì-méjì náà!',
+      inputs: [{ type: 'text', name: 'animal1', label: 'Animal 1', label_yo: 'Ẹranko 1' }, { type: 'text', name: 'animal2', label: 'Animal 2', label_yo: 'Ẹranko 2' }, { type: 'text', name: 'animal3', label: 'Animal 3', label_yo: 'Ẹranko 3' }],
+      code: `animal1 <- "lion"\nanimal2 <- "elephant"\nanimal3 <- "giraffe"\n\nark <- rep(c(animal1, animal2, animal3), each = 2)\ncat("Into the ark they go, two by two:\\n")\nprint(ark)\ncat("That makes", length(ark), "animals!\\n")\n\nbarplot(table(ark), col = c("sienna", "goldenrod", "grey60"),\n        main = "Noah's ark (Genesis 7:9)")` },
+    { id: 'G19', icon: '❓', bible: true, title: 'Bible quiz', title_yo: 'Ìdánwò Bíbélì',
+      prompt: 'Press Play to see a question. Type your answer in English and press Play again. Pick a harder level when you are ready!',
+      prompt_yo: 'Tẹ Ṣeré láti rí ìbéèrè. Kọ ìdáhùn rẹ ní èdè Gẹ̀ẹ́sì kí o sì tẹ Ṣeré lẹ́ẹ̀kan sí. Yan ìpele tí ó le nígbà tí o bá ṣetán!',
+      win: /Correct!/, noTry: /Type your answer/,
+      inputs: [{ type: 'difficulty', sets: { easy: { level: '"easy"' }, medium: { level: '"medium"' }, hard: { level: '"hard"' } } },
+        { type: 'text', name: 'my_answer', clearOnNew: true, label: 'My answer', label_yo: 'Ìdáhùn mi' }, { type: 'seed', label: 'new_question' }],
+      code: `level <- "easy"\nmy_answer <- ""\nset.seed(8)\n\nquiz <- list(\n  easy = list(\n    q = c("Who built the ark?", "Who was swallowed by a big fish?",\n          "Who killed the giant Goliath?", "How many disciples did Jesus choose?",\n          "In which town was Jesus born?"),\n    a = c("noah", "jonah", "david", "12|twelve", "bethlehem")),\n  medium = list(\n    q = c("Who was thrown into the lions' den?", "What is the first book of the Bible?",\n          "Who led the Israelites out of Egypt?", "What did Jesus turn water into?",\n          "For how many days did it rain in Noah's flood?"),\n    a = c("daniel", "genesis", "moses", "wine", "40|forty")),\n  hard = list(\n    q = c("Who lived the longest in the Bible?", "What is the shortest verse in the Bible (KJV)?",\n          "Who was the first king of Israel?", "On which island did John write Revelation?",\n          "How many books are in the Old Testament?"),\n    a = c("methuselah", "jesus wept", "saul", "patmos", "39|thirty-nine|thirty nine"))\n)\n\npool <- quiz[[level]]\nn <- sample(seq_along(pool$q), 1)\ncat("❓", pool$q[n], "\\n")\n\nanswer <- tolower(trimws(my_answer))\nif (answer == "") {\n  cat("Type your answer in the box, then press Play.\\n")\n} else if (answer %in% strsplit(pool$a[n], "|", fixed = TRUE)[[1]]) {\n  cat("✅ Correct! Well done.\\n")\n} else {\n  cat("❌ Not quite. Try again, or press New question.\\n")\n}` },
+    { id: 'G20', icon: '🎵', bible: true, music: true, title: 'Music maker', title_yo: 'Ẹlẹ́dàá orin',
+      prompt: 'R can write music! notes holds the tune and beats says how long each note lasts. This is the start of "Jesus Loves Me". Press Play to hear it, then change the notes to make your own song.',
+      prompt_yo: 'R lè kọ orin! notes ni ohùn orin, beats sì sọ bí ohùn kọ̀ọ̀kan ṣe gùn tó. Èyí ni ìbẹ̀rẹ̀ "Jesus Loves Me". Tẹ Ṣeré láti gbọ́ ọ, lẹ́yìn náà yí àwọn notes padà láti kọ orin tìrẹ.',
+      inputs: [{ type: 'number', name: 'speed', min: 40, max: 240, label: 'Speed', label_yo: 'Ìyára' }],
+      code: `# Notes you can use: C D E F G A B C5 D5 E5, and "rest" for a pause\nnotes <- c("G", "E", "E", "D", "E", "G", "G",\n           "A", "A", "C5", "A", "A", "G", "G")\nbeats <- c(1, 0.5, 0.5, 0.5, 0.5, 1, 1,\n           0.5, 0.5, 0.5, 0.5, 1, 1, 2)\nspeed <- 100\n\ncat("🎵 Jesus loves me! This I know,\\n   For the Bible tells me so.\\n")\ncat("That is", length(notes), "notes and", sum(beats), "beats.\\n")\n\nscale <- c("C", "D", "E", "F", "G", "A", "B", "C5", "D5", "E5")\nheight <- match(notes, scale)\nstart <- cumsum(c(0, head(beats, -1)))\nplot(start, height, pch = 15, cex = 3, col = rainbow(10)[height],\n     ylim = c(1, 10), yaxt = "n", xlab = "Time (beats)", ylab = "",\n     main = "My melody")\naxis(2, at = 1:10, labels = scale, las = 1)` },
   ],
   free: [
     { id: 'F1', icon: '📄', title: 'Blank page', title_yo: 'Ojú-ìwé òfo', saved: true,
@@ -854,6 +910,10 @@ const CONTENT = {
       prompt: 'Mix shapes, colours and loops into your own picture.',
       prompt_yo: 'Da àwọn ìrísí, àwọ̀ àti loop pọ̀ sínú àwòrán tìrẹ.',
       code: `plot(NULL, xlim = c(0, 10), ylim = c(0, 10), asp = 1,\n     axes = FALSE, xlab = "", ylab = "", main = "My art")\nfor (i in 1:12) {\n  symbols(5, 5, circles = i * 0.4, inches = FALSE, add = TRUE,\n          fg = rainbow(12)[i], lwd = 3)\n}` },
+    { id: 'F4', icon: '🎹', music: true, saved: true, title: 'My song', title_yo: 'Orin mi',
+      prompt: 'Write your own tune with notes and beats, then press Run to hear it. R remembers it for next time.',
+      prompt_yo: 'Kọ orin tìrẹ pẹ̀lú notes àti beats, lẹ́yìn náà tẹ Ṣe é láti gbọ́ ọ. R yóò rántí rẹ̀ fún ìgbà mìíràn.',
+      code: `# Notes: C D E F G A B C5 D5 E5, or "rest"\nnotes <- c("C", "D", "E", "F", "G", "A", "B", "C5")\nbeats <- rep(0.5, length(notes))\nspeed <- 120\n\ncat("My song has", length(notes), "notes\\n")` },
   ]
 };
 
@@ -869,17 +929,31 @@ const BADGES = [
   { id: 'streak3', icon: '🔥', en: ['On fire', 'Code 3 days in a row'], yo: ['Iná ń jó', 'Ṣe kóòdù ọjọ́ mẹ́ta léraléra'] },
   { id: 'gallery3', icon: '🖼️', en: ['Gallery owner', 'Save 3 pictures'], yo: ['Olùní àkójọ', 'Fi àwòrán mẹ́ta pamọ́'] },
   { id: 'yoruba', icon: '🗣️', en: ['Two languages', 'Use R Quest in Yorùbá'], yo: ['Èdè méjì', 'Lo R Quest ní Yorùbá'] },
+  { id: 'bible3', icon: '📖', en: ['Bible explorer', 'Finish 3 Bible activities'], yo: ['Aṣàwárí Bíbélì', 'Parí iṣẹ́ Bíbélì mẹ́ta'] },
+  { id: 'hard_win', icon: '💪', en: ['Brave heart', 'Win a game on Hard'], yo: ['Akíkanjú', 'Borí eré kan ní ìpele Le'] },
+  { id: 'musician', icon: '🎵', en: ['Musician', 'Play a tune you made in R'], yo: ['Olórin', 'Ṣe orin tí o kọ nínú R'] },
   { id: 'blocks', icon: '🧱', en: ['Block builder', 'Run code made of blocks'], yo: ['Akọ́lé bulọ́ọ̀kù', 'Ṣe kóòdù tí a fi bulọ́ọ̀kù ṣe'] },
 ];
 
-const AVATARS = ['🦉', '🐢', '🦁', '🐘', '🦒', '🐆', '🦜', '🐊'];
+const VERSES = [
+  'This is the day which the LORD hath made; we will rejoice and be glad in it. (Psalm 118:24)',
+  'I can do all things through Christ which strengtheneth me. (Philippians 4:13)',
+  'Thy word is a lamp unto my feet, and a light unto my path. (Psalm 119:105)',
+  'And whatsoever ye do, do it heartily, as to the Lord. (Colossians 3:23)',
+  'The LORD is my shepherd; I shall not want. (Psalm 23:1)',
+  'Trust in the LORD with all thine heart. (Proverbs 3:5)',
+  'Be strong and of a good courage; be not afraid. (Joshua 1:9)',
+];
+const verseOfDay = () => VERSES[Math.floor(Date.now() / 864e5) % VERSES.length];
+
+const AVATARS = ['🕊️', '🐑', '🦁', '🐘', '🦒', '🐢', '🦜', '🐟'];
 
 /* ---------- state ---------- */
 const S = store.get('rq2-state', null) || {};
 S.stars ??= 0; S.streak ??= 0; S.lastDay ??= null; S.done ??= {}; S.badges ??= {};
-S.name ??= ''; S.avatar ??= '🦉'; S.sound ??= true;
+S.name ??= ''; S.avatar ??= '🕊️'; if (S.avatar === '🦉' || S.avatar === '🐆' || S.avatar === '🐊') S.avatar = '🕊️'; S.sound ??= true;
 S.lang ??= store.get('rquest-lang', 'en');
-S.free ??= {};
+S.free ??= {}; S.diff ??= {}; S.wins ??= {}; S.big ??= false;
 let gallery = store.get('rq2-gallery', []);
 const today = new Date().toDateString();
 if (S.lastDay && S.lastDay !== today && S.lastDay !== new Date(Date.now() - 864e5).toDateString()) S.streak = 0;
@@ -919,6 +993,53 @@ const sfx = {
   bad: () => tone([300, 220], 0.18, 'sine', 0.12),
   tap: () => tone([880], 0.05, 'sine'),
 };
+
+/* ---------- music ---------- */
+const NOTE_HZ = { C: 261.63, D: 293.66, E: 329.63, F: 349.23, G: 392.0, A: 440.0, B: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.0, A4: 440.0, B4: 493.88 };
+function playMelody({ notes, beats, speed }) {
+  try {
+    actx ||= new (window.AudioContext || window.webkitAudioContext)();
+    const spb = 60 / Math.min(240, Math.max(40, speed || 100));
+    let t = actx.currentTime + 0.05;
+    notes.slice(0, 200).forEach((n, i) => {
+      const dur = Math.min(4, Math.max(0.125, beats[i] || 1)) * spb;
+      const hz = NOTE_HZ[String(n).trim().toUpperCase()] || NOTE_HZ[String(n).trim()];
+      if (hz) {
+        const o = actx.createOscillator(), g = actx.createGain(), o2 = actx.createOscillator(), g2 = actx.createGain();
+        o.type = 'triangle'; o.frequency.value = hz; o2.type = 'sine'; o2.frequency.value = hz * 2;
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.25, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.95);
+        g2.gain.setValueAtTime(0.0001, t); g2.gain.exponentialRampToValueAtTime(0.05, t + 0.02); g2.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.6);
+        o.connect(g).connect(actx.destination); o2.connect(g2).connect(actx.destination);
+        o.start(t); o.stop(t + dur); o2.start(t); o2.stop(t + dur);
+      }
+      t += dur;
+    });
+  } catch {}
+}
+
+/* ---------- read aloud ---------- */
+const hasTTS = 'speechSynthesis' in window;
+function ttsVoice() {
+  if (!hasTTS) return null;
+  const vs = speechSynthesis.getVoices();
+  if (S.lang === 'yo') return vs.find(v => /^yo/i.test(v.lang)) || null;
+  return vs.find(v => /^en-NG/i.test(v.lang)) || vs.find(v => /^en-GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+}
+const canSpeak = () => hasTTS && (S.lang !== 'yo' || !!ttsVoice());
+function speak(text) {
+  if (!hasTTS || !text) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}⬆️⬇️]/gu, '').replace(/\[\d+\]/g, '').slice(0, 600));
+    const v = ttsVoice(); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = S.lang === 'yo' ? 'yo-NG' : 'en-GB';
+    u.rate = 0.92; speechSynthesis.speak(u);
+  } catch {}
+}
+function refreshSpeakButtons() {
+  const ok = canSpeak();
+  document.querySelectorAll('.speak').forEach(b => { b.hidden = !ok; b.setAttribute('aria-label', tr('read_aloud')); b.title = tr('read_aloud'); });
+}
+if (hasTTS) speechSynthesis.addEventListener?.('voiceschanged', refreshSpeakButtons);
 
 /* ---------- editor ---------- */
 const ta = $('code'), hl = $('hl'), gutter = $('gutter');
@@ -1003,7 +1124,7 @@ function rLiteralFor(input, raw) {
     if (input.min != null) n = Math.max(input.min, n); if (input.max != null) n = Math.min(input.max, n);
     return String(n);
   }
-  return '"' + String(raw).replace(/["\\]/g, '').slice(0, 40) + '"';
+  return '"' + String(raw).replace(/["\\]/g, '').slice(0, 120) + '"';
 }
 function setVar(name, literal) {
   const re = new RegExp('^(\\s*' + name.replace(/\./g, '\\.') + '\\s*<-\\s*)[^\\n#]*', 'm');
@@ -1026,6 +1147,7 @@ function renderPlayBar() {
     }
     if (inp.type === 'choice') return inp.options.map(o => `<button type="button" class="choice" data-choice="${esc(o.v)}" data-i="${i}">${esc(S.lang === 'yo' ? o.l_yo : o.l)}</button>`).join('');
     if (inp.type === 'seed') return `<button type="button" class="btn btn-2 btn-sm" data-seed="1">${esc(tr(inp.label))}</button>`;
+    if (inp.type === 'difficulty') { const cur = S.diff[item.id] || 'easy'; return `<div class="field"><span class="lbl-sm" style="font-size:12px;font-weight:800;color:var(--muted)">${esc(tr('difficulty'))}</span><div class="seg" role="group" aria-label="${esc(tr('difficulty'))}">` + ['easy', 'medium', 'hard'].map(d => `<button type="button" class="d-${d}" data-diff="${d}" aria-pressed="${d === cur}">${esc(tr('d_' + d))}</button>`).join('') + '</div></div>'; }
     if (inp.type === 'tries') return `<span class="tries" id="tries">${esc(tr('tries'))}: ${tries}</span>`;
     return '';
   }).join('');
@@ -1038,21 +1160,31 @@ $('play-bar').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.ta
 $('play-bar').addEventListener('click', (e) => {
   const c = e.target.closest('[data-choice]');
   if (c) { const inp = item.inputs[+c.dataset.i]; setVar(inp.name, rLiteralFor(inp, c.dataset.choice)); run(); return; }
+  const dd = e.target.closest('[data-diff]');
+  if (dd) { S.diff[item.id] = dd.dataset.diff; save(); applyDifficulty(); clearAnswers(); tries = 0; renderPlayBar(); clearOutput(); sfx.tap(); return; }
   if (e.target.closest('[data-seed]')) {
-    setCode(ta.value.replace(/set\.seed\(\d+\)/, `set.seed(${Math.floor(Math.random() * 9000) + 100})`));
+    setCode(ta.value.replace(/set\.seed\(\d+\)/, `set.seed(${Math.floor(Math.random() * 9000) + 100})`)); clearAnswers();
     tries = 0; renderPlayBar(); clearOutput(); sfx.tap();
   }
 });
 
+function clearAnswers() { (item?.inputs || []).filter(i => i.clearOnNew).forEach(i => setVar(i.name, '""')); }
+function applyDifficulty() {
+  const dInp = item?.inputs?.find(i => i.type === 'difficulty'); if (!dInp) return;
+  const set = dInp.sets[S.diff[item.id] || 'easy'] || {};
+  for (const [k, v] of Object.entries(set)) setVar(k, v);
+}
+
 /* ---------- list & items ---------- */
+const chDiff = (it) => it.points <= 15 ? 'easy' : it.points <= 25 ? 'medium' : 'hard';
 function trackItems() { return CONTENT[tab] || []; }
 function renderList() {
   const items = trackItems();
   $('list').innerHTML = items.map(it => {
     const done = S.done[it.id];
     let tag = '';
-    if (tab === 'challenge') tag = done ? `<span class="tag done">✓ +${it.points}</span>` : `<span class="tag pts">+${it.points}⭐</span>`;
-    else if (tab !== 'free') tag = done ? `<span class="tag done">✓</span>` : '';
+    if (tab === 'challenge') tag = done ? `<span class="tag done">✓ +${it.points}</span>` : `<span class="tag d-${chDiff(it)}">${esc(tr('d_' + chDiff(it)))}</span>`;
+    else if (tab !== 'free') tag = done ? `<span class="tag done">✓</span>` : (it.bible ? `<span class="tag num" title="Bible">✝</span>` : '');
     return `<button type="button" class="item" data-id="${it.id}" aria-current="${item && item.id === it.id}"><span class="ic" aria-hidden="true">${it.icon}</span><span class="nm">${esc(pick(it, 'title'))}</span>${tag}</button>`;
   }).join('');
   const total = items.length, n = items.filter(i => S.done[i.id]).length;
@@ -1070,13 +1202,15 @@ function load(it) {
   p.className = 'prompt' + (tab === 'challenge' ? ' challenge' : '');
   let html = esc(pick(it, 'prompt'));
   if (it.goal) html += `<span class="goal">🎯 ${esc(pick(it, 'goal'))}</span>`;
+  if (tab === 'challenge') html += `<span class="pretend"><span class="tag d-${chDiff(it)}">${esc(tr('d_' + chDiff(it)))}</span> +${it.points} ⭐</span>`;
   if (it.pretend) html += `<span class="pretend">ⓘ ${esc(tr('pretend'))}</span>`;
-  p.innerHTML = html;
+  p.innerHTML = `<div class="prompt-row"><div>${html}</div><button type="button" class="speak" data-speak="prompt" aria-label="${esc(tr('read_aloud'))}" ${canSpeak() ? '' : 'hidden'}>🔈</button></div>`;
   const hb = $('hint-box'); hb.hidden = true;
   hb.innerHTML = it.hint ? `<code>${esc(pick(it, 'hint')).replace(/\n/g, '<br>')}</code>` : '';
   $('hint').hidden = !it.hint; $('hint').textContent = tr('hint');
   const code = (it.saved && S.free[it.id] != null) ? S.free[it.id] : (it.starter ?? it.code ?? '');
   setCode(code);
+  if (!it.saved) applyDifficulty();
   blocks = []; if (mode === 'blocks') renderBlocks();
   renderPlayBar();
   $('run').textContent = runLabel();
@@ -1108,8 +1242,8 @@ function switchTab(name) {
 
 /* ---------- output ---------- */
 function clearOutput() {
-  $('out').textContent = rReady ? tr('welcome') : '';
-  $('oops').hidden = true; $('plots').innerHTML = '';
+  $('out').textContent = rReady ? tr('welcome') + '\n\n📖 ' + verseOfDay() : '';
+  $('oops').hidden = true; $('plots').innerHTML = ''; $('next-wrap').hidden = true;
 }
 const ERR = [
   [/object '(.+?)' not found/, (m) => ({
@@ -1178,7 +1312,8 @@ async function run() {
   running = true;
   const btn = $('run'); btn.setAttribute('aria-busy', 'true'); btn.textContent = tr('running');
   $('oops').hidden = true; $('plots').innerHTML = ''; $('out').textContent = '';
-  let text = '', images = [], err = null, rpass = true;
+  let text = '', images = [], err = null, rpass = true, music = null;
+  $('next-wrap').hidden = true;
   try {
     await webR.evalRVoid('rm(list = ls(envir = globalenv(), all.names = TRUE), envir = globalenv())');
     const res = await shelter.captureR(code, { withAutoprint: true, captureStreams: true, captureConditions: false, captureGraphics: { width: 560, height: 420 } });
@@ -1195,6 +1330,15 @@ async function run() {
     if (item?.rcheck) {
       try { rpass = await webR.evalRBoolean(item.rcheck); } catch { rpass = false; }
     }
+    if (item?.music && !err) {
+      try {
+        const g = (v, f) => `if (exists("${v}", envir = globalenv(), inherits = FALSE)) paste(${f}(${v}), collapse = " ") else ""`;
+        const nStr = await webR.evalRString(g('notes', 'as.character'));
+        const bStr = await webR.evalRString(g('beats', 'as.numeric'));
+        const sp = await webR.evalRNumber('if (exists("speed", envir = globalenv(), inherits = FALSE)) as.numeric(speed)[1] else 100');
+        music = { notes: nStr.split(' ').filter(Boolean), beats: bStr.split(' ').filter(Boolean).map(Number), speed: sp };
+      } catch { music = null; }
+    }
   } catch (e) {
     err = (e && e.message) ? e.message : String(e);
   } finally {
@@ -1204,7 +1348,11 @@ async function run() {
   images.forEach((img) => addPlot(img));
   if (err) { showOops(err); sfx.bad(); sad(); lastRunFailed = true; }
   else afterSuccess(code, text, images.length, rpass);
-  if (tab === 'games' && item?.inputs?.some(i => i.type === 'tries')) { tries++; const t = $('tries'); if (t) t.textContent = `${tr('tries')}: ${tries}`; }
+  if (music && music.notes.length && !err) {
+    if (S.sound) { $('out').textContent += (text ? '\n' : '') + tr('playing'); playMelody(music); award('musician'); }
+    else $('out').textContent += (text ? '\n' : '') + tr('sound_off_music');
+  }
+  if (!err && tab === 'games' && item?.inputs?.some(i => i.type === 'tries') && !(item.noTry && item.noTry.test(text))) { tries++; const t = $('tries'); if (t) t.textContent = `${tr('tries')}: ${tries}`; }
   btn.removeAttribute('aria-busy'); btn.textContent = runLabel();
   running = false;
 }
@@ -1254,10 +1402,30 @@ function afterSuccess(code, out, nImages, rpass) {
     else { happy(); sfx.ok(); }
   } else if (tab === 'learn' && first) {
     S.done[item.id] = true; S.stars += 5; bumpStreak(); celebrate('+5 ⭐', tr('lesson_done'));
-  } else if (tab === 'games' && first) {
-    S.done[item.id] = true; S.stars += 3; bumpStreak(); celebrate('+3 ⭐', tr('game_done'));
-  } else { happy(); sfx.ok(); }
+  } else if (tab === 'games') {
+    let gained = 0, msg = null;
+    if (first) { S.done[item.id] = true; gained += 3; msg = tr('game_done'); }
+    const won = item.win && item.win.test(out);
+    if (won) {
+      const d = item.inputs?.some(i => i.type === 'difficulty') ? (S.diff[item.id] || 'easy') : 'easy';
+      const key = item.id + ':' + d;
+      if (d === 'hard') award('hard_win');
+      if (!S.wins[key]) { S.wins[key] = Date.now(); gained += { easy: 2, medium: 4, hard: 6 }[d]; msg = tr('won_on').replace('{d}', tr('d_' + d)); }
+    }
+    if (gained) { S.stars += gained; bumpStreak(); celebrate(`+${gained} ⭐`, msg); }
+    else if (won) { happy(); sfx.win(); }
+    else { happy(); if (!item.music) sfx.ok(); }
+  } else { happy(); if (!item.music) sfx.ok(); }
+  if (tab !== 'free' && (tab !== 'challenge' || S.done[item.id])) showNext();
   save(); checkBadges(); updateHud(); renderList();
+}
+function showNext() {
+  const list = CONTENT[tab] || []; const i = list.findIndex(x => x.id === item.id);
+  const nx = list[i + 1]; const w = $('next-wrap');
+  if (!nx) { w.hidden = true; return; }
+  w.innerHTML = `<button type="button" class="btn btn-run next-btn" id="next-btn">${esc(tr('next'))}: ${nx.icon} ${esc(pick(nx, 'title'))} →</button>`;
+  w.hidden = false;
+  $('next-btn').onclick = () => { sfx.tap(); load(nx); clearOutput(); $('prompt').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
 }
 function checkBadges() {
   const n = (k) => CONTENT[k].filter(i => S.done[i.id]).length;
@@ -1267,6 +1435,8 @@ function checkBadges() {
   if (n('challenge') === CONTENT.challenge.length) award('all_ch');
   if (n('games') >= 5) award('five_games');
   if (S.streak >= 3) award('streak3');
+  const bibleDone = ['learn', 'challenge', 'games'].flatMap(k => CONTENT[k]).filter(i => i.bible && S.done[i.id]).length;
+  if (bibleDone >= 3) award('bible3');
 }
 let toastTimer = null;
 function award(id) {
@@ -1286,6 +1456,8 @@ function updateHud() {
   $('lvl-bar').style.width = `${(S.stars % 50) * 2}%`;
   $('who').textContent = S.name ? `${tr('hello')}, ${S.name} ${S.avatar} · ${levelName()}` : '';
   $('sound-btn').textContent = S.sound ? '🔊' : '🔇';
+  document.body.classList.toggle('big', !!S.big);
+  $('big-btn').setAttribute('aria-pressed', String(!!S.big)); $('big-btn').title = tr('big_text');
   $('lang-btn').textContent = S.lang === 'en' ? 'Yorùbá' : 'English';
 }
 const levelName = () => { const names = tr('lvl_names'); return names[Math.min(Math.floor(S.stars / 50), names.length - 1)]; };
@@ -1362,6 +1534,7 @@ function applyLang() {
   $('mode-code').textContent = tr('mode_code'); $('mode-blocks').textContent = tr('mode_blocks');
   $('reset').textContent = tr('reset'); $('kbd').textContent = tr('kbd'); $('out-title').textContent = tr('out_title');
   renderPalette();
+  refreshSpeakButtons();
   if (S.lang === 'yo') award('yoruba');
   updateHud();
   setStatus(rReady ? 'ready' : rDown ? 'down' : 'loading');
@@ -1374,6 +1547,9 @@ function applyLang() {
 }
 $('lang-btn').addEventListener('click', () => { S.lang = S.lang === 'en' ? 'yo' : 'en'; save(); applyLang(); sfx.tap(); });
 $('sound-btn').addEventListener('click', () => { S.sound = !S.sound; save(); updateHud(); sfx.tap(); });
+$('big-btn').addEventListener('click', () => { S.big = !S.big; save(); updateHud(); sfx.tap(); });
+$('prompt').addEventListener('click', (e) => { if (e.target.closest('[data-speak]')) { const el = $('prompt').querySelector('.prompt-row > div'); speak(el ? el.innerText : ''); } });
+$('speak-out').addEventListener('click', () => { const oo = $('oops'); speak((oo.hidden ? '' : oo.innerText.split('\n').slice(0, 2).join('. ') + '. ') + $('out').textContent); });
 
 /* ---------- celebrate ---------- */
 const owl = $('owl');
@@ -1381,7 +1557,7 @@ function happy() { owl.classList.remove('sad', 'happy'); void owl.offsetWidth; o
 function sad() { owl.classList.remove('sad', 'happy'); void owl.offsetWidth; owl.classList.add('sad'); }
 function celebrate(pts, msg) {
   const box = $('celebrate');
-  $('c-emoji').textContent = ['🎉', '🌟', '🏆', '🚀', '🦉'][Math.floor(Math.random() * 5)];
+  $('c-emoji').textContent = ['🎉', '🌟', '🏆', '🙌', '🕊️'][Math.floor(Math.random() * 5)];
   $('c-msg').textContent = msg; $('c-pts').textContent = pts;
   box.querySelectorAll('.confetti').forEach(c => c.remove());
   const colors = ['#F0563A', '#FFC233', '#1F9D63', '#2E3FA3', '#9B6BFF'];
