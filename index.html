@@ -358,6 +358,213 @@
   body.big .code-area pre, body.big .code-area textarea, body.big .gutter { font-size: 16px; line-height: 26px; }
   body.big .keys button { height: 42px; font-size: 16px; min-width: 44px; }
 
+  /* ---------- mascot ---------- */
+  .dove-host { display: inline-block; line-height: 0; }
+  .dove-host svg { width: 100%; height: 100%; overflow: visible; }
+  .owl { width: 46px; height: 46px; }
+  .dove { animation: float 3.2s ease-in-out infinite; transform-origin: 50% 80%; }
+  .dove .wing { transform-origin: 62px 52px; animation: flap 3.2s ease-in-out infinite; }
+  .dove .eye { transform-origin: 76px 39px; animation: blink 4.5s infinite; }
+  .dove .branch { transform-origin: 90px 46px; animation: sway 3.2s ease-in-out infinite; }
+  .happy .dove { animation: hop .6s cubic-bezier(.3,1.6,.5,1) 2; }
+  .happy .dove .wing { animation: flapfast .15s ease-in-out 8; }
+  .sad .dove { animation: droop .9s ease-in-out; }
+  @keyframes float { 50% { transform: translateY(-4px); } }
+  @keyframes flap { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(-18deg); } 90% { transform: rotate(4deg); } }
+  @keyframes flapfast { 50% { transform: rotate(-32deg); } }
+  @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  @keyframes sway { 50% { transform: rotate(6deg); } }
+  @keyframes hop { 40% { transform: translateY(-14px) rotate(-6deg); } 70% { transform: translateY(0) scale(1.06, .94); } }
+  @keyframes droop { 30%, 70% { transform: rotate(10deg) translateY(3px); } }
+
+  /* coach */
+  .coach { display: flex; align-items: center; gap: 10px; }
+  .coach .dove-host { width: 58px; height: 58px; flex: 0 0 auto; }
+  .bubble {
+    position: relative; background: var(--card); border: 2px solid var(--line); border-radius: 16px;
+    padding: 8px 12px; font-weight: 800; font-size: 14px; line-height: 1.35; min-width: 0;
+  }
+  .bubble::before { content: ""; position: absolute; left: -10px; top: 50%; margin-top: -8px; border: 8px solid transparent; border-right-color: var(--line); border-left: 0; }
+  .bubble.pop { animation: bubblepop .35s cubic-bezier(.3,1.5,.6,1); }
+  @keyframes bubblepop { from { transform: scale(.7); opacity: 0; } }
+
+  /* views */
+  .enter { animation: viewIn .38s cubic-bezier(.2,.8,.3,1); }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } }
+  .back-btn { align-self: flex-start; border: 0; background: var(--soft); color: var(--indigo); font-weight: 800; border-radius: 99px; padding: 6px 14px; }
+  .back-btn:hover { background: #DDE2FA; }
+  .item.locked { opacity: .55; }
+
+  /* path */
+  .pathview {
+    max-width: 1120px; margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 18px 48px;
+    display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start;
+  }
+  .hero {
+    grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 16px 18px;
+  }
+  .hero .dove-host { width: 92px; height: 92px; }
+  .hero .bubble { font-size: 16px; flex: 1 1 220px; }
+  .hero .btn { margin-left: auto; }
+  .road { display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
+  .unit {
+    --u: var(--indigo-2);
+    border-radius: 20px; padding: 14px 18px; color: #fff; background-color: var(--u);
+    background-image: radial-gradient(circle at 14px 14px, rgba(255,255,255,.14) 3px, transparent 4px);
+    background-size: 28px 28px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 22px;
+  }
+  .unit:first-child { margin-top: 0; }
+  .unit small { display: block; font-size: 12px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; opacity: .85; }
+  .unit h3 { margin: 0; font-family: var(--font-display); font-size: 22px; line-height: 1.15; text-wrap: balance; }
+  .unit .uprog { font-weight: 800; font-size: 14px; background: rgba(255,255,255,.2); border-radius: 99px; padding: 4px 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .unit .uprog.full { background: var(--sun); color: #5A3E00; }
+  .nodes { display: flex; flex-direction: column; align-items: center; padding: 18px 0 4px; gap: 6px; }
+  .node-row {
+    --u: var(--indigo-2);
+    display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative;
+    transform: translateX(var(--off, 0px)); animation: nodeIn .45s cubic-bezier(.3,1.4,.5,1) both; animation-delay: var(--d, 0ms);
+  }
+  @keyframes nodeIn { from { opacity: 0; transform: translateX(var(--off, 0px)) scale(.5); } }
+  .node {
+    width: 74px; height: 74px; border-radius: 50%; border: 0; font-size: 30px; position: relative;
+    background: var(--u); color: #fff; box-shadow: 0 7px 0 rgba(0,0,0,.25), inset 0 -4px 0 rgba(0,0,0,.08);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .node:hover { transform: translateY(-2px); }
+  .node:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+  .node.done { background: var(--sun); box-shadow: 0 7px 0 #C98F00; }
+  .node.done .ck { position: absolute; right: -4px; bottom: -4px; width: 26px; height: 26px; border-radius: 50%; background: var(--leaf); color: #fff; font-size: 14px; display: grid; place-items: center; border: 3px solid var(--paper); }
+  .node.locked { background: #D6DAEA; box-shadow: 0 7px 0 #B6BCD6; color: #8890B5; cursor: not-allowed; }
+  .node.locked .ic { filter: grayscale(1); opacity: .5; }
+  .node.current::after { content: ""; position: absolute; inset: -10px; border-radius: 50%; border: 4px solid var(--u); opacity: .45; animation: ripple 1.6s ease-out infinite; }
+  @keyframes ripple { from { transform: scale(.85); opacity: .7; } to { transform: scale(1.25); opacity: 0; } }
+  .node-name { font-size: 13px; font-weight: 800; color: var(--muted); text-align: center; max-width: 140px; line-height: 1.2; }
+  .node-row.current .node-name { color: var(--ink); }
+  .start-tag {
+    background: var(--card); border: 2px solid var(--line); color: var(--u); border-radius: 12px;
+    padding: 3px 12px; font-weight: 800; font-size: 13px; letter-spacing: .5px; animation: bob 1.3s ease-in-out infinite;
+  }
+  @keyframes bob { 50% { transform: translateY(-5px); } }
+  .side { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 12px; }
+  .panel.goal-card { display: flex; flex-direction: row; align-items: center; gap: 14px; }
+  .ring { width: 72px; height: 72px; transform: rotate(-90deg); flex: 0 0 auto; }
+  .ring circle { fill: none; stroke-width: 9; }
+  .ring .bg { stroke: var(--soft); }
+  .ring .fg { stroke: var(--leaf); stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(.3,.8,.3,1); }
+  .goal-card b { display: block; font-family: var(--font-display); font-size: 18px; color: var(--indigo); line-height: 1.2; }
+  .goal-card span { font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .tile {
+    display: flex; align-items: center; gap: 12px; text-align: left; width: 100%;
+    border: 1px solid var(--line); background: var(--card); border-radius: 18px; padding: 12px 14px; font-weight: 800; font-size: 15px;
+    transition: transform .15s, border-color .15s;
+  }
+  .tile:hover { transform: translateY(-2px); border-color: var(--indigo-2); }
+  .tile .ti { font-size: 28px; }
+  .tile small { display: block; font-weight: 700; color: var(--muted); font-size: 13px; }
+  .flame { display: inline-block; }
+  .lit .flame { animation: flicker 1.2s ease-in-out infinite; }
+  @keyframes flicker { 25% { transform: scale(1.12) rotate(-6deg); } 60% { transform: scale(.95) rotate(4deg); } }
+
+  /* motion */
+  .out .ln { animation: lineIn .3s ease-out both; }
+  @keyframes lineIn { from { opacity: 0; transform: translateX(-6px); } }
+  .plot-wrap canvas { animation: reveal .9s cubic-bezier(.3,.7,.3,1); }
+  @keyframes reveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+  .flyer {
+    position: fixed; z-index: 80; pointer-events: none; font-family: var(--font-display); font-weight: 800;
+    font-size: 22px; color: var(--indigo); background: var(--sun); border-radius: 99px; padding: 2px 12px;
+  }
+  .fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 65; }
+  .item { transition: transform .12s, border-color .12s; }
+  .item:hover { transform: translateX(3px); }
+  .btn-run:hover { filter: brightness(1.06); }
+  .sheet.center { align-items: center; text-align: center; }
+  .sheet .big-dove { width: 120px; height: 120px; }
+
+  /* parents */
+  .parents {
+    max-width: 1060px; margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 18px 48px;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start;
+  }
+  .parents .wide { grid-column: 1 / -1; }
+  .gate { max-width: 420px; margin: 0 auto; align-items: center; text-align: center; grid-column: 1 / -1; }
+  .gate .big-dove { width: 96px; height: 96px; }
+  .gate h2, .parents h2 { margin: 0; font-family: var(--font-display); color: var(--indigo); font-size: 22px; line-height: 1.2; }
+  .gate input { width: 140px; text-align: center; border: 2px solid var(--line); border-radius: var(--r-md); padding: 10px; font-size: 20px; font-weight: 800; }
+  .kid-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .kid-row .ava { font-size: 54px; line-height: 1; }
+  .kid-row h2 { font-size: 26px; }
+  .bar-row { display: grid; grid-template-columns: 110px minmax(0,1fr) 56px; gap: 10px; align-items: center; font-weight: 800; font-size: 14px; }
+  .bar-row .track-bar { height: 12px; }
+  .bar-row span:last-child { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .week { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 8px; align-items: end; height: 150px; }
+  .week .col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; }
+  .week .b { width: 100%; max-width: 34px; border-radius: 8px 8px 3px 3px; background: var(--indigo-2); min-height: 3px; transition: height .8s cubic-bezier(.3,.8,.3,1); }
+  .week .b.today { background: var(--coral); }
+  .week small { font-size: 12px; font-weight: 800; color: var(--muted); }
+  .week .v { font-size: 12px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .skills { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .skills li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+  .skills li b { display: block; }
+  .skills .mk { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex: 0 0 auto; font-size: 13px; font-weight: 800; background: var(--soft); color: var(--muted); }
+  .skills .mk.ok { background: var(--leaf); color: #fff; }
+  .tips { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+  .plus { background: var(--indigo); color: #fff; border: 0; }
+  .plus h2 { color: var(--sun); }
+  .plus p { margin: 0; }
+  .fine { font-size: 13px; color: var(--muted); margin: 0; }
+
+  @media (max-width: 900px) {
+    .pathview { grid-template-columns: minmax(0,1fr); }
+    .hero { order: -2; }
+    .side { position: static; order: -1; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .side .goal-card { grid-column: 1 / -1; }
+    .parents { grid-template-columns: minmax(0,1fr); }
+  }
+  @media (max-width: 480px) {
+    .hero .btn { margin-left: 0; width: 100%; justify-content: center; }
+    .bar-row { grid-template-columns: 84px minmax(0,1fr) 48px; }
+  }
+
+  /* cloud / family */
+  .cloud-pill[data-s="saved"] { background: rgba(31,157,99,.35); }
+  .cloud-pill[data-s="error"], .cloud-pill[data-s="offline"] { background: rgba(240,86,58,.45); }
+  .family h2 { display: flex; align-items: center; gap: 8px; }
+  .family form, .family .stack2 { display: flex; flex-direction: column; gap: 10px; }
+  .family label { display: flex; flex-direction: column; gap: 4px; font-weight: 800; font-size: 14px; }
+  .family input[type="email"], .family input[type="password"], .family input[type="text"] {
+    border: 2px solid var(--line); border-radius: var(--r-md); padding: 9px 12px; font-weight: 700; font-size: 16px; max-width: 420px; width: 100%;
+  }
+  .linkbtn { border: 0; background: none; color: var(--indigo-2); font-weight: 800; text-decoration: underline; padding: 4px 2px; }
+  .msg { margin: 0; font-weight: 800; font-size: 14px; }
+  .msg.ok { color: var(--leaf); } .msg.bad { color: #B3341B; }
+  .kids { display: flex; flex-direction: column; gap: 8px; }
+  .kid {
+    display: grid; grid-template-columns: 44px minmax(0,1fr) auto; gap: 10px; align-items: center;
+    background: var(--soft); border-radius: var(--r-md); padding: 8px 12px;
+  }
+  .kid .a { font-size: 32px; line-height: 1; text-align: center; }
+  .kid b { display: block; } .kid small { color: var(--muted); font-weight: 700; }
+  .kid .acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .here { background: #D6F3E4; color: #11663F; font-weight: 800; font-size: 12px; border-radius: 99px; padding: 3px 10px; white-space: nowrap; }
+  .banner { background: #FFF6DA; border: 1px dashed #E2B23A; border-radius: var(--r-md); padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+  .ava-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ava-row button { font-size: 24px; border: 2px solid var(--line); background: var(--card); border-radius: var(--r-sm); width: 44px; height: 44px; }
+  .ava-row button[aria-pressed="true"] { border-color: var(--sun); background: #FFF3CF; }
+  .who-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+  .who-grid button { border: 2px solid var(--line); background: var(--soft); border-radius: 18px; padding: 14px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-weight: 800; transition: transform .12s; }
+  .who-grid button:hover { transform: translateY(-3px); border-color: var(--sun); }
+  .who-grid .a { font-size: 44px; line-height: 1; }
+  .who-grid small { color: var(--muted); font-weight: 700; }
+
   @media (max-width: 1100px) {
     .studio { grid-template-columns: 240px minmax(0,1fr); }
     .studio .output { grid-column: 1 / -1; }
@@ -383,7 +590,7 @@
   <div class="band-inner">
     <div class="top">
       <div class="brand">
-        <span class="owl" id="owl" aria-hidden="true">🕊️</span>
+        <span class="owl dove-host" id="owl" aria-hidden="true" data-dove></span>
         <div>
           <h1 id="brand">R <span>Quest</span></h1>
           <div class="who" id="who"></div>
@@ -392,7 +599,8 @@
       <div class="hud">
         <span class="pill level-pill" title="Level"><span id="lvl-label">Lv 1</span><span class="level-bar"><i id="lvl-bar"></i></span></span>
         <span class="pill" title="Stars">⭐ <span id="stars">0</span></span>
-        <span class="pill" title="Streak">🔥 <span id="streak">0</span></span>
+        <span class="pill" id="streak-pill" title="Streak"><span class="flame">🔥</span> <span id="streak">0</span></span>
+        <span class="pill cloud-pill" id="cloud-pill" hidden>☁️</span>
         <button class="pill" id="sound-btn" type="button" aria-label="Sound on or off">🔊</button>
         <button class="pill" id="big-btn" type="button" aria-pressed="false" aria-label="Bigger text">A+</button>
         <button class="pill" id="lang-btn" type="button">Yorùbá</button>
@@ -404,13 +612,17 @@
       <button class="tab" role="tab" data-tab="games" aria-selected="false">🎮 Games</button>
       <button class="tab" role="tab" data-tab="free" aria-selected="false">🎨 Free play</button>
       <button class="tab" role="tab" data-tab="stuff" aria-selected="false">🏅 My stuff</button>
+      <button class="tab" role="tab" data-tab="parents" aria-selected="false">👪 Parents</button>
     </nav>
   </div>
 </header>
 
 <main>
+  <section class="pathview" id="pathview" hidden></section>
+  <section class="parents" id="parents" hidden></section>
   <section class="studio" id="studio">
     <aside class="panel">
+      <button type="button" class="back-btn" id="back-path" hidden>← Path</button>
       <h2 class="panel-title"><span id="list-title">Lessons</span><span class="count" id="track-count">0/0</span></h2>
       <div class="track-bar"><i id="track-bar"></i></div>
       <div class="list" id="list"></div>
@@ -451,6 +663,7 @@
 
     <section class="panel output">
       <h2 class="panel-title"><span id="out-title">R says</span><button type="button" class="speak" id="speak-out" aria-label="Read aloud">🔈</button></h2>
+      <div class="coach"><span class="dove-host" data-dove aria-hidden="true"></span><div class="bubble" id="bubble">Let's code!</div></div>
       <div>
         <div class="status loading" id="status">Loading R…</div>
         <div class="loading-bar" id="loading-bar"><i></i></div>
@@ -503,9 +716,25 @@
       <button type="button" data-lang="yo" id="ob-yo">Yorùbá</button>
     </div>
     <button class="btn btn-run" type="submit" id="ob-go" style="justify-content:center">Let's go!</button>
+    <button class="linkbtn" type="button" id="ob-family" hidden>Grown-ups: sign in to your family account</button>
   </form>
 </div>
 
+<canvas class="fx" id="fx" hidden></canvas>
+<div class="scrim" id="levelup" hidden>
+  <div class="sheet center">
+    <span class="dove-host big-dove" data-dove aria-hidden="true"></span>
+    <h2 id="lu-title">Level up!</h2>
+    <p id="lu-sub"></p>
+    <button class="btn btn-run" id="lu-ok" type="button">Keep going</button>
+  </div>
+</div>
+<div class="scrim" id="whopick" hidden>
+  <div class="sheet">
+    <h2 id="wp-title">Who is learning?</h2>
+    <div class="who-grid" id="wp-grid"></div>
+  </div>
+</div>
 <div class="celebrate" id="celebrate" hidden>
   <div class="cbox"><div class="big" id="c-emoji">🎉</div><div class="msg" id="c-msg"></div><div class="pts" id="c-pts"></div></div>
 </div>
@@ -558,6 +787,29 @@ const I18N = {
     hello: 'Hi', badge_new: 'New badge!',
     lvl_names: ['Seedling', 'Explorer', 'Builder', 'Inventor', 'R Champion'],
     b_print: '+ print', b_math: '+ math', b_var: '+ box', b_plot: '+ chart', b_loop: '+ repeat',
+    cloud_title: 'Family account', cloud_soon: 'Online saving is not switched on yet.',
+    cloud_intro: 'Save progress online so it works on any phone or computer. Only a grown-up gives an email. Children just use a first name.',
+    email: 'Email', password: 'Password (at least 6 letters)', sign_in: 'Sign in', create_acc: 'Create account', forgot: 'Forgot password?', sign_out: 'Sign out',
+    signed_as: 'Signed in as {e}', kids_title: 'Children', add_child: 'Add a child', child_name: "Child's first name", add_btn: 'Add', use_here: 'Use on this device',
+    on_device: 'On this device', remove: 'Remove', remove_q: 'Remove {n} and all their progress?', link_banner: "Save {n}'s progress on this device to your family account?",
+    link_btn: 'Save to family', no_kids: 'No children yet. Add one below.', check_email: 'Check your email and tap the link to confirm, then sign in here.',
+    reset_sent: 'If that email has an account, a reset link is on its way.', new_pass: 'Choose a new password', save_pass: 'Save password', pass_saved: 'Password changed.',
+    need_email: 'Type an email address first.', bad_login: 'That email and password do not match.', exists: 'That email already has an account. Sign in instead.',
+    not_confirmed: 'Please confirm your email first. Check your inbox.', net_err: 'Could not reach the internet. Try again when you are online.', gen_err: 'Something went wrong. Please try again.',
+    who_title: 'Who is learning?', ob_family: 'Grown-ups: sign in to your family account',
+    c_saved: 'Saved online', c_saving: 'Saving…', c_error: 'Could not save online. It will try again.', c_offline: 'Offline. Progress is saved on this device.', c_out: 'Not signed in',
+    stars_short: 'stars',
+    tab_parents: '👪 Parents', back_path: '← Path', continue: 'Continue', start: 'START', daily_goal: "Today's goal", goal_done: 'Goal reached! 🎉',
+    greet_path: 'Hi {n}! Ready to learn something new today?', greet_done: 'Wow {n}, you finished every lesson! Try the challenges and games next.',
+    try_ch: 'Try a challenge', try_ch_s: 'Puzzles that check your code', play_game: 'Play a game', play_game_s: 'Games you can change', unit: 'Unit',
+    unit_done: 'Unit complete!', levelup_title: 'Level up!', levelup_sub: 'You are now {l}. Keep going!', keep_going: 'Keep going', streak_days: 'day streak',
+    gate_title: 'For grown-ups', gate_q: 'To open the parent page, answer: what is {a} × {b}?', gate_btn: 'Open', gate_err: 'That is not right. Please try again.',
+    rep_title: "{n}'s progress", rep_lessons: 'Lessons', rep_ch: 'Challenges', rep_games: 'Games', rep_week: 'Stars earned this week',
+    rep_minutes: '{m} minutes coding this week', rep_skills: 'Skills learned', rep_skills_note: 'A skill is ticked when its whole unit is finished.',
+    rep_tips: 'How you can help', tip1: 'Sit with your child for 15 minutes a day.', tip2: 'Ask them to explain their code to you. Teaching is the best way to learn.',
+    tip3: 'Use Free play to make a chart about your own family.', privacy: 'Everything is saved only on this device. R Quest collects no personal information.',
+    plus_title: 'R Quest Plus is coming', plus_body: 'New units, and class reports for schools and Sunday schools.',
+    privacy_cloud: 'Progress is saved on this device and in your family account. R Quest stores only your email and each child\'s first name, animal picture and progress.', lock: '🔒 Lock',
     d_easy: 'Easy', d_medium: 'Medium', d_hard: 'Hard', difficulty: 'Difficulty', won_on: 'You won on {d}!',
     new_question: '🔄 New question', next: 'Next', read_aloud: 'Read aloud', big_text: 'Bigger text',
     playing: '🎵 Playing your tune…', sound_off_music: '🔇 Sound is off. Tap 🔇 at the top, then press Play to hear your tune.',
@@ -595,6 +847,29 @@ const I18N = {
     hello: 'Báwo ni', badge_new: 'Àmì-ẹ̀yẹ tuntun!',
     lvl_names: ['Irúgbìn', 'Aṣàwárí', 'Akọ́lé', 'Olùdásílẹ̀', 'Akọni R'],
     b_print: '+ tẹ̀ jáde', b_math: '+ ìṣirò', b_var: '+ àpótí', b_plot: '+ àwòrán', b_loop: '+ àtúnṣe',
+    cloud_title: 'Àkáǹtì ìdílé', cloud_soon: 'A kò tíì tan ìfipamọ́ orí íntánẹ́ẹ̀tì.',
+    cloud_intro: 'Fi ìlọsíwájú pamọ́ sórí íntánẹ́ẹ̀tì kí ó lè ṣiṣẹ́ lórí fóònù tàbí kọ̀ǹpútà èyíkéyìí. Àgbà nìkan ni yóò fún wa ní ímeèlì. Àwọn ọmọdé ń lo orúkọ àkọ́kọ́ nìkan.',
+    email: 'Ímeèlì', password: 'Ọ̀rọ̀ aṣínà (lẹ́tà mẹ́fà ó kéré jù)', sign_in: 'Wọlé', create_acc: 'Ṣẹ̀dá àkáǹtì', forgot: 'Gbàgbé ọ̀rọ̀ aṣínà?', sign_out: 'Jáde',
+    signed_as: 'O ti wọlé gẹ́gẹ́ bí {e}', kids_title: 'Àwọn ọmọ', add_child: 'Fi ọmọ kún un', child_name: 'Orúkọ àkọ́kọ́ ọmọ', add_btn: 'Fi kún un', use_here: 'Lò ó lórí ẹ̀rọ yìí',
+    on_device: 'Lórí ẹ̀rọ yìí', remove: 'Yọ ọ́ kúrò', remove_q: 'Yọ {n} àti gbogbo ìlọsíwájú rẹ̀ kúrò?', link_banner: 'Fi ìlọsíwájú {n} lórí ẹ̀rọ yìí pamọ́ sínú àkáǹtì ìdílé rẹ?',
+    link_btn: 'Fi pamọ́ fún ìdílé', no_kids: 'Kò sí ọmọ kankan síbẹ̀. Fi ọ̀kan kún un nísàlẹ̀.', check_email: 'Ṣàyẹ̀wò ímeèlì rẹ kí o sì tẹ ìjápọ̀ náà láti fìdí rẹ̀ múlẹ̀, lẹ́yìn náà wọlé níbí.',
+    reset_sent: 'Bí ímeèlì yẹn bá ní àkáǹtì, ìjápọ̀ àtúntò ń bọ̀.', new_pass: 'Yan ọ̀rọ̀ aṣínà tuntun', save_pass: 'Fi ọ̀rọ̀ aṣínà pamọ́', pass_saved: 'A ti yí ọ̀rọ̀ aṣínà padà.',
+    need_email: 'Kọ́kọ́ kọ ímeèlì.', bad_login: 'Ímeèlì àti ọ̀rọ̀ aṣínà yẹn kò bára mu.', exists: 'Ímeèlì yẹn ti ní àkáǹtì. Wọlé dípò rẹ̀.',
+    not_confirmed: 'Jọ̀wọ́ kọ́kọ́ fìdí ímeèlì rẹ múlẹ̀. Ṣàyẹ̀wò àpò-ìwé rẹ.', net_err: 'A kò lè dé íntánẹ́ẹ̀tì. Gbìyànjú nígbà tí o bá wà lórí ayélujára.', gen_err: 'Nǹkan kan kò lọ dáadáa. Jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan sí.',
+    who_title: 'Ta ló ń kẹ́kọ̀ọ́?', ob_family: 'Àwọn àgbà: wọlé sí àkáǹtì ìdílé yín',
+    c_saved: 'Ó ti wà ní ìpamọ́ lórí íntánẹ́ẹ̀tì', c_saving: 'Ó ń fi pamọ́…', c_error: 'A kò lè fi pamọ́ sórí íntánẹ́ẹ̀tì. Yóò gbìyànjú lẹ́ẹ̀kan sí.', c_offline: 'Kò sí íntánẹ́ẹ̀tì. Ìlọsíwájú wà ní ìpamọ́ lórí ẹ̀rọ yìí.', c_out: 'O kò tíì wọlé',
+    stars_short: 'ìràwọ̀',
+    tab_parents: '👪 Àwọn òbí', back_path: '← Ọ̀nà', continue: 'Tẹ̀síwájú', start: 'BẸ̀RẸ̀', daily_goal: 'Àfojúsùn òní', goal_done: 'O ti dé àfojúsùn! 🎉',
+    greet_path: 'Báwo ni {n}! Ṣé o ṣetán láti kọ́ nǹkan tuntun lónìí?', greet_done: 'Háà {n}, o ti parí gbogbo ẹ̀kọ́! Gbìyànjú àwọn ìdíje àti eré báyìí.',
+    try_ch: 'Gbìyànjú ìdíje', try_ch_s: 'Àdìtú tí ó ń ṣàyẹ̀wò kóòdù rẹ', play_game: 'Ṣe eré kan', play_game_s: 'Eré tí o lè yí padà', unit: 'Ìpín',
+    unit_done: 'Ìpín parí!', levelup_title: 'Ìpele tuntun!', levelup_sub: 'Ìwọ ni {l} báyìí. Máa bá a lọ!', keep_going: 'Máa bá a lọ', streak_days: 'ọjọ́ léraléra',
+    gate_title: 'Fún àwọn àgbà', gate_q: 'Láti ṣí ojú-ìwé àwọn òbí, dáhùn: kí ni {a} × {b}?', gate_btn: 'Ṣí i', gate_err: 'Ìyẹn kò tọ̀nà. Jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan sí.',
+    rep_title: 'Ìlọsíwájú {n}', rep_lessons: 'Ẹ̀kọ́', rep_ch: 'Ìdíje', rep_games: 'Eré', rep_week: 'Ìràwọ̀ tí ó gbà ní ọ̀sẹ̀ yìí',
+    rep_minutes: 'Ìṣẹ́jú {m} ti kíkọ kóòdù ní ọ̀sẹ̀ yìí', rep_skills: 'Ohun tí ó ti kọ́', rep_skills_note: 'A máa ń sàmì sí ìmọ̀ kan nígbà tí gbogbo ìpín rẹ̀ bá parí.',
+    rep_tips: 'Bí o ṣe lè ṣèrànwọ́', tip1: 'Jókòó pẹ̀lú ọmọ rẹ fún ìṣẹ́jú 15 lójoojúmọ́.', tip2: 'Ní kí ó ṣàlàyé kóòdù rẹ̀ fún ọ. Kíkọ́ni ni ọ̀nà tí ó dára jù láti kọ́.',
+    tip3: 'Lo Eré ọ̀fẹ́ láti ya àwòrán nípa ìdílé yín.', privacy: 'Gbogbo nǹkan wà ní ìpamọ́ lórí ẹ̀rọ yìí nìkan. R Quest kò gba àlàyé ara ẹni kankan.',
+    plus_title: 'R Quest Plus ń bọ̀', plus_body: 'Àwọn ìpín tuntun, àti ìjábọ̀ kíláàsì fún ilé-ìwé àti ilé-ẹ̀kọ́ ọjọ́ ìsinmi.',
+    privacy_cloud: 'Ìlọsíwájú wà ní ìpamọ́ lórí ẹ̀rọ yìí àti nínú àkáǹtì ìdílé rẹ. R Quest ń tọ́jú ímeèlì rẹ nìkan, àti orúkọ àkọ́kọ́, àwòrán ẹranko àti ìlọsíwájú ọmọ kọ̀ọ̀kan.', lock: '🔒 Tì í',
     d_easy: 'Rọrùn', d_medium: 'Àárín', d_hard: 'Le', difficulty: 'Ìpele ìṣòro', won_on: 'O borí ní ìpele {d}!',
     new_question: '🔄 Ìbéèrè tuntun', next: 'Èyí tó kàn', read_aloud: 'Kà á sókè', big_text: 'Ọ̀rọ̀ ńlá',
     playing: '🎵 Orin rẹ ń dún…', sound_off_music: '🔇 Ohùn ti wà ní pípa. Tẹ 🔇 lókè, lẹ́yìn náà tẹ Ṣeré láti gbọ́ orin rẹ.',
@@ -932,6 +1207,8 @@ const BADGES = [
   { id: 'bible3', icon: '📖', en: ['Bible explorer', 'Finish 3 Bible activities'], yo: ['Aṣàwárí Bíbélì', 'Parí iṣẹ́ Bíbélì mẹ́ta'] },
   { id: 'hard_win', icon: '💪', en: ['Brave heart', 'Win a game on Hard'], yo: ['Akíkanjú', 'Borí eré kan ní ìpele Le'] },
   { id: 'musician', icon: '🎵', en: ['Musician', 'Play a tune you made in R'], yo: ['Olórin', 'Ṣe orin tí o kọ nínú R'] },
+  { id: 'unit_done', icon: '🏁', en: ['Unit champion', 'Finish a whole unit'], yo: ['Akọni ìpín', 'Parí ìpín kan pátápátá'] },
+  { id: 'daily_goal', icon: '🎯', en: ['Goal getter', "Reach today's goal of 20 stars"], yo: ['Aṣeyọrí ojoojúmọ́', 'Dé àfojúsùn ìràwọ̀ 20 ti òní'] },
   { id: 'blocks', icon: '🧱', en: ['Block builder', 'Run code made of blocks'], yo: ['Akọ́lé bulọ́ọ̀kù', 'Ṣe kóòdù tí a fi bulọ́ọ̀kù ṣe'] },
 ];
 
@@ -946,18 +1223,79 @@ const VERSES = [
 ];
 const verseOfDay = () => VERSES[Math.floor(Date.now() / 864e5) % VERSES.length];
 
+const UNITS = [
+  { id: 'u1', color: '#2E3FA3', en: 'Talk to R', yo: 'Bá R sọ̀rọ̀', skill_en: 'Printing, maths and variables', skill_yo: 'Títẹ̀ jáde, ìṣirò àti àwọn àpótí (variables)', ids: ['L1', 'L2', 'L3'] },
+  { id: 'u2', color: '#1F9D63', en: 'Lists and words', yo: 'Àkọsílẹ̀ àti ọ̀rọ̀', skill_en: 'Vectors (lists), sorting and picking items', skill_yo: 'Àkọsílẹ̀ (vectors), títò àti yíyan nǹkan', ids: ['L4', 'L5', 'L15', 'L16', 'L17'] },
+  { id: 'u3', color: '#E0532F', en: 'Draw with R', yo: 'Ya àwòrán pẹ̀lú R', skill_en: 'Scatter, bar, pie and line charts', skill_yo: 'Àwòrán ààmì, ọ̀pá, àkàrà àti ìlà', ids: ['L6', 'L7', 'L8', 'L9'] },
+  { id: 'u4', color: '#7B4BD1', en: 'Decisions and loops', yo: 'Ìpinnu àti ìyípo', skill_en: 'If/else, loops, functions and random numbers', skill_yo: 'Bí/bí kò ṣe, ìyípo, function àti nọ́mbà láìròtẹ́lẹ̀', ids: ['L18', 'L10', 'L11', 'L12', 'L13', 'L14'] },
+  { id: 'u5', color: '#C77700', en: 'R in real life', yo: 'R nínú ayé gidi', skill_en: 'Data frames (tables) and real-world maths', skill_yo: 'Tábìlì (data frame) àti ìṣirò ayé gidi', ids: ['L19', 'L20', 'L21'] },
+];
+CONTENT.learn = UNITS.flatMap(u => u.ids).map(id => CONTENT.learn.find(x => x.id === id)).filter(Boolean);
+const unitOf = (id) => UNITS.find(u => u.ids.includes(id));
+const DAILY_GOAL = 20;
+
+const DOVE = `<svg class="dove" viewBox="0 0 100 100" aria-hidden="true">
+  <path d="M20 60 L4 50 L9 63 L2 72 L22 67 Z" fill="#E6EAFF" stroke="#C3CCF2" stroke-width="2" stroke-linejoin="round"/>
+  <ellipse cx="46" cy="61" rx="30" ry="20" fill="#FFFFFF" stroke="#C3CCF2" stroke-width="2"/>
+  <path d="M40 81 l-3 7 M50 81 l-1 7" stroke="#F2A62E" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="72" cy="42" r="15" fill="#FFFFFF" stroke="#C3CCF2" stroke-width="2"/>
+  <circle cx="71" cy="49" r="3.4" fill="#FFC6BC"/>
+  <ellipse class="eye" cx="76" cy="39" rx="2.8" ry="3.2" fill="#1A1D33"/>
+  <circle cx="77" cy="38" r="0.9" fill="#FFFFFF"/>
+  <path d="M86 40 L98 44 L86 48 Z" fill="#FFB020" stroke="#E0951A" stroke-width="1.2" stroke-linejoin="round"/>
+  <g class="branch">
+    <path d="M93 46 Q 99 56 92 66" stroke="#3E8E41" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <ellipse cx="98" cy="54" rx="4.2" ry="2" transform="rotate(50 98 54)" fill="#5DB35F"/>
+    <ellipse cx="91" cy="58" rx="4.2" ry="2" transform="rotate(-30 91 58)" fill="#5DB35F"/>
+    <ellipse cx="96" cy="63" rx="4.2" ry="2" transform="rotate(40 96 63)" fill="#5DB35F"/>
+  </g>
+  <path class="wing" d="M28 56 Q 46 28 66 50 Q 52 66 28 56 Z" fill="#EEF1FF" stroke="#C3CCF2" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M38 52 Q 48 44 58 50" stroke="#C3CCF2" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+</svg>`;
+const COACH = {
+  en: {
+    encourage: ['You can do it!', "Let's code!", 'Read the task, then press ▶.', 'Try changing a number and see what happens!'],
+    success: ['Brilliant!', 'Well done!', "You're a star! ⭐", 'Great job! Ready for the next one?'],
+    error: ['Oops! Mistakes help us learn. Read the box below.', 'Almost! Check your spelling and brackets.', "Don't give up. Try one small change."],
+    notyet: ['So close! Read the goal again.', 'Not yet. Tap 💡 Hint if you need help.'],
+    locked: ['Finish the lesson before this one to unlock it. 🔒'],
+  },
+  yo: {
+    encourage: ['O lè ṣe é!', 'Ẹ jẹ́ ká kọ kóòdù!', 'Ka iṣẹ́ náà, lẹ́yìn náà tẹ ▶.', 'Yí nọ́mbà kan padà kí o wo ohun tí yóò ṣẹlẹ̀!'],
+    success: ['Àgbàyanu!', 'O ṣe dáadáa!', 'Ìràwọ̀ ni ọ́! ⭐', 'Iṣẹ́ takuntakun! Ṣé o ṣetán fún èyí tó kàn?'],
+    error: ['Yéè! Àṣìṣe ń kọ́ wa ní nǹkan. Ka àpótí tó wà nísàlẹ̀.', 'Ó fẹ́rẹ̀ẹ́ tó! Ṣàyẹ̀wò bí o ṣe kọ ọ́ àti àwọn àkámọ́.', 'Má ṣe jáwọ́. Gbìyànjú àtúnṣe kékeré kan.'],
+    notyet: ['Ó fẹ́rẹ̀ẹ́ tó! Ka àfojúsùn náà lẹ́ẹ̀kan sí.', 'Kò tíì pé. Tẹ 💡 Ìmọ̀ràn bí o bá nílò ìrànlọ́wọ́.'],
+    locked: ['Parí ẹ̀kọ́ tó ṣáájú èyí láti ṣí i. 🔒'],
+  },
+};
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.querySelectorAll('[data-dove]').forEach(el => { el.innerHTML = DOVE; });
+
 const AVATARS = ['🕊️', '🐑', '🦁', '🐘', '🦒', '🐢', '🦜', '🐟'];
 
 /* ---------- state ---------- */
 const S = store.get('rq2-state', null) || {};
-S.stars ??= 0; S.streak ??= 0; S.lastDay ??= null; S.done ??= {}; S.badges ??= {};
-S.name ??= ''; S.avatar ??= '🕊️'; if (S.avatar === '🦉' || S.avatar === '🐆' || S.avatar === '🐊') S.avatar = '🕊️'; S.sound ??= true;
-S.lang ??= store.get('rquest-lang', 'en');
-S.free ??= {}; S.diff ??= {}; S.wins ??= {}; S.big ??= false;
-let gallery = store.get('rq2-gallery', []);
+function fillDefaults(o) {
+  o.stars ??= 0; o.streak ??= 0; o.lastDay ??= null; o.done ??= {}; o.badges ??= {};
+  o.name ??= ''; o.avatar ??= '🕊️'; if (o.avatar === '🦉' || o.avatar === '🐆' || o.avatar === '🐊') o.avatar = '🕊️'; o.sound ??= true;
+  o.lang ??= store.get('rquest-lang', 'en');
+  o.free ??= {}; o.diff ??= {}; o.wins ??= {}; o.big ??= false; o.hist ??= {}; o.mins ??= {}; o.day ??= { date: '', stars: 0 };
+  o.updatedAt ??= 0;
+  if (!o.earned) { o.earned = {}; o.legacy = o.stars || 0; }
+  o.legacy ??= 0;
+  return o;
+}
+fillDefaults(S);
+const galleryKey = () => S.cloudId ? 'rq2-gallery-' + S.cloudId : 'rq2-gallery';
+let gallery = store.get(galleryKey(), []);
 const today = new Date().toDateString();
 if (S.lastDay && S.lastDay !== today && S.lastDay !== new Date(Date.now() - 864e5).toDateString()) S.streak = 0;
-const save = () => store.set('rq2-state', S);
+const save = () => {
+  S.updatedAt = Date.now();
+  store.set('rq2-state', S);
+  if (S.cloudId) store.set('rq2-child-' + S.cloudId, S);
+  schedulePush();
+};
 
 const tr = (k) => (I18N[S.lang] && I18N[S.lang][k] !== undefined) ? I18N[S.lang][k] : I18N.en[k];
 const pick = (obj, key) => (S.lang === 'yo' && obj[key + '_yo']) ? obj[key + '_yo'] : obj[key];
@@ -1177,6 +1515,10 @@ function applyDifficulty() {
 
 /* ---------- list & items ---------- */
 const chDiff = (it) => it.points <= 15 ? 'easy' : it.points <= 25 ? 'medium' : 'hard';
+function isUnlocked(it) {
+  const L = CONTENT.learn; const i = L.indexOf(it);
+  return i <= 0 || !!S.done[it.id] || !!S.done[L[i - 1].id];
+}
 function trackItems() { return CONTENT[tab] || []; }
 function renderList() {
   const items = trackItems();
@@ -1185,7 +1527,9 @@ function renderList() {
     let tag = '';
     if (tab === 'challenge') tag = done ? `<span class="tag done">✓ +${it.points}</span>` : `<span class="tag d-${chDiff(it)}">${esc(tr('d_' + chDiff(it)))}</span>`;
     else if (tab !== 'free') tag = done ? `<span class="tag done">✓</span>` : (it.bible ? `<span class="tag num" title="Bible">✝</span>` : '');
-    return `<button type="button" class="item" data-id="${it.id}" aria-current="${item && item.id === it.id}"><span class="ic" aria-hidden="true">${it.icon}</span><span class="nm">${esc(pick(it, 'title'))}</span>${tag}</button>`;
+    const locked = tab === 'learn' && !isUnlocked(it);
+    if (locked) tag = `<span class="tag num">🔒</span>`;
+    return `<button type="button" class="item${locked ? ' locked' : ''}" data-id="${it.id}" aria-current="${item && item.id === it.id}"><span class="ic" aria-hidden="true">${it.icon}</span><span class="nm">${esc(pick(it, 'title'))}</span>${tag}</button>`;
   }).join('');
   const total = items.length, n = items.filter(i => S.done[i.id]).length;
   $('track-count').textContent = tab === 'free' ? '' : `${n}/${total}`;
@@ -1194,7 +1538,9 @@ function renderList() {
 }
 $('list').addEventListener('click', (e) => {
   const b = e.target.closest('.item'); if (!b) return;
-  const it = trackItems().find(x => x.id === b.dataset.id); if (it) { sfx.tap(); load(it); }
+  const it = trackItems().find(x => x.id === b.dataset.id); if (!it) return;
+  if (tab === 'learn' && !isUnlocked(it)) { sfx.bad(); coach('locked'); return; }
+  sfx.tap(); load(it); clearOutput();
 });
 function load(it) {
   item = it; tries = 0;
@@ -1215,6 +1561,7 @@ function load(it) {
   renderPlayBar();
   $('run').textContent = runLabel();
   renderList();
+  coach('encourage');
 }
 const runLabel = () => tab === 'games' ? tr('play') : tab === 'challenge' ? tr('check') : tr('run');
 $('reset').addEventListener('click', () => {
@@ -1229,16 +1576,186 @@ $('hint').addEventListener('click', () => {
 
 /* ---------- tabs ---------- */
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+function showView(v) {
+  ['pathview', 'studio', 'stuff', 'parents'].forEach(id => { $(id).hidden = id !== v; });
+  const el = $(v); el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter');
+}
 function switchTab(name) {
   tab = name;
   document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', String(x.dataset.tab === name)));
-  const stuff = name === 'stuff';
-  $('studio').hidden = stuff; $('stuff').hidden = !stuff;
-  if (stuff) { renderStuff(); return; }
+  if (hasTTS) { try { speechSynthesis.cancel(); } catch {} }
+  if (name === 'stuff') { showView('stuff'); renderStuff(); return; }
+  if (name === 'parents') { showView('parents'); renderParents(); return; }
+  if (name === 'learn') { showView('pathview'); renderPath(); return; }
+  showView('studio'); $('back-path').hidden = true;
   $('list-title').textContent = tr('title_' + name);
   load(CONTENT[name][0]);
   clearOutput();
 }
+function openLesson(it) {
+  tab = 'learn';
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', String(x.dataset.tab === 'learn')));
+  showView('studio'); $('back-path').hidden = false; $('back-path').textContent = tr('back_path');
+  $('list-title').textContent = tr('title_learn');
+  load(it); clearOutput();
+  window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' });
+}
+$('back-path').addEventListener('click', () => { sfx.tap(); showView('pathview'); renderPath(); });
+
+/* ---------- path (learn map) ---------- */
+function currentLesson() { return CONTENT.learn.find(it => !S.done[it.id] && isUnlocked(it)) || null; }
+function renderPath() {
+  const cur = currentLesson();
+  const day = (S.day.date === isoDay()) ? S.day.stars : 0;
+  const pct = Math.min(100, Math.round((day / DAILY_GOAL) * 100));
+  const name = S.name || '';
+  const greet = (cur ? tr('greet_path') : tr('greet_done')).replace('{n}', name).replace(/\s+([!,])/, '$1');
+  let i = 0;
+  const units = UNITS.map((u, ui) => {
+    const items = u.ids.map(id => CONTENT.learn.find(x => x.id === id));
+    const n = items.filter(x => S.done[x.id]).length;
+    const rows = items.map((it) => {
+      const idx = CONTENT.learn.indexOf(it);
+      const state = S.done[it.id] ? 'done' : (cur && cur.id === it.id) ? 'current' : isUnlocked(it) ? 'open' : 'locked';
+      const off = Math.round(Math.sin(idx * 0.95) * 64);
+      const d = (i++) * 45;
+      return `<div class="node-row ${state}" style="--off:${off}px;--d:${d}ms;--u:${u.color}">
+        ${state === 'current' ? `<span class="start-tag">${esc(tr('start'))}</span>` : ''}
+        <button type="button" class="node ${state}" data-id="${it.id}" aria-label="${esc(pick(it, 'title'))}${state === 'locked' ? ' 🔒' : ''}"><span class="ic">${state === 'locked' ? '🔒' : it.icon}</span>${state === 'done' ? '<span class="ck">✓</span>' : ''}</button>
+        <span class="node-name">${esc(pick(it, 'title'))}</span>
+      </div>`;
+    }).join('');
+    return `<div class="unit" style="--u:${u.color}"><div><small>${esc(tr('unit'))} ${ui + 1}</small><h3>${esc(u[S.lang] || u.en)}</h3></div><span class="uprog ${n === items.length ? 'full' : ''}">${n === items.length ? '🏆 ' : ''}${n}/${items.length}</span></div><div class="nodes">${rows}</div>`;
+  }).join('');
+  $('pathview').innerHTML = `
+    <div class="hero">
+      <span class="dove-host" aria-hidden="true">${DOVE}</span>
+      <div class="bubble pop">${esc(greet)}</div>
+      ${cur ? `<button type="button" class="btn btn-run" id="continue-btn">▶ ${esc(tr('continue'))}: ${cur.icon} ${esc(pick(cur, 'title'))}</button>` : ''}
+    </div>
+    <div class="road">${units}</div>
+    <aside class="side">
+      <div class="panel goal-card">
+        <svg class="ring" viewBox="0 0 72 72" aria-hidden="true"><circle class="bg" cx="36" cy="36" r="29"/><circle class="fg" id="goal-ring" cx="36" cy="36" r="29" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/></svg>
+        <div><b>${esc(tr('daily_goal'))}</b><span>${day >= DAILY_GOAL ? esc(tr('goal_done')) : `${day} / ${DAILY_GOAL} ⭐`}</span><br><span>🔥 ${S.streak} ${esc(tr('streak_days'))}</span></div>
+      </div>
+      <button type="button" class="tile" data-go="challenge"><span class="ti" aria-hidden="true">🎯</span><span>${esc(tr('try_ch'))}<small>${esc(tr('try_ch_s'))}</small></span></button>
+      <button type="button" class="tile" data-go="games"><span class="ti" aria-hidden="true">🎮</span><span>${esc(tr('play_game'))}<small>${esc(tr('play_game_s'))}</small></span></button>
+    </aside>`;
+  requestAnimationFrame(() => requestAnimationFrame(() => { const r = $('goal-ring'); if (r) r.style.strokeDashoffset = String(100 - pct); }));
+  const c = $('continue-btn'); if (c) c.onclick = () => { sfx.tap(); openLesson(cur); };
+}
+$('pathview').addEventListener('click', (e) => {
+  const g = e.target.closest('[data-go]'); if (g) { sfx.tap(); switchTab(g.dataset.go); return; }
+  const n = e.target.closest('.node'); if (!n) return;
+  const it = CONTENT.learn.find(x => x.id === n.dataset.id);
+  if (!isUnlocked(it)) {
+    sfx.bad(); n.animate?.([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 300 });
+    const b = $('pathview').querySelector('.hero .bubble'); if (b) { b.textContent = COACH[S.lang].locked[0]; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+    return;
+  }
+  sfx.tap(); openLesson(it);
+});
+
+/* ---------- coach & motion ---------- */
+function coach(kind) {
+  const list = (COACH[S.lang] || COACH.en)[kind]; if (!list) return;
+  const b = $('bubble'); b.textContent = list[Math.floor(Math.random() * list.length)];
+  b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+}
+function isoDay(d = new Date()) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function animateNumber(el, to) {
+  const from = el.dataset.v != null ? +el.dataset.v : +el.textContent || 0;
+  el.dataset.v = to;
+  if (REDUCED || from === to) { el.textContent = to; return; }
+  const t0 = performance.now(), dur = 800;
+  const step = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function flyStars(n) {
+  if (REDUCED || !document.body.animate) return;
+  const src = $('run'); if (!src || src.offsetParent === null) return;
+  const a = src.getBoundingClientRect(), b = $('stars').getBoundingClientRect();
+  const f = document.createElement('div'); f.className = 'flyer'; f.textContent = `+${n} ⭐`;
+  f.style.left = (a.left + a.width / 2) + 'px'; f.style.top = a.top + 'px';
+  document.body.append(f);
+  const dx = b.left - (a.left + a.width / 2), dy = b.top - a.top;
+  f.animate([
+    { transform: 'translate(-50%, 0) scale(.6)', opacity: 0 },
+    { transform: `translate(calc(-50% + ${dx * 0.25}px), ${dy * 0.25 - 70}px) scale(1.35)`, opacity: 1, offset: 0.35 },
+    { transform: `translate(calc(-50% + ${dx}px), ${dy}px) scale(.5)`, opacity: 0.3 },
+  ], { duration: 1150, easing: 'cubic-bezier(.3,.7,.4,1)' }).onfinish = () => {
+    f.remove();
+    $('stars').parentElement.animate?.([{ transform: 'scale(1)' }, { transform: 'scale(1.3)' }, { transform: 'scale(1)' }], { duration: 380, easing: 'ease-out' });
+  };
+}
+function confettiBurst() {
+  if (REDUCED) return;
+  const c = $('fx'); const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = innerWidth, H = innerHeight; c.width = W * dpr; c.height = H * dpr; c.hidden = false;
+  const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const cols = ['#F0563A', '#FFC233', '#1F9D63', '#2E3FA3', '#9B6BFF', '#FF7EB6'];
+  const P = Array.from({ length: 150 }, (_, i) => {
+    const left = i % 2 === 0;
+    return { x: left ? -10 : W + 10, y: H * 0.65, vx: (left ? 1 : -1) * (6 + Math.random() * 9), vy: -(9 + Math.random() * 12),
+      r: Math.random() * 6, vr: (Math.random() - .5) * .35, w: 6 + Math.random() * 6, h: 9 + Math.random() * 8, c: cols[i % cols.length], round: Math.random() < .3 };
+  });
+  const t0 = performance.now();
+  (function tick(t) {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of P) {
+      p.vy += 0.32; p.vx *= 0.985; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c;
+      if (p.round) { ctx.beginPath(); ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2); ctx.fill(); }
+      else ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2)) + 2);
+      ctx.restore();
+    }
+    if (t - t0 < 2800) requestAnimationFrame(tick); else { ctx.clearRect(0, 0, W, H); c.hidden = true; }
+  })(t0);
+}
+function setOut(text) {
+  const lines = String(text).split('\n');
+  $('out').innerHTML = lines.map((l, i) => `<span class="ln" style="animation-delay:${Math.min(i, 30) * 35}ms">${esc(l)}${i < lines.length - 1 ? '\n' : ''}</span>`).join('');
+}
+function addStars(n, msg) {
+  const prevLvl = Math.floor(S.stars / 50);
+  S.stars += n; bumpStreak();
+  const k = isoDay();
+  S.hist[k] = (S.hist[k] || 0) + n;
+  for (const key of Object.keys(S.hist).sort().slice(0, -60)) delete S.hist[key];
+  if (S.day.date !== k) S.day = { date: k, stars: 0 };
+  const before = S.day.stars; S.day.stars += n;
+  if (before < DAILY_GOAL && S.day.stars >= DAILY_GOAL) award('daily_goal');
+  flyStars(n);
+  celebrate(`+${n} ⭐`, msg);
+  if (Math.floor(S.stars / 50) > prevLvl) setTimeout(showLevelUp, 2300);
+}
+function unitJustDone(it) {
+  const u = unitOf(it.id); if (!u) return false;
+  const all = u.ids.every(id => S.done[id]);
+  if (all) award('unit_done');
+  return all;
+}
+function showLevelUp() {
+  $('lu-title').textContent = tr('levelup_title');
+  $('lu-sub').textContent = tr('levelup_sub').replace('{l}', levelName());
+  $('lu-ok').textContent = tr('keep_going');
+  $('levelup').hidden = false; confettiBurst(); tone([523, 659, 784, 1047, 1319], 0.22, 'triangle', 0.11);
+  const d = $('levelup').querySelector('.dove-host'); d.classList.remove('happy'); void d.offsetWidth; d.classList.add('happy');
+  $('lu-ok').focus();
+}
+$('lu-ok').addEventListener('click', () => { $('levelup').hidden = true; });
+$('levelup').addEventListener('click', (e) => { if (e.target.id === 'levelup') $('levelup').hidden = true; });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('levelup').hidden) $('levelup').hidden = true; });
+let lastAct = Date.now();
+['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { lastAct = Date.now(); }, { passive: true }));
+setInterval(() => {
+  if (document.visibilityState === 'visible' && Date.now() - lastAct < 120000 && S.name) {
+    const k = isoDay(); S.mins[k] = (S.mins[k] || 0) + 1;
+    for (const key of Object.keys(S.mins).sort().slice(0, -60)) delete S.mins[key];
+    save();
+  }
+}, 60000);
 
 /* ---------- output ---------- */
 function clearOutput() {
@@ -1344,9 +1861,9 @@ async function run() {
   } finally {
     try { await shelter.purge(); } catch {}
   }
-  $('out').textContent = text || (err ? '' : tr('no_output'));
+  setOut(text || (err ? '' : tr('no_output')));
   images.forEach((img) => addPlot(img));
-  if (err) { showOops(err); sfx.bad(); sad(); lastRunFailed = true; }
+  if (err) { showOops(err); sfx.bad(); sad(); coach('error'); lastRunFailed = true; }
   else afterSuccess(code, text, images.length, rpass);
   if (music && music.notes.length && !err) {
     if (S.sound) { $('out').textContent += (text ? '\n' : '') + tr('playing'); playMelody(music); award('musician'); }
@@ -1370,7 +1887,7 @@ function addPlot(img) {
     let url; try { url = c.toDataURL('image/png'); } catch { return; }
     gallery.unshift({ img: url, title, date: Date.now() });
     gallery = gallery.slice(0, 12);
-    while (!store.set('rq2-gallery', gallery) && gallery.length > 1) gallery.pop();
+    while (!store.set(galleryKey(), gallery) && gallery.length > 1) gallery.pop();
     sv.textContent = tr('saved_pic'); sv.disabled = true; sfx.ok();
     if (gallery.length >= 3) award('gallery3');
   });
@@ -1397,27 +1914,28 @@ function afterSuccess(code, out, nImages, rpass) {
   const first = !S.done[item.id];
   if (tab === 'challenge') {
     const ok = (item.check ? !!item.check(out, code, { images: nImages }) : true) && rpass;
-    if (!ok) { $('oops').hidden = false; $('oops').innerHTML = `<strong>🎯 ${esc(tr('not_yet'))}</strong><p>${esc(pick(item, 'goal'))}</p>`; sfx.bad(); sad(); return; }
-    if (first) { S.done[item.id] = true; S.stars += item.points; bumpStreak(); celebrate(`+${item.points} ⭐`, tr('challenge_done')); }
+    if (!ok) { $('oops').hidden = false; $('oops').innerHTML = `<strong>🎯 ${esc(tr('not_yet'))}</strong><p>${esc(pick(item, 'goal'))}</p>`; sfx.bad(); sad(); coach('notyet'); return; }
+    if (first) { S.done[item.id] = true; S.earned[item.id] = item.points; addStars(item.points, tr('challenge_done')); }
     else { happy(); sfx.ok(); }
   } else if (tab === 'learn' && first) {
-    S.done[item.id] = true; S.stars += 5; bumpStreak(); celebrate('+5 ⭐', tr('lesson_done'));
+    S.done[item.id] = true; S.earned[item.id] = 5; addStars(5, unitJustDone(item) ? tr('unit_done') : tr('lesson_done'));
   } else if (tab === 'games') {
     let gained = 0, msg = null;
-    if (first) { S.done[item.id] = true; gained += 3; msg = tr('game_done'); }
+    if (first) { S.done[item.id] = true; S.earned[item.id] = 3; gained += 3; msg = tr('game_done'); }
     const won = item.win && item.win.test(out);
     if (won) {
       const d = item.inputs?.some(i => i.type === 'difficulty') ? (S.diff[item.id] || 'easy') : 'easy';
       const key = item.id + ':' + d;
       if (d === 'hard') award('hard_win');
-      if (!S.wins[key]) { S.wins[key] = Date.now(); gained += { easy: 2, medium: 4, hard: 6 }[d]; msg = tr('won_on').replace('{d}', tr('d_' + d)); }
+      if (!S.wins[key]) { S.wins[key] = Date.now(); S.earned['win:' + key] = { easy: 2, medium: 4, hard: 6 }[d]; gained += { easy: 2, medium: 4, hard: 6 }[d]; msg = tr('won_on').replace('{d}', tr('d_' + d)); }
     }
-    if (gained) { S.stars += gained; bumpStreak(); celebrate(`+${gained} ⭐`, msg); }
+    if (gained) addStars(gained, msg);
     else if (won) { happy(); sfx.win(); }
     else { happy(); if (!item.music) sfx.ok(); }
   } else { happy(); if (!item.music) sfx.ok(); }
   if (tab !== 'free' && (tab !== 'challenge' || S.done[item.id])) showNext();
   save(); checkBadges(); updateHud(); renderList();
+  coach('success');
 }
 function showNext() {
   const list = CONTENT[tab] || []; const i = list.findIndex(x => x.id === item.id);
@@ -1451,7 +1969,8 @@ function award(id) {
 /* ---------- HUD ---------- */
 function updateHud() {
   const lvl = Math.floor(S.stars / 50) + 1;
-  $('stars').textContent = S.stars; $('streak').textContent = S.streak;
+  animateNumber($('stars'), S.stars); $('streak').textContent = S.streak;
+  $('streak-pill').classList.toggle('lit', S.streak > 0);
   $('lvl-label').textContent = `${S.lang === 'yo' ? 'Ìp' : 'Lv'} ${lvl}`;
   $('lvl-bar').style.width = `${(S.stars % 50) * 2}%`;
   $('who').textContent = S.name ? `${tr('hello')}, ${S.name} ${S.avatar} · ${levelName()}` : '';
@@ -1484,17 +2003,336 @@ function renderStuff() {
 }
 $('gallery').addEventListener('click', (e) => {
   const d = e.target.closest('[data-delpic]'); if (!d) return;
-  gallery.splice(+d.dataset.delpic, 1); store.set('rq2-gallery', gallery); renderStuff();
+  gallery.splice(+d.dataset.delpic, 1); store.set(galleryKey(), gallery); renderStuff();
 });
 $('reset-area').addEventListener('click', (e) => {
   if (e.target.id === 'reset-progress') {
     $('reset-area').innerHTML = `<div class="confirm"><span>${esc(tr('sure'))}</span><button class="danger" type="button" id="yes-reset">${esc(tr('yes_delete'))}</button><button class="btn btn-2 btn-sm" type="button" id="no-reset">${esc(tr('cancel'))}</button></div>`;
   } else if (e.target.id === 'yes-reset') {
-    S.stars = 0; S.streak = 0; S.lastDay = null; S.done = {}; S.badges = {}; S.free = {}; gallery = [];
-    save(); store.set('rq2-gallery', gallery); updateHud(); renderStuff();
+    S.stars = 0; S.earned = {}; S.legacy = 0; S.streak = 0; S.lastDay = null; S.done = {}; S.badges = {}; S.free = {}; S.wins = {}; S.hist = {}; S.mins = {}; S.day = { date: '', stars: 0 }; gallery = [];
+    save(); store.set(galleryKey(), gallery); updateHud(); renderStuff();
   } else if (e.target.id === 'no-reset') renderStuff();
 });
 $('edit-profile').addEventListener('click', () => openOnboard());
+
+/* ---------- cloud (Supabase) ---------- */
+// To switch on online saving, paste your Supabase project URL and anon (publishable) key here.
+// Both are safe to publish: row-level security in supabase-setup.sql keeps each family's data private.
+const CLOUD_CONFIG = {
+  url: 'https://fivtlyastykrocirzqgh.supabase.co',
+  key: 'sb_publishable_QnrIjns33DQHoyfBG2jrdQ_-s57Smo4',
+};
+const SB_LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js';
+const cloudCfg = window.RQ_CLOUD || CLOUD_CONFIG;
+const cloudOn = !!(cloudCfg.url && cloudCfg.key);
+let sb = null, session = null, kids = [], recovery = false, pushTimer = null, famMsg = null, famMsgOk = false, removing = null, newAva = '🐑';
+const DEVICE_PREFS = ['lang', 'sound', 'big'];
+
+function loadScript(src) {
+  return new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = rej; document.head.append(el); });
+}
+function setCloud(st) {
+  const pill = $('cloud-pill'); if (!pill) return;
+  pill.hidden = !cloudOn || !session;
+  pill.dataset.s = st;
+  pill.textContent = st === 'saving' ? '☁️…' : st === 'saved' ? '☁️✓' : st === 'offline' || st === 'error' ? '☁️!' : '☁️';
+  pill.title = tr({ saved: 'c_saved', saving: 'c_saving', error: 'c_error', offline: 'c_offline' }[st] || 'c_out');
+  pill.setAttribute('aria-label', pill.title);
+}
+function cloudState(o = S) {
+  const c = JSON.parse(JSON.stringify(o));
+  DEVICE_PREFS.forEach(k => delete c[k]); delete c.cloudId;
+  return c;
+}
+function freshState(name = '', avatar = '🕊️') { return fillDefaults({ name, avatar, lang: S.lang, sound: S.sound, big: S.big }); }
+function mergeState(a, b) {
+  a = fillDefaults({ ...a }); b = fillDefaults({ ...b });
+  const newer = (a.updatedAt || 0) >= (b.updatedAt || 0) ? a : b;
+  const maxMap = (x, y) => { const r = { ...y }; for (const k in x) r[k] = Math.max(+x[k] || 0, +r[k] || 0); return r; };
+  const out = { ...b, ...a };
+  out.done = { ...b.done, ...a.done }; out.badges = { ...b.badges, ...a.badges }; out.wins = { ...b.wins, ...a.wins };
+  out.earned = { ...b.earned, ...a.earned };
+  out.legacy = Math.max(a.legacy || 0, b.legacy || 0);
+  out.stars = out.legacy + Object.values(out.earned).reduce((t, v) => t + (+v || 0), 0);
+  out.hist = maxMap(a.hist, b.hist); out.mins = maxMap(a.mins, b.mins);
+  const da = a.lastDay ? Date.parse(a.lastDay) : 0, db = b.lastDay ? Date.parse(b.lastDay) : 0;
+  if (da === db) out.streak = Math.max(a.streak, b.streak); else { const w = da > db ? a : b; out.streak = w.streak; out.lastDay = w.lastDay; }
+  out.day = a.day.date === b.day.date ? { date: a.day.date, stars: Math.max(a.day.stars, b.day.stars) } : (a.day.date > b.day.date ? a.day : b.day);
+  out.free = newer.free; out.diff = newer.diff;
+  out.updatedAt = Math.max(a.updatedAt || 0, b.updatedAt || 0);
+  return out;
+}
+function schedulePush() {
+  if (!sb || !session || !S.cloudId) return;
+  clearTimeout(pushTimer); pushTimer = setTimeout(pushNow, 2500);
+}
+async function pushNow() {
+  clearTimeout(pushTimer);
+  if (!sb || !session || !S.cloudId) return;
+  setCloud('saving');
+  try {
+    const id = S.cloudId;
+    const { data: row } = await sb.from('children').select('id,name,avatar,state').eq('id', id).single();
+    if (row && row.state && S.cloudId === id) {
+      const before = JSON.stringify([S.stars, Object.keys(S.done).length, Object.keys(S.badges).length]);
+      const merged = mergeState(S, row.state);
+      merged.name = S.name; merged.avatar = S.avatar; merged.cloudId = id;
+      replaceState(merged);
+      store.set('rq2-child-' + id, S);
+      if (before !== JSON.stringify([S.stars, Object.keys(S.done).length, Object.keys(S.badges).length])) {
+        updateHud(); if (tab === 'learn' && !$('pathview').hidden) renderPath(); else if (tab !== 'stuff' && tab !== 'parents') renderList();
+      }
+    }
+    const { error } = await sb.from('children').update({ name: S.name, avatar: S.avatar, state: cloudState(), updated_at: new Date().toISOString() }).eq('id', id);
+    setCloud(error ? (navigator.onLine === false ? 'offline' : 'error') : 'saved');
+    if (error && navigator.onLine !== false) { clearTimeout(pushTimer); pushTimer = setTimeout(pushNow, 30000); }
+  } catch { setCloud(navigator.onLine === false ? 'offline' : 'error'); }
+}
+addEventListener('online', () => { if (S.cloudId) pushNow(); });
+addEventListener('offline', () => setCloud('offline'));
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && pushTimer) pushNow(); });
+
+async function loadKids() {
+  if (!sb || !session) { kids = []; return; }
+  const { data, error } = await sb.from('children').select('id,name,avatar,state,updated_at').order('created_at', { ascending: true });
+  if (!error) kids = data || [];
+}
+function stashCurrent() {
+  if (S.cloudId) store.set('rq2-child-' + S.cloudId, S);
+  else if (S.name) store.set('rq2-local', S);
+}
+function replaceState(next) {
+  const prefs = {}; DEVICE_PREFS.forEach(k => { prefs[k] = S[k]; });
+  Object.keys(S).forEach(k => delete S[k]);
+  Object.assign(S, fillDefaults({ ...next, ...prefs }));
+  gallery = store.get(galleryKey(), []);
+  store.set('rq2-state', S);
+}
+function refreshAll() {
+  parentOpen = false;
+  applyLang(); updateHud();
+  switchTab('learn');
+}
+async function useChild(row, silent) {
+  stashCurrent();
+  const cached = store.get('rq2-child-' + row.id, null);
+  const merged = mergeState(cached || {}, row.state || {});
+  merged.name = row.name; merged.avatar = row.avatar; merged.cloudId = row.id;
+  replaceState(merged);
+  save(); await pushNow();
+  $('whopick').hidden = true; $('onboard').hidden = true;
+  if (!silent) { sfx.win(); refreshAll(); }
+}
+async function syncActive() {
+  if (!S.cloudId) return;
+  const row = kids.find(k => k.id === S.cloudId);
+  if (!row) { delete S.cloudId; store.set('rq2-state', S); return; }
+  const merged = mergeState(S, row.state || {});
+  merged.name = row.name; merged.avatar = row.avatar; merged.cloudId = row.id;
+  replaceState(merged); save(); await pushNow();
+  updateHud(); if (tab === 'learn' && !$('pathview').hidden) renderPath();
+}
+function showWhoPicker() {
+  $('wp-title').textContent = tr('who_title');
+  $('wp-grid').innerHTML = kids.map(k => `<button type="button" data-kid="${k.id}"><span class="a">${esc(k.avatar)}</span>${esc(k.name)}<small>${(k.state && k.state.stars) || 0} ⭐</small></button>`).join('');
+  $('whopick').hidden = false; $('onboard').hidden = true;
+}
+$('wp-grid').addEventListener('click', (e) => { const b = e.target.closest('[data-kid]'); if (!b) return; const row = kids.find(k => k.id === b.dataset.kid); if (row) useChild(row); });
+
+async function afterAuth() {
+  if (session) {
+    await loadKids();
+    if (S.cloudId && kids.some(k => k.id === S.cloudId)) await syncActive();
+    else if (!S.name && kids.length === 1) await useChild(kids[0]);
+    else if (!S.name && kids.length > 1) showWhoPicker();
+    setCloud(S.cloudId ? 'saved' : 'idle');
+  } else { kids = []; setCloud('out'); }
+  if (!$('onboard').hidden) paintOnboard();
+  if (tab === 'parents') renderParents();
+}
+async function initCloud() {
+  if (!cloudOn) return;
+  try {
+    if (!window.supabase) await loadScript(SB_LIB);
+    sb = window.supabase.createClient(cloudCfg.url, cloudCfg.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+    sb.auth.onAuthStateChange((ev, s) => {
+      session = s;
+      if (ev === 'PASSWORD_RECOVERY') { recovery = true; $('onboard').hidden = true; switchTab('parents'); return; }
+      if (ev === 'SIGNED_IN' || ev === 'SIGNED_OUT') setTimeout(afterAuth, 0);
+    });
+    const { data } = await sb.auth.getSession(); session = data.session;
+    await afterAuth();
+  } catch { sb = null; }
+}
+function authError(err) {
+  const m = String(err && (err.message || err)).toLowerCase();
+  if (m.includes('invalid login')) return tr('bad_login');
+  if (m.includes('already registered') || m.includes('already been registered')) return tr('exists');
+  if (m.includes('not confirmed')) return tr('not_confirmed');
+  if (m.includes('fetch') || m.includes('network')) return tr('net_err');
+  if (m.includes('password')) return tr('password');
+  return tr('gen_err');
+}
+function familyPanel() {
+  const msg = famMsg ? `<p class="msg ${famMsgOk ? 'ok' : 'bad'}" role="status">${esc(famMsg)}</p>` : '';
+  if (!cloudOn) return `<div class="panel wide family"><h2>☁️ ${esc(tr('cloud_title'))}</h2><p class="fine">${esc(tr('cloud_soon'))}</p></div>`;
+  if (recovery) return `<div class="panel wide family"><h2>☁️ ${esc(tr('new_pass'))}</h2>
+    <form id="pw-form" novalidate><label for="pw-new">${esc(tr('password'))}<input type="password" id="pw-new" minlength="6" autocomplete="new-password"></label>
+    <div class="actions"><button class="btn btn-run" type="submit">${esc(tr('save_pass'))}</button></div>${msg}</form></div>`;
+  if (!session) return `<div class="panel wide family"><h2>☁️ ${esc(tr('cloud_title'))}</h2><p>${esc(tr('cloud_intro'))}</p>
+    <form id="auth-form" novalidate>
+      <label for="au-email">${esc(tr('email'))}<input type="email" id="au-email" autocomplete="email" inputmode="email"></label>
+      <label for="au-pass">${esc(tr('password'))}<input type="password" id="au-pass" minlength="6" autocomplete="current-password"></label>
+      <div class="actions"><button class="btn btn-run" type="submit">${esc(tr('sign_in'))}</button><button class="btn btn-2" type="button" id="au-create">${esc(tr('create_acc'))}</button><button class="linkbtn" type="button" id="au-forgot">${esc(tr('forgot'))}</button></div>
+      ${msg}
+    </form></div>`;
+  const list = kids.length ? kids.map(k => {
+    const here = S.cloudId === k.id;
+    const st = k.id === S.cloudId ? S : (k.state || {});
+    const confirm = removing === k.id
+      ? `<span class="confirm"><span>${esc(tr('remove_q').replace('{n}', k.name))}</span><button class="danger" type="button" data-rm-yes="${k.id}">${esc(tr('yes_delete'))}</button><button class="btn btn-2 btn-sm" type="button" data-rm-no="1">${esc(tr('cancel'))}</button></span>`
+      : `${here ? `<span class="here">${esc(tr('on_device'))}</span>` : `<button class="btn btn-2 btn-sm" type="button" data-use="${k.id}">${esc(tr('use_here'))}</button>`}<button class="danger" type="button" data-rm="${k.id}">${esc(tr('remove'))}</button>`;
+    return `<div class="kid"><span class="a">${esc(k.avatar)}</span><span><b>${esc(k.name)}</b><small>${esc(tr('level'))} ${Math.floor((st.stars || 0) / 50) + 1} · ${st.stars || 0} ${esc(tr('stars_short'))}</small></span><span class="acts">${confirm}</span></div>`;
+  }).join('') : `<p class="fine">${esc(tr('no_kids'))}</p>`;
+  const banner = (S.name && !S.cloudId) ? `<div class="banner"><span>${esc(tr('link_banner').replace('{n}', S.name))}</span><button class="btn btn-run btn-sm" type="button" id="link-local">${esc(tr('link_btn'))}</button></div>` : '';
+  return `<div class="panel wide family">
+    <div class="kid-row"><h2>☁️ ${esc(tr('cloud_title'))}</h2><button class="btn btn-2 btn-sm" type="button" id="au-out" style="margin-left:auto">${esc(tr('sign_out'))}</button></div>
+    <p class="fine">${esc(tr('signed_as').replace('{e}', session.user?.email || ''))}</p>
+    ${banner}
+    <h2 style="font-size:18px">${esc(tr('kids_title'))}</h2>
+    <div class="kids">${list}</div>
+    <form id="kid-form" class="stack2" novalidate>
+      <label for="kid-name">${esc(tr('add_child'))}<input type="text" id="kid-name" maxlength="20" placeholder="${esc(tr('child_name'))}" autocomplete="off"></label>
+      <div class="ava-row" id="kid-avas">${AVATARS.map(a => `<button type="button" data-nava="${a}" aria-pressed="${a === newAva}">${a}</button>`).join('')}</div>
+      <div class="actions"><button class="btn btn-run" type="submit">${esc(tr('add_btn'))}</button></div>
+    </form>
+    ${msg}
+  </div>`;
+}
+function say(text, ok = false) {
+  famMsg = text; famMsgOk = ok;
+  const keep = {}; ['au-email', 'au-pass', 'kid-name', 'pw-new'].forEach(id => { if ($(id)) keep[id] = $(id).value; });
+  renderParents();
+  for (const id in keep) if ($(id)) $(id).value = keep[id];
+  const m = $('parents').querySelector('.family .msg'); if (m && text) m.scrollIntoView({ block: 'nearest' });
+}
+function wireFamily() {
+  const af = $('auth-form');
+  if (af) {
+    const creds = () => ({ email: $('au-email').value.trim(), password: $('au-pass').value });
+    af.addEventListener('submit', async (e) => {
+      e.preventDefault(); const c = creds(); if (!c.email) return say(tr('need_email'));
+      const { error } = await sb.auth.signInWithPassword(c);
+      if (error) say(authError(error)); else { famMsg = null; }
+    });
+    $('au-create').onclick = async () => {
+      const c = creds(); if (!c.email) return say(tr('need_email')); if (c.password.length < 6) return say(tr('password'));
+      const { data, error } = await sb.auth.signUp({ ...c, options: { emailRedirectTo: location.origin + location.pathname } });
+      if (error) say(authError(error)); else if (!data.session) say(tr('check_email'), true); else famMsg = null;
+    };
+    $('au-forgot').onclick = async () => {
+      const email = $('au-email').value.trim(); if (!email) return say(tr('need_email'));
+      await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+      say(tr('reset_sent'), true);
+    };
+  }
+  const pf = $('pw-form');
+  if (pf) pf.addEventListener('submit', async (e) => {
+    e.preventDefault(); const pw = $('pw-new').value; if (pw.length < 6) return say(tr('password'));
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if (error) say(authError(error)); else { recovery = false; say(tr('pass_saved'), true); }
+  });
+  if ($('au-out')) $('au-out').onclick = async () => { await pushNow(); await sb.auth.signOut(); famMsg = null; };
+  if ($('link-local')) $('link-local').onclick = async () => {
+    const { data, error } = await sb.from('children').insert({ name: S.name, avatar: S.avatar, state: cloudState() }).select('id,name,avatar,state,updated_at').single();
+    if (error) return say(authError(error));
+    S.cloudId = data.id; store.set('rq2-local', null); save(); await loadKids(); await pushNow(); sfx.win(); say(tr('c_saved'), true);
+  };
+  const ka = $('kid-avas'); if (ka) ka.onclick = (e) => { const b = e.target.closest('[data-nava]'); if (b) { newAva = b.dataset.nava; ka.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); } };
+  const kf = $('kid-form');
+  if (kf) kf.addEventListener('submit', async (e) => {
+    e.preventDefault(); const name = $('kid-name').value.trim(); if (!name) return say(tr('ob_err'));
+    const { error } = await sb.from('children').insert({ name, avatar: newAva, state: cloudState(freshState(name, newAva)) });
+    if (error) return say(authError(error));
+    await loadKids(); sfx.ok(); say(null);
+  });
+  $('parents').querySelectorAll('[data-use]').forEach(b => b.onclick = () => { const row = kids.find(k => k.id === b.dataset.use); if (row) useChild(row); });
+  $('parents').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { removing = b.dataset.rm; renderParents(); });
+  $('parents').querySelectorAll('[data-rm-no]').forEach(b => b.onclick = () => { removing = null; renderParents(); });
+  $('parents').querySelectorAll('[data-rm-yes]').forEach(b => b.onclick = async () => {
+    const id = b.dataset.rmYes; removing = null;
+    const { error } = await sb.from('children').delete().eq('id', id);
+    if (error) return say(authError(error));
+    store.set('rq2-child-' + id, null);
+    if (S.cloudId === id) { delete S.cloudId; S.name = ''; replaceState(freshState()); updateHud(); }
+    await loadKids(); say(null);
+  });
+}
+
+/* ---------- parents ---------- */
+let parentOpen = false, gateA = 7, gateB = 8;
+function renderParents() {
+  const el = $('parents');
+  if (recovery) parentOpen = true;
+  if (!parentOpen) {
+    gateA = 6 + Math.floor(Math.random() * 4); gateB = 6 + Math.floor(Math.random() * 4);
+    el.innerHTML = `<form class="panel gate" id="gate-form" novalidate>
+      <span class="dove-host big-dove" aria-hidden="true">${DOVE}</span>
+      <h2>${esc(tr('gate_title'))}</h2>
+      <label for="gate-in">${esc(tr('gate_q').replace('{a}', gateA).replace('{b}', gateB))}</label>
+      <input id="gate-in" type="number" inputmode="numeric" autocomplete="off">
+      <span class="err-text" id="gate-err" hidden>${esc(tr('gate_err'))}</span>
+      <button class="btn btn-run" type="submit">${esc(tr('gate_btn'))}</button>
+    </form>`;
+    $('gate-in').addEventListener('input', () => { $('gate-err').hidden = true; });
+    $('gate-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (+$('gate-in').value === gateA * gateB) { parentOpen = true; sfx.ok(); renderParents(); }
+      else { $('gate-err').hidden = false; sfx.bad(); }
+    });
+    return;
+  }
+  const cnt = (k) => CONTENT[k].filter(i => S.done[i.id]).length;
+  const bar = (label, n, total, color) => `<div class="bar-row"><span>${esc(label)}</span><div class="track-bar"><i style="width:${total ? Math.round(n / total * 100) : 0}%;background:${color}"></i></div><span>${n}/${total}</span></div>`;
+  const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return d; });
+  const vals = days.map(d => S.hist[isoDay(d)] || 0);
+  const max = Math.max(10, ...vals);
+  const mins = days.reduce((a, d) => a + (S.mins[isoDay(d)] || 0), 0);
+  let loc = S.lang === 'yo' ? 'yo-NG' : 'en-GB';
+  const dayName = (d) => { try { return d.toLocaleDateString(loc, { weekday: 'short' }); } catch { return d.toDateString().slice(0, 3); } };
+  const week = days.map((d, i) => `<div class="col"><span class="v">${vals[i]}</span><div class="b ${i === 6 ? 'today' : ''}" style="height:${Math.round(vals[i] / max * 100)}%"></div><small>${esc(dayName(d))}</small></div>`).join('');
+  const skills = UNITS.map(u => { const ok = u.ids.every(id => S.done[id]); return `<li><span class="mk ${ok ? 'ok' : ''}">${ok ? '✓' : ''}</span><span><b>${esc(u[S.lang] || u.en)}</b>${esc(S.lang === 'yo' ? u.skill_yo : u.skill_en)}</span></li>`; }).join('');
+  el.innerHTML = `
+    <div class="panel wide">
+      <div class="kid-row"><span class="ava">${S.avatar}</span><div><h2>${esc(tr('rep_title').replace('{n}', S.name || '—'))}</h2><span class="lvl-name">${esc(tr('level'))} ${Math.floor(S.stars / 50) + 1} · ${esc(levelName())}</span></div>
+        <button type="button" class="btn btn-2 btn-sm" id="lock-parents" style="margin-left:auto">${esc(tr('lock'))}</button></div>
+      <div class="stat-row"><div class="stat"><b>${S.stars}</b><span>${esc(tr('stars_l'))}</span></div><div class="stat"><b>${S.streak}</b><span>${esc(tr('streak_days'))}</span></div><div class="stat"><b>${Object.keys(S.badges).length}</b><span>${esc(tr('badges_l'))}</span></div></div>
+    </div>
+    <div class="panel">
+      ${bar(tr('rep_lessons'), cnt('learn'), CONTENT.learn.length, 'var(--indigo-2)')}
+      ${bar(tr('rep_ch'), cnt('challenge'), CONTENT.challenge.length, '#7B4BD1')}
+      ${bar(tr('rep_games'), cnt('games'), CONTENT.games.length, 'var(--coral)')}
+    </div>
+    <div class="panel">
+      <h2>${esc(tr('rep_week'))}</h2>
+      <div class="week">${week}</div>
+      <p class="fine">⏱ ${esc(tr('rep_minutes').replace('{m}', mins))}</p>
+    </div>
+    <div class="panel">
+      <h2>${esc(tr('rep_skills'))}</h2>
+      <ul class="skills">${skills}</ul>
+      <p class="fine">${esc(tr('rep_skills_note'))}</p>
+    </div>
+    <div class="panel">
+      <h2>${esc(tr('rep_tips'))}</h2>
+      <ul class="tips"><li>${esc(tr('tip1'))}</li><li>${esc(tr('tip2'))}</li><li>${esc(tr('tip3'))}</li></ul>
+      <p class="fine">🔒 ${esc(tr(cloudOn && session ? 'privacy_cloud' : 'privacy'))}</p>
+    </div>
+    <div class="panel plus wide"><h2>✨ ${esc(tr('plus_title'))}</h2><p>${esc(tr('plus_body'))}</p></div>`;
+  el.insertAdjacentHTML('afterbegin', familyPanel());
+  wireFamily();
+  $('lock-parents').onclick = () => { parentOpen = false; renderParents(); };
+}
 
 /* ---------- onboarding ---------- */
 let obAvatar = S.avatar, obLang = S.lang;
@@ -1510,6 +2348,7 @@ function paintOnboard() {
   $('ob-title').textContent = L.ob_title; $('ob-sub').textContent = L.ob_sub;
   $('ob-name-l').textContent = L.ob_name; $('ob-ava-l').textContent = L.ob_ava; $('ob-lang-l').textContent = L.ob_lang;
   $('ob-go').textContent = L.ob_go;
+  $('ob-family').textContent = L.ob_family; $('ob-family').hidden = !cloudOn || !!session;
   $('ob-avas').innerHTML = AVATARS.map(a => `<button type="button" data-ava="${a}" aria-pressed="${a === obAvatar}">${a}</button>`).join('');
   $('ob-en').setAttribute('aria-pressed', String(obLang === 'en'));
   $('ob-yo').setAttribute('aria-pressed', String(obLang === 'yo'));
@@ -1517,6 +2356,7 @@ function paintOnboard() {
 $('ob-avas').addEventListener('click', (e) => { const b = e.target.closest('[data-ava]'); if (b) { obAvatar = b.dataset.ava; paintOnboard(); sfx.tap(); } });
 document.querySelectorAll('.langs button').forEach(b => b.addEventListener('click', () => { obLang = b.dataset.lang; paintOnboard(); }));
 $('ob-name').addEventListener('input', () => { $('ob-err').hidden = true; });
+$('ob-family').addEventListener('click', () => { S.lang = obLang; $('onboard').hidden = true; applyLang(); switchTab('parents'); });
 $('onboard-form').addEventListener('submit', (e) => {
   e.preventDefault();
   const name = $('ob-name').value.trim();
@@ -1524,7 +2364,7 @@ $('onboard-form').addEventListener('submit', (e) => {
   S.name = name; S.avatar = obAvatar;
   const langChanged = S.lang !== obLang; S.lang = obLang; save();
   $('onboard').hidden = true; sfx.win();
-  if (langChanged) applyLang(); else { updateHud(); if (tab === 'stuff') renderStuff(); }
+  if (langChanged) applyLang(); else { updateHud(); if (tab === 'stuff') renderStuff(); if (!$('pathview').hidden) renderPath(); }
 });
 
 /* ---------- language ---------- */
@@ -1537,8 +2377,12 @@ function applyLang() {
   refreshSpeakButtons();
   if (S.lang === 'yo') award('yoruba');
   updateHud();
+  setCloud($('cloud-pill').dataset.s || 'out');
   setStatus(rReady ? 'ready' : rDown ? 'down' : 'loading');
+  $('back-path').textContent = tr('back_path');
   if (tab === 'stuff') { renderStuff(); return; }
+  if (tab === 'parents') { renderParents(); return; }
+  if (!$('pathview').hidden) { renderPath(); return; }
   $('list-title').textContent = tr('title_' + tab);
   if (item) {
     const keep = ta.value; load(item); setCode(keep); renderPlayBar();
@@ -1552,23 +2396,14 @@ $('prompt').addEventListener('click', (e) => { if (e.target.closest('[data-speak
 $('speak-out').addEventListener('click', () => { const oo = $('oops'); speak((oo.hidden ? '' : oo.innerText.split('\n').slice(0, 2).join('. ') + '. ') + $('out').textContent); });
 
 /* ---------- celebrate ---------- */
-const owl = $('owl');
-function happy() { owl.classList.remove('sad', 'happy'); void owl.offsetWidth; owl.classList.add('happy'); }
-function sad() { owl.classList.remove('sad', 'happy'); void owl.offsetWidth; owl.classList.add('sad'); }
+function react(cls) { document.querySelectorAll('.dove-host').forEach(d => { d.classList.remove('sad', 'happy'); void d.offsetWidth; d.classList.add(cls); }); }
+function happy() { react('happy'); }
+function sad() { react('sad'); }
 function celebrate(pts, msg) {
   const box = $('celebrate');
   $('c-emoji').textContent = ['🎉', '🌟', '🏆', '🙌', '🕊️'][Math.floor(Math.random() * 5)];
   $('c-msg').textContent = msg; $('c-pts').textContent = pts;
-  box.querySelectorAll('.confetti').forEach(c => c.remove());
-  const colors = ['#F0563A', '#FFC233', '#1F9D63', '#2E3FA3', '#9B6BFF'];
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    for (let i = 0; i < 44; i++) {
-      const c = document.createElement('i'); c.className = 'confetti';
-      c.style.left = Math.random() * 100 + 'vw'; c.style.background = colors[i % colors.length];
-      c.style.animationDelay = Math.random() * 0.5 + 's'; c.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
-      box.append(c);
-    }
-  }
+  confettiBurst();
   box.hidden = false; happy(); sfx.win();
   setTimeout(() => { box.hidden = true; }, 2100);
 }
@@ -1579,6 +2414,7 @@ switchTab('learn');
 updateHud();
 if (!S.name) openOnboard();
 bootR();
+initCloud();
 </script>
 
 </body>
