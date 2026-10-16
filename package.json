@@ -1,0 +1,12 @@
+{
+  "name": "rquest",
+  "private": true,
+  "description": "R Quest: a free, bilingual R coding playground for children.",
+  "scripts": {
+    "start": "node tests/server.js",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.0"
+  }
+}

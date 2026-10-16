@@ -1,0 +1,33 @@
+name: Keep Supabase awake
+
+# Free Supabase projects pause after a week without activity, which would stop sign-in.
+# This makes one tiny read every three days. It uses only the public (publishable) key,
+# which is already in index.html, so no secrets are needed.
+on:
+  schedule:
+    - cron: '17 6 */3 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the project address and key from index.html
+        id: cfg
+        run: |
+          url=$(grep -oP "url: '\Khttps://[^']+(?=')" index.html | head -1)
+          key=$(grep -oP "key: '\Ksb_publishable_[^']+(?=')" index.html | head -1)
+          if [ -z "$url" ] || [ -z "$key" ]; then echo "Online saving is not set up in index.html; nothing to ping."; exit 0; fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+      - name: Ping Supabase
+        if: steps.cfg.outputs.url != ''
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' "${{ steps.cfg.outputs.url }}/rest/v1/children?select=id&limit=1" -H "apikey: ${{ steps.cfg.outputs.key }}")
+          echo "Supabase answered with HTTP $code"
+          test "$code" -lt 500

@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="R Quest: a free, bilingual (English and Yorùbá) R coding playground for children, with lessons, exercises, games and Bible activities.">
+<meta name="theme-color" content="#1E2A78">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta property="og:title" content="R Quest">
+<meta property="og:description" content="Learn to code in R by drawing, playing games and solving puzzles. Free, in English and Yorùbá.">
+<meta property="og:image" content="https://exelegch.github.io/rquest/docs/screenshots/path.png">
 <title>R Quest</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -438,6 +446,8 @@
   .node:hover { transform: translateY(-2px); }
   .node:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
   .node.done { background: var(--sun); box-shadow: 0 7px 0 #C98F00; }
+  .node.ex { border-radius: 22px; }
+  .node.ex:not(.locked):not(.done) { background: #1A1D33; box-shadow: 0 7px 0 #000; }
   .node.done .ck { position: absolute; right: -4px; bottom: -4px; width: 26px; height: 26px; border-radius: 50%; background: var(--leaf); color: #fff; font-size: 14px; display: grid; place-items: center; border: 3px solid var(--paper); }
   .node.locked { background: #D6DAEA; box-shadow: 0 7px 0 #B6BCD6; color: #8890B5; cursor: not-allowed; }
   .node.locked .ic { filter: grayscale(1); opacity: .5; }
@@ -763,8 +773,8 @@ const I18N = {
     loading: 'Loading R… the first time takes about 20 seconds',
     ready: 'R is ready. Press ▶ Run!',
     down: 'R could not start here',
-    down_1: 'This preview window cannot download the R engine.',
-    down_2: 'Open the downloaded R Quest file in Chrome or Edge with internet on, or put it on a free website such as GitHub Pages. R will start there.',
+    down_1: 'R Quest could not download the R engine.',
+    down_2: 'Check that you are online, then press Try again. The first visit downloads about 20 MB; after that R starts from this device.',
     down_3: 'You can still look around, read the lessons and switch languages.',
     not_ready: 'R is still waking up. Try again in a few seconds.',
     welcome: 'Welcome! Pick something on the left, then press ▶ Run.',
@@ -799,17 +809,19 @@ const I18N = {
     who_title: 'Who is learning?', ob_family: 'Grown-ups: sign in to your family account',
     c_saved: 'Saved online', c_saving: 'Saving…', c_error: 'Could not save online. It will try again.', c_offline: 'Offline. Progress is saved on this device.', c_out: 'Not signed in',
     stars_short: 'stars',
+    offline_r: 'You are offline. R needs the internet to start. Your lessons and progress are still here, and R will start by itself as soon as you are back online.',
+    retry: 'Try again', no_wasm: 'This browser is too old to run R. Please open R Quest in a recent Chrome, Edge or Firefox.',
     tab_parents: '👪 Parents', back_path: '← Path', continue: 'Continue', start: 'START', daily_goal: "Today's goal", goal_done: 'Goal reached! 🎉',
     greet_path: 'Hi {n}! Ready to learn something new today?', greet_done: 'Wow {n}, you finished every lesson! Try the challenges and games next.',
     try_ch: 'Try a challenge', try_ch_s: 'Puzzles that check your code', play_game: 'Play a game', play_game_s: 'Games you can change', unit: 'Unit',
-    unit_done: 'Unit complete!', levelup_title: 'Level up!', levelup_sub: 'You are now {l}. Keep going!', keep_going: 'Keep going', streak_days: 'day streak',
+    unit_done: 'Unit complete!', exercise_done: 'Exercise complete!', levelup_title: 'Level up!', levelup_sub: 'You are now {l}. Keep going!', keep_going: 'Keep going', streak_days: 'day streak',
     gate_title: 'For grown-ups', gate_q: 'To open the parent page, answer: what is {a} × {b}?', gate_btn: 'Open', gate_err: 'That is not right. Please try again.',
     rep_title: "{n}'s progress", rep_lessons: 'Lessons', rep_ch: 'Challenges', rep_games: 'Games', rep_week: 'Stars earned this week',
     rep_minutes: '{m} minutes coding this week', rep_skills: 'Skills learned', rep_skills_note: 'A skill is ticked when its whole unit is finished.',
     rep_tips: 'How you can help', tip1: 'Sit with your child for 15 minutes a day.', tip2: 'Ask them to explain their code to you. Teaching is the best way to learn.',
-    tip3: 'Use Free play to make a chart about your own family.', privacy: 'Everything is saved only on this device. R Quest collects no personal information.',
+    tip3: 'Use Free play to make a chart about your own family.', privacy: 'Progress is saved on this device. R Quest also counts anonymous usage (which lessons are finished, no names) to improve the lessons.',
     plus_title: 'R Quest Plus is coming', plus_body: 'New units, and class reports for schools and Sunday schools.',
-    privacy_cloud: 'Progress is saved on this device and in your family account. R Quest stores only your email and each child\'s first name, animal picture and progress.', lock: '🔒 Lock',
+    privacy_cloud: 'Progress is saved on this device and in your family account. R Quest stores only your email and each child\'s first name, animal picture and progress, plus anonymous usage counts with no names.', lock: '🔒 Lock',
     d_easy: 'Easy', d_medium: 'Medium', d_hard: 'Hard', difficulty: 'Difficulty', won_on: 'You won on {d}!',
     new_question: '🔄 New question', next: 'Next', read_aloud: 'Read aloud', big_text: 'Bigger text',
     playing: '🎵 Playing your tune…', sound_off_music: '🔇 Sound is off. Tap 🔇 at the top, then press Play to hear your tune.',
@@ -823,8 +835,8 @@ const I18N = {
     loading: 'R ń jí… nígbà àkọ́kọ́ ó máa ń gba ìṣẹ́jú-àáyá 20',
     ready: 'R ti ṣetán. Tẹ ▶ Ṣe é!',
     down: 'R kò lè bẹ̀rẹ̀ níbí',
-    down_1: 'Fèrèsé àyẹ̀wò yìí kò lè gba ẹ̀rọ R wọlé.',
-    down_2: 'Ṣí fáìlì R Quest tí o gbà sílẹ̀ nínú Chrome tàbí Edge pẹ̀lú íntánẹ́ẹ̀tì, tàbí fi sí orí ìkànnì ọ̀fẹ́ bíi GitHub Pages. R yóò bẹ̀rẹ̀ níbẹ̀.',
+    down_1: 'R Quest kò lè gba ẹ̀rọ R wọlé.',
+    down_2: 'Rí i dájú pé o wà lórí íntánẹ́ẹ̀tì, lẹ́yìn náà tẹ Gbìyànjú lẹ́ẹ̀kan sí. Ìbẹ̀wò àkọ́kọ́ máa ń gba nǹkan bí 20 MB; lẹ́yìn ìyẹn R yóò bẹ̀rẹ̀ láti orí ẹ̀rọ yìí.',
     down_3: 'O ṣì lè wo àyíká, ka àwọn ẹ̀kọ́, kí o sì yí èdè padà.',
     not_ready: 'R ṣì ń jí. Gbìyànjú lẹ́ẹ̀kan sí ní ìṣẹ́jú-àáyá díẹ̀.',
     welcome: 'Káàbọ̀! Yan nǹkan kan ní apá òsì, lẹ́yìn náà tẹ ▶ Ṣe é.',
@@ -859,17 +871,19 @@ const I18N = {
     who_title: 'Ta ló ń kẹ́kọ̀ọ́?', ob_family: 'Àwọn àgbà: wọlé sí àkáǹtì ìdílé yín',
     c_saved: 'Ó ti wà ní ìpamọ́ lórí íntánẹ́ẹ̀tì', c_saving: 'Ó ń fi pamọ́…', c_error: 'A kò lè fi pamọ́ sórí íntánẹ́ẹ̀tì. Yóò gbìyànjú lẹ́ẹ̀kan sí.', c_offline: 'Kò sí íntánẹ́ẹ̀tì. Ìlọsíwájú wà ní ìpamọ́ lórí ẹ̀rọ yìí.', c_out: 'O kò tíì wọlé',
     stars_short: 'ìràwọ̀',
+    offline_r: 'O kò sí lórí íntánẹ́ẹ̀tì. R nílò íntánẹ́ẹ̀tì láti bẹ̀rẹ̀. Àwọn ẹ̀kọ́ àti ìlọsíwájú rẹ ṣì wà níbí, R yóò sì bẹ̀rẹ̀ fúnra rẹ̀ ní kété tí o bá padà sórí íntánẹ́ẹ̀tì.',
+    retry: 'Gbìyànjú lẹ́ẹ̀kan sí', no_wasm: 'Aṣàwákiri yìí ti gbó jù láti ṣe R. Jọ̀wọ́ ṣí R Quest nínú Chrome, Edge tàbí Firefox tuntun.',
     tab_parents: '👪 Àwọn òbí', back_path: '← Ọ̀nà', continue: 'Tẹ̀síwájú', start: 'BẸ̀RẸ̀', daily_goal: 'Àfojúsùn òní', goal_done: 'O ti dé àfojúsùn! 🎉',
     greet_path: 'Báwo ni {n}! Ṣé o ṣetán láti kọ́ nǹkan tuntun lónìí?', greet_done: 'Háà {n}, o ti parí gbogbo ẹ̀kọ́! Gbìyànjú àwọn ìdíje àti eré báyìí.',
     try_ch: 'Gbìyànjú ìdíje', try_ch_s: 'Àdìtú tí ó ń ṣàyẹ̀wò kóòdù rẹ', play_game: 'Ṣe eré kan', play_game_s: 'Eré tí o lè yí padà', unit: 'Ìpín',
-    unit_done: 'Ìpín parí!', levelup_title: 'Ìpele tuntun!', levelup_sub: 'Ìwọ ni {l} báyìí. Máa bá a lọ!', keep_going: 'Máa bá a lọ', streak_days: 'ọjọ́ léraléra',
+    unit_done: 'Ìpín parí!', exercise_done: 'Ìdánrawò parí!', levelup_title: 'Ìpele tuntun!', levelup_sub: 'Ìwọ ni {l} báyìí. Máa bá a lọ!', keep_going: 'Máa bá a lọ', streak_days: 'ọjọ́ léraléra',
     gate_title: 'Fún àwọn àgbà', gate_q: 'Láti ṣí ojú-ìwé àwọn òbí, dáhùn: kí ni {a} × {b}?', gate_btn: 'Ṣí i', gate_err: 'Ìyẹn kò tọ̀nà. Jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan sí.',
     rep_title: 'Ìlọsíwájú {n}', rep_lessons: 'Ẹ̀kọ́', rep_ch: 'Ìdíje', rep_games: 'Eré', rep_week: 'Ìràwọ̀ tí ó gbà ní ọ̀sẹ̀ yìí',
     rep_minutes: 'Ìṣẹ́jú {m} ti kíkọ kóòdù ní ọ̀sẹ̀ yìí', rep_skills: 'Ohun tí ó ti kọ́', rep_skills_note: 'A máa ń sàmì sí ìmọ̀ kan nígbà tí gbogbo ìpín rẹ̀ bá parí.',
     rep_tips: 'Bí o ṣe lè ṣèrànwọ́', tip1: 'Jókòó pẹ̀lú ọmọ rẹ fún ìṣẹ́jú 15 lójoojúmọ́.', tip2: 'Ní kí ó ṣàlàyé kóòdù rẹ̀ fún ọ. Kíkọ́ni ni ọ̀nà tí ó dára jù láti kọ́.',
-    tip3: 'Lo Eré ọ̀fẹ́ láti ya àwòrán nípa ìdílé yín.', privacy: 'Gbogbo nǹkan wà ní ìpamọ́ lórí ẹ̀rọ yìí nìkan. R Quest kò gba àlàyé ara ẹni kankan.',
+    tip3: 'Lo Eré ọ̀fẹ́ láti ya àwòrán nípa ìdílé yín.', privacy: 'Ìlọsíwájú wà ní ìpamọ́ lórí ẹ̀rọ yìí. R Quest tún ń ka ìlò láìdárúkọ ẹnikẹ́ni (àwọn ẹ̀kọ́ tí a parí, láìsí orúkọ) láti mú àwọn ẹ̀kọ́ dára sí i.',
     plus_title: 'R Quest Plus ń bọ̀', plus_body: 'Àwọn ìpín tuntun, àti ìjábọ̀ kíláàsì fún ilé-ìwé àti ilé-ẹ̀kọ́ ọjọ́ ìsinmi.',
-    privacy_cloud: 'Ìlọsíwájú wà ní ìpamọ́ lórí ẹ̀rọ yìí àti nínú àkáǹtì ìdílé rẹ. R Quest ń tọ́jú ímeèlì rẹ nìkan, àti orúkọ àkọ́kọ́, àwòrán ẹranko àti ìlọsíwájú ọmọ kọ̀ọ̀kan.', lock: '🔒 Tì í',
+    privacy_cloud: 'Ìlọsíwájú wà ní ìpamọ́ lórí ẹ̀rọ yìí àti nínú àkáǹtì ìdílé rẹ. R Quest ń tọ́jú ímeèlì rẹ nìkan, àti orúkọ àkọ́kọ́, àwòrán ẹranko àti ìlọsíwájú ọmọ kọ̀ọ̀kan, pẹ̀lú kíka ìlò láìsí orúkọ.', lock: '🔒 Tì í',
     d_easy: 'Rọrùn', d_medium: 'Àárín', d_hard: 'Le', difficulty: 'Ìpele ìṣòro', won_on: 'O borí ní ìpele {d}!',
     new_question: '🔄 Ìbéèrè tuntun', next: 'Èyí tó kàn', read_aloud: 'Kà á sókè', big_text: 'Ọ̀rọ̀ ńlá',
     playing: '🎵 Orin rẹ ń dún…', sound_off_music: '🔇 Ohùn ti wà ní pípa. Tẹ 🔇 lókè, lẹ́yìn náà tẹ Ṣeré láti gbọ́ orin rẹ.',
@@ -967,6 +981,146 @@ const CONTENT = {
       prompt: 'Jesus fed 5,000 people with 5 loaves and 2 fish, and 12 baskets were left over (John 6). Let R do the maths!',
       prompt_yo: 'Jésù bọ́ ẹgbẹ̀rún márùn-ún ènìyàn pẹ̀lú búrẹ́dì márùn-ún àti ẹja méjì, agbọ̀n méjìlá sì ṣẹ́kù (Jòhánù 6). Jẹ́ kí R ṣe ìṣirò náà!',
       code: `loaves <- 5\nfish <- 2\npeople <- 5000\nbaskets_left <- 12\n\ncat("Jesus fed", people, "people with", loaves, "loaves and", fish, "fish.\\n")\ncat("That is", people / loaves, "people for every loaf!\\n")\ncat("And", baskets_left, "baskets were left over. (John 6:13)\\n")\n\nbarplot(c(Loaves = loaves, Fish = fish, Baskets = baskets_left),\n        col = c("burlywood", "steelblue", "darkgoldenrod"),\n        main = "Feeding the 5,000")` },
+    { id: 'L22', icon: '🔗', title: 'Glue words', title_yo: 'Lẹ ọ̀rọ̀ pọ̀',
+      prompt: 'paste() glues words together with a space between them. paste0() glues them with no space.',
+      prompt_yo: 'paste() ń lẹ ọ̀rọ̀ pọ̀ pẹ̀lú àlàfo láàrin wọn. paste0() ń lẹ̀ wọ́n pọ̀ láìsí àlàfo.',
+      code: `first <- "Ada"\nlast <- "Okafor"\npaste("My name is", first, last)\npaste0("R", "Quest", "!")\npaste("Day", 1:3)` },
+    { id: 'L23', icon: '🔠', title: 'Big and small letters', title_yo: 'Lẹ́tà ńlá àti kékeré',
+      prompt: 'toupper() makes CAPITAL letters, tolower() makes small letters, and nchar() counts the letters.',
+      prompt_yo: 'toupper() ń ṣe lẹ́tà ŃLÁ, tolower() ń ṣe lẹ́tà kékeré, nchar() sì ń ka iye lẹ́tà.',
+      code: `word <- "Hallelujah"\ntoupper(word)\ntolower(word)\nnchar(word)   # how many letters?` },
+    { id: 'L24', icon: '✂️', title: 'Cut words up', title_yo: 'Gé ọ̀rọ̀ sí wẹ́wẹ́',
+      prompt: 'substr() takes a piece of a word. strsplit() cuts a sentence into separate words.',
+      prompt_yo: 'substr() ń mú apá kan nínú ọ̀rọ̀. strsplit() ń gé gbólóhùn sí ọ̀rọ̀ kọ̀ọ̀kan.',
+      code: `verse <- "God is love"\nsubstr(verse, 1, 3)\nwords <- strsplit(verse, " ")[[1]]\nwords\nlength(words)` },
+    { id: 'L25', icon: '🔁', title: 'Backwards words', title_yo: 'Ọ̀rọ̀ tí a kà sẹ́yìn',
+      prompt: 'rev() turns a list around. Some words read the same backwards, like level and racecar. Try your own name!',
+      prompt_yo: 'rev() ń yí àkọsílẹ̀ padà sẹ́yìn. Àwọn ọ̀rọ̀ kan máa ń rí bákan náà tí a bá kà wọ́n sẹ́yìn, bíi level àti racecar. Gbìyànjú orúkọ tìrẹ!',
+      code: `word <- "level"\nletters_in <- strsplit(word, "")[[1]]\nbackwards <- paste(rev(letters_in), collapse = "")\ncat(word, "backwards is", backwards, "\\n")\nif (word == backwards) cat("It reads the same both ways! 🔁\\n")` },
+    { id: 'L26', icon: '🌼', title: 'Meet a dataset', title_yo: 'Mọ dátà kan',
+      prompt: 'R comes with real datasets. iris measures 150 flowers. head() shows the first rows, nrow() counts them.',
+      prompt_yo: 'R ní àwọn dátà gidi nínú rẹ̀. iris wọn òdòdó 150. head() ń fi àwọn ìlà àkọ́kọ́ hàn, nrow() sì ń kà wọ́n.',
+      code: `# iris is real data about 150 flowers, built into R\nhead(iris)\nnrow(iris)\nnames(iris)` },
+    { id: 'L27', icon: '🧾', title: 'Count and average', title_yo: 'Kà àti ìpíndọ́gba',
+      prompt: 'table() counts each kind. mean() finds the average. round() tidies up long decimals.',
+      prompt_yo: 'table() ń ka irú kọ̀ọ̀kan. mean() ń wá ìpíndọ́gba. round() ń tún àwọn nọ́mbà ẹlẹ́sẹ̀ gígùn ṣe.',
+      code: `table(iris$Species)\nmean(iris$Petal.Length)\nround(mean(iris$Petal.Length), 1)` },
+    { id: 'L28', icon: '📶', title: 'Histogram', title_yo: 'Àwòrán ìpín (histogram)',
+      prompt: 'A histogram shows how many values fall into each range. Tall bars mean many flowers have that size.',
+      prompt_yo: 'Histogram ń fi iye nǹkan tí ó bọ́ sí ìpín kọ̀ọ̀kan hàn. Ọ̀pá gíga túmọ̀ sí pé òdòdó púpọ̀ ní ìwọ̀n yẹn.',
+      code: `hist(iris$Sepal.Length, col = "#7B4BD1", border = "white",\n     main = "How long are the sepals?", xlab = "Length (cm)")` },
+    { id: 'L29', icon: '📦', title: 'Compare groups', title_yo: 'Fi àwọn ẹgbẹ́ wéra',
+      prompt: 'A box plot compares groups. The thick line in each box is the middle value.',
+      prompt_yo: 'Box plot ń fi àwọn ẹgbẹ́ wéra. Ìlà tí ó nípọn nínú àpótí kọ̀ọ̀kan ni iye àárín.',
+      code: `boxplot(Petal.Length ~ Species, data = iris,\n        col = c("#FFC233", "#1F9D63", "#F0563A"),\n        main = "Petal length by species", ylab = "cm")` },
+    { id: 'L30', icon: '🏅', title: 'Sort a table', title_yo: 'Tò tábìlì',
+      prompt: 'order() sorts the rows of a table. Here the highest score comes first.',
+      prompt_yo: 'order() ń tò àwọn ìlà tábìlì. Níbí, máàkì tí ó ga jù ló kọ́kọ́ wá.',
+      pretend: true,
+      code: `class_scores <- data.frame(\n  name  = c("Tolu", "Chidi", "Musa", "Ada", "Bisi"),\n  score = c(78, 92, 85, 64, 88)\n)\nclass_scores[order(class_scores$score, decreasing = TRUE), ]` },
+    { id: 'E1', icon: '🏋️', exercise: true, points: 10, title: 'Minutes in a day', title_yo: 'Ìṣẹ́jú inú ọjọ́ kan',
+      prompt: 'There are 24 hours in a day and 60 minutes in an hour. Make R work out how many minutes are in a day.',
+      prompt_yo: 'Wákàtí 24 ló wà nínú ọjọ́ kan, ìṣẹ́jú 60 sì wà nínú wákàtí kan. Jẹ́ kí R ṣírò iye ìṣẹ́jú tí ó wà nínú ọjọ́ kan.',
+      goal: 'R prints 1440, using *', goal_yo: 'R tẹ 1440 jáde, pẹ̀lú *',
+      hint: '24 * 60', hint_yo: '24 * 60',
+      starter: `# How many minutes in a day?\n`,
+      check: (out, code) => /\b1440\b/.test(out) && /\*/.test(code) },
+    { id: 'E2', icon: '🏋️', exercise: true, points: 10, title: 'My age box', title_yo: 'Àpótí ọjọ́-orí mi',
+      prompt: 'Make a box called my_age with your age in it. Then print my_age + 1 to see how old you will be next year.',
+      prompt_yo: 'Ṣe àpótí kan tí a ń pè ní my_age pẹ̀lú ọjọ́-orí rẹ nínú rẹ̀. Lẹ́yìn náà tẹ my_age + 1 jáde láti rí ọjọ́-orí rẹ ní ọdún tó ń bọ̀.',
+      goal: 'my_age holds one number, and R prints my_age + 1', goal_yo: 'my_age ní nọ́mbà kan, R sì tẹ my_age + 1 jáde',
+      hint: 'my_age <- 9\nmy_age + 1', hint_yo: 'my_age <- 9\nmy_age + 1',
+      starter: `my_age <- \n`,
+      check: (out, code) => /my_age\s*\+\s*1/.test(code) && /\d/.test(out),
+      rcheck: `exists("my_age", envir = globalenv(), inherits = FALSE) && is.numeric(my_age) && length(my_age) == 1` },
+    { id: 'E3', icon: '🏋️', exercise: true, points: 10, title: 'Five friends', title_yo: 'Ọ̀rẹ́ márùn-ún',
+      prompt: 'Make a list called friends with 5 names in it. Then print how many there are with length().',
+      prompt_yo: 'Ṣe àkọsílẹ̀ kan tí a ń pè ní friends pẹ̀lú orúkọ márùn-ún. Lẹ́yìn náà tẹ iye wọn jáde pẹ̀lú length().',
+      goal: 'friends has exactly 5 names', goal_yo: 'friends ní orúkọ márùn-ún gẹ́lẹ́',
+      hint: 'friends <- c("Ada", "Tolu", "Musa", "Chidi", "Bisi")\nlength(friends)', hint_yo: 'friends <- c("Ada", "Tolu", "Musa", "Chidi", "Bisi")\nlength(friends)',
+      starter: `friends <- c("Ada", "Tolu")\nlength(friends)`,
+      rcheck: `exists("friends", envir = globalenv(), inherits = FALSE) && is.character(friends) && length(friends) == 5` },
+    { id: 'E4', icon: '🏋️', exercise: true, points: 10, title: 'Top score', title_yo: 'Máàkì tó ga jù',
+      prompt: 'Print the highest score, then print all the scores from smallest to biggest.',
+      prompt_yo: 'Tẹ máàkì tí ó ga jù jáde, lẹ́yìn náà tẹ gbogbo máàkì jáde láti kékeré sí ńlá.',
+      goal: 'Use max() and sort()', goal_yo: 'Lo max() àti sort()',
+      hint: 'max(scores)\nsort(scores)', hint_yo: 'max(scores)\nsort(scores)',
+      starter: `scores <- c(45, 88, 72, 91, 60)\n`,
+      check: (out, code) => /max\s*\(/.test(code) && /sort\s*\(/.test(code) && /\b91\b/.test(out) && /45\s+60\s+72\s+88\s+91/.test(out) },
+    { id: 'E5', icon: '🏋️', exercise: true, points: 10, title: 'My own bar chart', title_yo: 'Àwòrán ọ̀pá tìrẹ',
+      prompt: 'Make a bar chart of 3 things you like. Give each bar its own colour and give the chart a title with main.',
+      prompt_yo: 'Ṣe àwòrán ọ̀pá nípa nǹkan mẹ́ta tí o fẹ́ràn. Fún ọ̀pá kọ̀ọ̀kan ní àwọ̀ tirẹ̀, kí o sì fún àwòrán náà ní àkọlé pẹ̀lú main.',
+      goal: 'likes has 3 things, with 3 colours and a title', goal_yo: 'likes ní nǹkan mẹ́ta, àwọ̀ mẹ́ta àti àkọlé',
+      hint: 'likes <- c(Football = 8, Music = 6, Reading = 5)\nbarplot(likes, col = c("red", "gold", "blue"), main = "Things I like")',
+      hint_yo: 'likes <- c(Football = 8, Music = 6, Reading = 5)\nbarplot(likes, col = c("red", "gold", "blue"), main = "Things I like")',
+      starter: `likes <- c(Football = 8, Music = 6)\nbarplot(likes)`,
+      check: (out, code, ctx) => { const m = code.match(/col\s*=\s*c\(([^)]+)\)/); return ctx.images > 0 && /main\s*=/.test(code) && !!m && m[1].split(',').length >= 3; },
+      rcheck: `exists("likes", envir = globalenv(), inherits = FALSE) && length(likes) >= 3` },
+    { id: 'E6', icon: '🏋️', exercise: true, points: 10, title: 'Growing bean', title_yo: 'Ẹ̀wà tí ń dàgbà',
+      prompt: 'A bean plant grew to 2, 4, 7, 9 and 12 cm over 5 days. Draw it as a line chart with points, using type = "o".',
+      prompt_yo: 'Igi ẹ̀wà kan dàgbà dé 2, 4, 7, 9 àti 12 cm ní ọjọ́ márùn-ún. Yà á ní àwòrán ìlà pẹ̀lú ààmì, pẹ̀lú type = "o".',
+      goal: 'A plot with type = "o"', goal_yo: 'Àwòrán pẹ̀lú type = "o"',
+      hint: 'plot(day, height, type = "o", col = "darkgreen", lwd = 3)', hint_yo: 'plot(day, height, type = "o", col = "darkgreen", lwd = 3)',
+      starter: `day <- 1:5\nheight <- c(2, 4, 7, 9, 12)\n`,
+      check: (out, code, ctx) => ctx.images > 0 && /type\s*=\s*["']o["']/.test(code) },
+    { id: 'E7', icon: '🏋️', exercise: true, points: 10, title: 'Pass or try again', title_yo: 'Yege tàbí gbìyànjú',
+      prompt: 'Write an if/else. If score is 50 or more, print "Pass". Otherwise print "Try again".',
+      prompt_yo: 'Kọ if/else kan. Bí score bá jẹ́ 50 tàbí jù bẹ́ẹ̀ lọ, tẹ "Pass" jáde. Bí kò bá rí bẹ́ẹ̀, tẹ "Try again" jáde.',
+      goal: 'Uses if and else, and prints "Pass" when score is 65', goal_yo: 'Lo if àti else, kí ó sì tẹ "Pass" jáde nígbà tí score jẹ́ 65',
+      hint: 'if (score >= 50) {\n  print("Pass")\n} else {\n  print("Try again")\n}', hint_yo: 'if (score >= 50) {\n  print("Pass")\n} else {\n  print("Try again")\n}',
+      starter: `score <- 65\n`,
+      check: (out, code) => /\bif\s*\(/.test(code) && /\belse\b/.test(code) && /Pass/.test(out) && !/Try again/.test(out) },
+    { id: 'E8', icon: '🏋️', exercise: true, points: 10, title: 'Seven times table', title_yo: 'Ìsọdipúpọ̀ méje',
+      prompt: 'Use a for-loop to print the 7 times table, from 7 × 1 up to 7 × 10.',
+      prompt_yo: 'Lo for-loop láti tẹ ìsọdipúpọ̀ méje jáde, láti 7 × 1 dé 7 × 10.',
+      goal: '7, 14, 21 … 70 all appear, using for', goal_yo: '7, 14, 21 … 70 hàn, pẹ̀lú for',
+      hint: 'for (i in 1:10) {\n  cat("7 x", i, "=", 7 * i, "\\n")\n}', hint_yo: 'for (i in 1:10) {\n  cat("7 x", i, "=", 7 * i, "\\n")\n}',
+      starter: `# 7 times table\n`,
+      check: (out, code) => /\bfor\s*\(/.test(code) && [7, 14, 21, 28, 35, 42, 49, 56, 63, 70].every(n => new RegExp(`\\b${n}\\b`).test(out)) },
+    { id: 'E9', icon: '🏋️', exercise: true, points: 10, title: 'Shopping total', title_yo: 'Àròpọ̀ ọjà',
+      prompt: 'Make R add up all the prices in the shopping cart.',
+      prompt_yo: 'Jẹ́ kí R ṣe àròpọ̀ gbogbo iye owó tí ó wà nínú agbọ̀n ọjà náà.',
+      goal: 'R prints the total using sum()', goal_yo: 'R tẹ àròpọ̀ jáde pẹ̀lú sum()',
+      hint: 'sum(cart$price)', hint_yo: 'sum(cart$price)',
+      pretend: true,
+      starter: `cart <- data.frame(\n  item  = c("Bread", "Eggs", "Milk"),\n  price = c(1500, 2200, 1800)\n)\n`,
+      check: (out, code) => /\b5500\b/.test(out) && /sum\s*\(/.test(code) },
+    { id: 'E10', icon: '🏋️', exercise: true, bible: true, points: 10, title: 'The four Gospels', title_yo: 'Ìwé Ìhìnrere mẹ́rin',
+      prompt: 'Make a list called gospels with the four Gospels: Matthew, Mark, Luke and John. Then print it.',
+      prompt_yo: 'Ṣe àkọsílẹ̀ kan tí a ń pè ní gospels pẹ̀lú ìwé Ìhìnrere mẹ́rin: Matthew, Mark, Luke àti John. Lẹ́yìn náà tẹ̀ ẹ́ jáde.',
+      goal: 'gospels has all four names', goal_yo: 'gospels ní gbogbo orúkọ mẹ́rẹ̀ẹ̀rin',
+      hint: 'gospels <- c("Matthew", "Mark", "Luke", "John")\ngospels', hint_yo: 'gospels <- c("Matthew", "Mark", "Luke", "John")\ngospels',
+      starter: `gospels <- c("Matthew")\ngospels`,
+      rcheck: `exists("gospels", envir = globalenv(), inherits = FALSE) && length(gospels) == 4 && all(c("Matthew", "Mark", "Luke", "John") %in% gospels)` },
+    { id: 'E11', icon: '🏋️', exercise: true, bible: true, points: 10, title: 'Shout it out', title_yo: 'Kígbe rẹ̀ sókè',
+      prompt: 'Make R print JESUS LOVES ME in capital letters, using toupper().',
+      prompt_yo: 'Jẹ́ kí R tẹ JESUS LOVES ME jáde ní lẹ́tà ńlá, pẹ̀lú toupper().',
+      goal: 'R prints JESUS LOVES ME using toupper()', goal_yo: 'R tẹ JESUS LOVES ME jáde pẹ̀lú toupper()',
+      hint: 'toupper(words)', hint_yo: 'toupper(words)',
+      starter: `words <- "Jesus loves me"\n`,
+      check: (out, code) => /JESUS LOVES ME/.test(out) && /toupper\s*\(/.test(code) },
+    { id: 'E12', icon: '🏋️', exercise: true, points: 10, title: 'How long is my name?', title_yo: 'Báwo ni orúkọ mi ṣe gùn tó?',
+      prompt: 'Put your name in a box called my_name, then use nchar() to count its letters.',
+      prompt_yo: 'Fi orúkọ rẹ sínú àpótí kan tí a ń pè ní my_name, lẹ́yìn náà lo nchar() láti ka lẹ́tà rẹ̀.',
+      goal: 'my_name holds your name, and nchar() counts it', goal_yo: 'my_name ní orúkọ rẹ, nchar() sì kà á',
+      hint: 'my_name <- "Bisi"\nnchar(my_name)', hint_yo: 'my_name <- "Bisi"\nnchar(my_name)',
+      starter: `my_name <- ""\n`,
+      check: (out, code) => /nchar\s*\(/.test(code) && /\d/.test(out),
+      rcheck: `exists("my_name", envir = globalenv(), inherits = FALSE) && is.character(my_name) && nchar(my_name) >= 2` },
+    { id: 'E13', icon: '🏋️', exercise: true, points: 10, title: 'Average sepal', title_yo: 'Ìpíndọ́gba sepal',
+      prompt: 'Find the average Sepal.Length of all the iris flowers.',
+      prompt_yo: 'Wá ìpíndọ́gba Sepal.Length gbogbo òdòdó iris.',
+      goal: 'R prints the average (about 5.84)', goal_yo: 'R tẹ ìpíndọ́gba jáde (nǹkan bí 5.84)',
+      hint: 'mean(iris$Sepal.Length)', hint_yo: 'mean(iris$Sepal.Length)',
+      starter: `# average sepal length\n`,
+      check: (out, code) => /5\.84/.test(out) && /mean\s*\(/.test(code) },
+    { id: 'E14', icon: '🏋️', exercise: true, points: 10, title: 'Longest petal', title_yo: 'Ewé òdòdó tó gùn jù',
+      prompt: 'Which iris flower has the longest petal? Use max() on iris$Petal.Length.',
+      prompt_yo: 'Òdòdó iris wo ló ní ewé tí ó gùn jù? Lo max() lórí iris$Petal.Length.',
+      goal: 'R prints the longest petal length using max()', goal_yo: 'R tẹ gígùn ewé tí ó gùn jù jáde pẹ̀lú max()',
+      hint: 'max(iris$Petal.Length)', hint_yo: 'max(iris$Petal.Length)',
+      starter: `# longest petal\n`,
+      check: (out, code) => /\b6\.9\b/.test(out) && /max\s*\(/.test(code) },
   ],
   challenge: [
     { id: 'C1', icon: '🎯', points: 10, title: 'Print your name', title_yo: 'Tẹ orúkọ rẹ jáde',
@@ -1224,11 +1378,13 @@ const VERSES = [
 const verseOfDay = () => VERSES[Math.floor(Date.now() / 864e5) % VERSES.length];
 
 const UNITS = [
-  { id: 'u1', color: '#2E3FA3', en: 'Talk to R', yo: 'Bá R sọ̀rọ̀', skill_en: 'Printing, maths and variables', skill_yo: 'Títẹ̀ jáde, ìṣirò àti àwọn àpótí (variables)', ids: ['L1', 'L2', 'L3'] },
-  { id: 'u2', color: '#1F9D63', en: 'Lists and words', yo: 'Àkọsílẹ̀ àti ọ̀rọ̀', skill_en: 'Vectors (lists), sorting and picking items', skill_yo: 'Àkọsílẹ̀ (vectors), títò àti yíyan nǹkan', ids: ['L4', 'L5', 'L15', 'L16', 'L17'] },
-  { id: 'u3', color: '#E0532F', en: 'Draw with R', yo: 'Ya àwòrán pẹ̀lú R', skill_en: 'Scatter, bar, pie and line charts', skill_yo: 'Àwòrán ààmì, ọ̀pá, àkàrà àti ìlà', ids: ['L6', 'L7', 'L8', 'L9'] },
-  { id: 'u4', color: '#7B4BD1', en: 'Decisions and loops', yo: 'Ìpinnu àti ìyípo', skill_en: 'If/else, loops, functions and random numbers', skill_yo: 'Bí/bí kò ṣe, ìyípo, function àti nọ́mbà láìròtẹ́lẹ̀', ids: ['L18', 'L10', 'L11', 'L12', 'L13', 'L14'] },
-  { id: 'u5', color: '#C77700', en: 'R in real life', yo: 'R nínú ayé gidi', skill_en: 'Data frames (tables) and real-world maths', skill_yo: 'Tábìlì (data frame) àti ìṣirò ayé gidi', ids: ['L19', 'L20', 'L21'] },
+  { id: 'u1', color: '#2E3FA3', en: 'Talk to R', yo: 'Bá R sọ̀rọ̀', skill_en: 'Printing, maths and variables', skill_yo: 'Títẹ̀ jáde, ìṣirò àti àwọn àpótí (variables)', ids: ['L1', 'L2', 'L3', 'E1', 'E2'] },
+  { id: 'u2', color: '#1F9D63', en: 'Lists and words', yo: 'Àkọsílẹ̀ àti ọ̀rọ̀', skill_en: 'Vectors (lists), sorting and picking items', skill_yo: 'Àkọsílẹ̀ (vectors), títò àti yíyan nǹkan', ids: ['L4', 'L5', 'L15', 'L16', 'L17', 'E3', 'E4'] },
+  { id: 'u3', color: '#E0532F', en: 'Draw with R', yo: 'Ya àwòrán pẹ̀lú R', skill_en: 'Scatter, bar, pie and line charts', skill_yo: 'Àwòrán ààmì, ọ̀pá, àkàrà àti ìlà', ids: ['L6', 'L7', 'L8', 'L9', 'E5', 'E6'] },
+  { id: 'u4', color: '#7B4BD1', en: 'Decisions and loops', yo: 'Ìpinnu àti ìyípo', skill_en: 'If/else, loops, functions and random numbers', skill_yo: 'Bí/bí kò ṣe, ìyípo, function àti nọ́mbà láìròtẹ́lẹ̀', ids: ['L18', 'L10', 'L11', 'L12', 'L13', 'L14', 'E7', 'E8'] },
+  { id: 'u5', color: '#C77700', en: 'R in real life', yo: 'R nínú ayé gidi', skill_en: 'Data frames (tables) and real-world maths', skill_yo: 'Tábìlì (data frame) àti ìṣirò ayé gidi', ids: ['L19', 'L20', 'L21', 'E9', 'E10'] },
+  { id: 'u6', color: '#0E7C86', en: 'Words and text', yo: 'Ọ̀rọ̀ àti lẹ́tà', skill_en: 'Joining, cutting and changing text', skill_yo: 'Dída ọ̀rọ̀ pọ̀, gígé wọn àti yíyí wọn padà', ids: ['L22', 'L23', 'L24', 'L25', 'E11', 'E12'] },
+  { id: 'u7', color: '#A8326E', en: 'Data detective', yo: 'Aṣàwárí dátà', skill_en: 'Real datasets, counts, averages, histograms and box plots', skill_yo: 'Dátà gidi, kíkà, ìpíndọ́gba, histogram àti box plot', ids: ['L26', 'L27', 'L28', 'L29', 'L30', 'E13', 'E14'] },
 ];
 CONTENT.learn = UNITS.flatMap(u => u.ids).map(id => CONTENT.learn.find(x => x.id === id)).filter(Boolean);
 const unitOf = (id) => UNITS.find(u => u.ids.includes(id));
@@ -1545,7 +1701,7 @@ $('list').addEventListener('click', (e) => {
 function load(it) {
   item = it; tries = 0;
   const p = $('prompt');
-  p.className = 'prompt' + (tab === 'challenge' ? ' challenge' : '');
+  p.className = 'prompt' + (tab === 'challenge' || it.exercise ? ' challenge' : '');
   let html = esc(pick(it, 'prompt'));
   if (it.goal) html += `<span class="goal">🎯 ${esc(pick(it, 'goal'))}</span>`;
   if (tab === 'challenge') html += `<span class="pretend"><span class="tag d-${chDiff(it)}">${esc(tr('d_' + chDiff(it)))}</span> +${it.points} ⭐</span>`;
@@ -1563,7 +1719,7 @@ function load(it) {
   renderList();
   coach('encourage');
 }
-const runLabel = () => tab === 'games' ? tr('play') : tab === 'challenge' ? tr('check') : tr('run');
+const runLabel = () => tab === 'games' ? tr('play') : (tab === 'challenge' || item?.exercise) ? tr('check') : tr('run');
 $('reset').addEventListener('click', () => {
   if (!item) return;
   if (item.saved) { delete S.free[item.id]; save(); }
@@ -1621,7 +1777,7 @@ function renderPath() {
       const d = (i++) * 45;
       return `<div class="node-row ${state}" style="--off:${off}px;--d:${d}ms;--u:${u.color}">
         ${state === 'current' ? `<span class="start-tag">${esc(tr('start'))}</span>` : ''}
-        <button type="button" class="node ${state}" data-id="${it.id}" aria-label="${esc(pick(it, 'title'))}${state === 'locked' ? ' 🔒' : ''}"><span class="ic">${state === 'locked' ? '🔒' : it.icon}</span>${state === 'done' ? '<span class="ck">✓</span>' : ''}</button>
+        <button type="button" class="node ${state}${it.exercise ? ' ex' : ''}" data-id="${it.id}" aria-label="${esc(pick(it, 'title'))}${state === 'locked' ? ' 🔒' : ''}"><span class="ic">${state === 'locked' ? '🔒' : it.icon}</span>${state === 'done' ? '<span class="ck">✓</span>' : ''}</button>
         <span class="node-name">${esc(pick(it, 'title'))}</span>
       </div>`;
     }).join('');
@@ -1799,8 +1955,13 @@ function showOops(msg) {
 /* ---------- webR ---------- */
 let webR = null, shelter = null, rReady = false, rDown = false, running = false;
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+let noWasm = false, offlineBoot = false;
 async function bootR() {
-  setStatus('loading');
+  if (typeof WebAssembly !== 'object') { noWasm = true; rDown = true; setStatus('down'); return; }
+  if (rReady) return;
+  offlineBoot = navigator.onLine === false;
+  if (offlineBoot) { rDown = true; setStatus('down'); return; }
+  rDown = false; setStatus('loading');
   try {
     const mod = await withTimeout(import(WEBR_BASE + 'webr.mjs'), 20000);
     webR = new mod.WebR({ baseUrl: WEBR_BASE });
@@ -1809,6 +1970,7 @@ async function bootR() {
     rReady = true; setStatus('ready'); clearOutput();
   } catch (e) {
     rDown = true; setStatus('down');
+    if (navigator.onLine !== false) reportError('R failed to start: ' + ((e && e.message) || e), 'bootR', e && e.stack);
   }
 }
 function setStatus(s) {
@@ -1818,7 +1980,8 @@ function setStatus(s) {
   $('loading-bar').hidden = s !== 'loading';
   const dc = $('down-card');
   dc.hidden = s !== 'down';
-  if (s === 'down') dc.innerHTML = `<p>${esc(tr('down_1'))}</p><p>${esc(tr('down_2'))}</p><p>${esc(tr('down_3'))}</p>`;
+  if (s === 'down') dc.innerHTML = noWasm ? `<p>${esc(tr('no_wasm'))}</p>` : offlineBoot ? `<p>${esc(tr('offline_r'))}</p>`
+    : `<p>${esc(tr('down_1'))}</p><p>${esc(tr('down_2'))}</p><p><button type="button" class="btn btn-run btn-sm" id="retry-r">↻ ${esc(tr('retry'))}</button></p><p>${esc(tr('down_3'))}</p>`;
 }
 
 async function run() {
@@ -1863,7 +2026,7 @@ async function run() {
   }
   setOut(text || (err ? '' : tr('no_output')));
   images.forEach((img) => addPlot(img));
-  if (err) { showOops(err); sfx.bad(); sad(); coach('error'); lastRunFailed = true; }
+  if (err) { showOops(err); sfx.bad(); sad(); coach('error'); lastRunFailed = true; track('run_error', item && item.id); }
   else afterSuccess(code, text, images.length, rpass);
   if (music && music.notes.length && !err) {
     if (S.sound) { $('out').textContent += (text ? '\n' : '') + tr('playing'); playMelody(music); award('musician'); }
@@ -1874,6 +2037,8 @@ async function run() {
   running = false;
 }
 $('run').addEventListener('click', run);
+addEventListener('online', () => { if (rDown && !noWasm) bootR(); });
+$('down-card').addEventListener('click', (e) => { if (e.target.closest('#retry-r')) { sfx.tap(); bootR(); } });
 
 function addPlot(img) {
   const wrap = document.createElement('div'); wrap.className = 'plot-wrap';
@@ -1912,28 +2077,28 @@ function afterSuccess(code, out, nImages, rpass) {
   lastRunFailed = false;
   if (!item) return happy();
   const first = !S.done[item.id];
-  if (tab === 'challenge') {
+  if (tab === 'challenge' || item.exercise) {
     const ok = (item.check ? !!item.check(out, code, { images: nImages }) : true) && rpass;
-    if (!ok) { $('oops').hidden = false; $('oops').innerHTML = `<strong>🎯 ${esc(tr('not_yet'))}</strong><p>${esc(pick(item, 'goal'))}</p>`; sfx.bad(); sad(); coach('notyet'); return; }
-    if (first) { S.done[item.id] = true; S.earned[item.id] = item.points; addStars(item.points, tr('challenge_done')); }
+    if (!ok) { $('oops').hidden = false; $('oops').innerHTML = `<strong>🎯 ${esc(tr('not_yet'))}</strong><p>${esc(pick(item, 'goal'))}</p>`; sfx.bad(); sad(); coach('notyet'); track('not_yet', item.id); return; }
+    if (first) { track(item.exercise ? 'exercise_done' : 'challenge_done', item.id); S.done[item.id] = true; S.earned[item.id] = item.points; addStars(item.points, item.exercise ? (unitJustDone(item) ? tr('unit_done') : tr('exercise_done')) : tr('challenge_done')); }
     else { happy(); sfx.ok(); }
   } else if (tab === 'learn' && first) {
-    S.done[item.id] = true; S.earned[item.id] = 5; addStars(5, unitJustDone(item) ? tr('unit_done') : tr('lesson_done'));
+    track('lesson_done', item.id); S.done[item.id] = true; S.earned[item.id] = 5; addStars(5, unitJustDone(item) ? tr('unit_done') : tr('lesson_done'));
   } else if (tab === 'games') {
     let gained = 0, msg = null;
-    if (first) { S.done[item.id] = true; S.earned[item.id] = 3; gained += 3; msg = tr('game_done'); }
+    if (first) { track('game_play', item.id); S.done[item.id] = true; S.earned[item.id] = 3; gained += 3; msg = tr('game_done'); }
     const won = item.win && item.win.test(out);
     if (won) {
       const d = item.inputs?.some(i => i.type === 'difficulty') ? (S.diff[item.id] || 'easy') : 'easy';
       const key = item.id + ':' + d;
       if (d === 'hard') award('hard_win');
-      if (!S.wins[key]) { S.wins[key] = Date.now(); S.earned['win:' + key] = { easy: 2, medium: 4, hard: 6 }[d]; gained += { easy: 2, medium: 4, hard: 6 }[d]; msg = tr('won_on').replace('{d}', tr('d_' + d)); }
+      if (!S.wins[key]) { track('game_win', item.id); S.wins[key] = Date.now(); S.earned['win:' + key] = { easy: 2, medium: 4, hard: 6 }[d]; gained += { easy: 2, medium: 4, hard: 6 }[d]; msg = tr('won_on').replace('{d}', tr('d_' + d)); }
     }
     if (gained) addStars(gained, msg);
     else if (won) { happy(); sfx.win(); }
     else { happy(); if (!item.music) sfx.ok(); }
   } else { happy(); if (!item.music) sfx.ok(); }
-  if (tab !== 'free' && (tab !== 'challenge' || S.done[item.id])) showNext();
+  if (tab !== 'free' && ((tab !== 'challenge' && !item.exercise) || S.done[item.id])) showNext();
   save(); checkBadges(); updateHud(); renderList();
   coach('success');
 }
@@ -2025,6 +2190,47 @@ const CLOUD_CONFIG = {
 const SB_LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js';
 const cloudCfg = window.RQ_CLOUD || CLOUD_CONFIG;
 const cloudOn = !!(cloudCfg.url && cloudCfg.key);
+const APP_VERSION = '2026.10.16';
+const DEVICE = (() => {
+  let d = store.get('rq-device', null);
+  if (!d) { d = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36)); store.set('rq-device', d); }
+  return d;
+})();
+let evq = store.get('rq-evq', []) || [], evTimer = null;
+const restHeaders = () => ({ apikey: cloudCfg.key, 'Content-Type': 'application/json', Prefer: 'return=minimal' });
+function track(kind, itemId) {
+  if (!cloudOn) return;
+  evq.push({ device: DEVICE, kind, item: itemId || null, lang: S.lang === 'yo' ? 'yo' : 'en', app_version: APP_VERSION });
+  evq = evq.slice(-300); store.set('rq-evq', evq);
+  clearTimeout(evTimer); evTimer = setTimeout(flushEvents, 8000);
+}
+async function flushEvents() {
+  clearTimeout(evTimer);
+  if (!cloudOn || !evq.length || navigator.onLine === false) return;
+  const batch = evq.slice(0, 50);
+  try {
+    const r = await fetch(cloudCfg.url + '/rest/v1/app_events', { method: 'POST', headers: restHeaders(), body: JSON.stringify(batch), keepalive: true });
+    if (r.ok || r.status === 400) { evq = evq.slice(batch.length); store.set('rq-evq', evq); if (evq.length) evTimer = setTimeout(flushEvents, 1500); }
+  } catch {}
+}
+const seenErrors = new Set();
+function reportError(message, source, stack) {
+  try {
+    if (!cloudOn) return;
+    const msg = String(message || 'Unknown error').slice(0, 500);
+    if (seenErrors.has(msg) || seenErrors.size >= 5) return;
+    seenErrors.add(msg);
+    fetch(cloudCfg.url + '/rest/v1/app_errors', { method: 'POST', headers: restHeaders(), keepalive: true, body: JSON.stringify({
+      device: DEVICE, message: msg, source: String(source || '').slice(0, 300), stack: String(stack || '').slice(0, 2000),
+      user_agent: String(navigator.userAgent || '').slice(0, 300), app_version: APP_VERSION,
+    }) }).catch(() => {});
+  } catch {}
+}
+addEventListener('error', (e) => reportError(e.message, `${e.filename || ''}:${e.lineno || ''}:${e.colno || ''}`, e.error && e.error.stack));
+addEventListener('unhandledrejection', (e) => { const r = e.reason; reportError('Unhandled promise: ' + ((r && r.message) || r), 'promise', r && r.stack); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushEvents(); });
+addEventListener('online', () => flushEvents());
+
 let sb = null, session = null, kids = [], recovery = false, pushTimer = null, famMsg = null, famMsgOk = false, removing = null, newAva = '🐑';
 const DEVICE_PREFS = ['lang', 'sound', 'big'];
 
@@ -2228,7 +2434,7 @@ function wireFamily() {
     $('au-create').onclick = async () => {
       const c = creds(); if (!c.email) return say(tr('need_email')); if (c.password.length < 6) return say(tr('password'));
       const { data, error } = await sb.auth.signUp({ ...c, options: { emailRedirectTo: location.origin + location.pathname } });
-      if (error) say(authError(error)); else if (!data.session) say(tr('check_email'), true); else famMsg = null;
+      if (error) say(authError(error)); else { track('signup'); if (!data.session) say(tr('check_email'), true); else famMsg = null; }
     };
     $('au-forgot').onclick = async () => {
       const email = $('au-email').value.trim(); if (!email) return say(tr('need_email'));
@@ -2415,6 +2621,10 @@ updateHud();
 if (!S.name) openOnboard();
 bootR();
 initCloud();
+if (store.get('rq-open-day', '') !== isoDay()) { store.set('rq-open-day', isoDay()); track('open'); }
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
 </script>
 
 </body>

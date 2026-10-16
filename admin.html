@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>R Quest Dashboard</title>
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@500;700;800&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  /* Layout: indigo header band, one filter row, stat tiles, two single-series column charts, then two tables. */
+  :root {
+    --bg: #F3F5FC; --surface: #FFFFFF; --ink: #1A1D33; --muted: #565C80; --faint: #8A90B0;
+    --line: #DDE1F2; --grid: #E9ECF8; --brand: #1E2A78; --series: #2E3FA3; --series-hover: #4B5CC4;
+    --sun: #FFC233; --good-bg: #D6F3E4; --good: #11663F; --warn-bg: #FFF0C2; --warn: #7A5600; --bad-bg: #FFE0D8; --bad: #A3341B;
+    --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+    --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+    --font-code: "JetBrains Mono", ui-monospace, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10132A; --surface: #191D3A; --ink: #EEF0FA; --muted: #A9AFD3; --faint: #7D84AE;
+      --line: #2B3160; --grid: #252A52; --brand: #141A4A; --series: #8E9CFF; --series-hover: #B3BDFF;
+      --good-bg: #123D2B; --good: #7FE0B0; --warn-bg: #3F3210; --warn: #FFD27A; --bad-bg: #4A1E15; --bad: #FFB4A3;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10132A; --surface: #191D3A; --ink: #EEF0FA; --muted: #A9AFD3; --faint: #7D84AE;
+    --line: #2B3160; --grid: #252A52; --brand: #141A4A; --series: #8E9CFF; --series-hover: #B3BDFF;
+    --good-bg: #123D2B; --good: #7FE0B0; --warn-bg: #3F3210; --warn: #FFD27A; --bad-bg: #4A1E15; --bad: #FFB4A3;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+  .band { background: var(--brand); color: #fff; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .band .wrap { padding-block: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  h1 { margin: 0; font-family: var(--font-display); font-size: 28px; line-height: 1.1; }
+  h1 span { color: var(--sun); }
+  .band small { opacity: .8; font-weight: 700; }
+  main.wrap { padding-block: 20px 48px; display: flex; flex-direction: column; gap: 18px; }
+  h2 { margin: 0; font-family: var(--font-display); font-size: 20px; line-height: 1.2; color: var(--ink); text-wrap: balance; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; min-width: 0; }
+  .sub { margin: 2px 0 12px; color: var(--muted); font-size: 14px; }
+  .btn { border: 0; border-radius: 10px; padding: 9px 16px; font-weight: 800; cursor: pointer; background: var(--series); color: #fff; }
+  .btn.ghost { background: transparent; color: inherit; border: 1px solid currentColor; opacity: .9; }
+  .btn.small { padding: 6px 12px; font-size: 13px; }
+  form.signin { max-width: 380px; display: flex; flex-direction: column; gap: 10px; }
+  label { font-weight: 800; font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+  input[type=email], input[type=password] { border: 2px solid var(--line); background: var(--bg); border-radius: 10px; padding: 9px 12px; }
+  .msg { font-weight: 800; color: var(--bad); margin: 0; }
+  pre { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; overflow-x: auto; font-family: var(--font-code); font-size: 13px; }
+  .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 99px; overflow: hidden; background: var(--surface); }
+  .seg button { border: 0; background: transparent; padding: 7px 14px; font-weight: 800; font-size: 14px; cursor: pointer; color: var(--muted); }
+  .seg button[aria-pressed="true"] { background: var(--series); color: #fff; }
+  .updated { color: var(--muted); font-size: 13px; }
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+  .tile .label { color: var(--muted); font-weight: 800; font-size: 13px; }
+  .tile .value { font-weight: 800; font-size: 30px; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .tile.hero { grid-column: span 2; }
+  .tile.hero .value { font-size: 52px; }
+  .tile .note { color: var(--faint); font-size: 12px; font-weight: 700; }
+  .charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .chart { position: relative; height: 240px; }
+  .chart svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .chart text { fill: var(--muted); font-size: 11px; font-family: var(--font-body); font-weight: 700; }
+  .chart .gridline { stroke: var(--grid); stroke-width: 1; }
+  .chart .col { fill: var(--series); transition: fill .12s; }
+  .chart .hit { fill: transparent; cursor: default; }
+  .chart .hit:hover + .col, .chart g.on .col { fill: var(--series-hover); }
+  .tip {
+    position: absolute; pointer-events: none; background: var(--ink); color: var(--surface); border-radius: 10px;
+    padding: 6px 10px; font-size: 13px; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); z-index: 2;
+  }
+  .tip b { font-size: 16px; display: block; font-variant-numeric: tabular-nums; }
+  details { margin-top: 8px; }
+  details summary { cursor: pointer; color: var(--muted); font-weight: 800; font-size: 13px; }
+  .tbl-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+  th button { all: unset; cursor: pointer; }
+  th button:focus-visible { outline: 3px solid var(--sun); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 99px; padding: 2px 9px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+  .chip.bad { background: var(--bad-bg); color: var(--bad); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); }
+  .chip.ok { background: var(--good-bg); color: var(--good); }
+  .kind { color: var(--muted); font-size: 12px; font-weight: 800; }
+  .err-msg { font-family: var(--font-code); font-size: 12.5px; overflow-wrap: anywhere; }
+  .empty { color: var(--muted); }
+  .row-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+  .loading { opacity: .55; transition: opacity .2s; }
+  @media (max-width: 860px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .charts { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 420px) { .tile.hero .value { font-size: 42px; } }
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <div><h1>R <span>Quest</span> dashboard</h1><small>Private. Only admins can see these numbers.</small></div>
+  <div id="who"></div>
+</div></header>
+<main class="wrap" id="main"><div class="card"><p class="sub">Loading…</p></div></main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js"></script>
+<script>
+(async function () {
+  const $ = (id) => document.getElementById(id);
+  const main = $('main');
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) { if (k === 'class') n.className = v; else if (k.startsWith('on')) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v); }
+    for (const k of kids.flat()) n.append(k instanceof Node ? k : document.createTextNode(String(k)));
+    return n;
+  };
+  const fmt = (n) => { n = +n || 0; return n >= 10000 ? (n / 1000).toFixed(n >= 100000 ? 0 : 1).replace(/\.0$/, '') + 'K' : n.toLocaleString('en-GB'); };
+
+  // Read the Supabase settings and the lesson names from the app itself, so there is one source of truth.
+  let appSrc = '';
+  try { appSrc = await (await fetch('index.html', { cache: 'no-store' })).text(); } catch {}
+  const cfgBlock = (appSrc.match(/const CLOUD_CONFIG = \{([\s\S]*?)\};/) || [])[1] || '';
+  const url = (cfgBlock.match(/url:\s*'([^']*)'/) || [])[1];
+  const key = (cfgBlock.match(/key:\s*'([^']*)'/) || [])[1];
+  const titles = {};
+  for (const m of appSrc.matchAll(/\{ id: '([A-Z]\d+)', icon: '([^']*)',([^\n]*?)title: (?:'((?:[^'\\]|\\.)*)'|"([^"]*)")/g)) {
+    titles[m[1]] = { icon: m[2], title: (m[4] || m[5] || '').replace(/\\'/g, "'"), exercise: /exercise: true/.test(m[3]) };
+  }
+  const kindOf = (id) => ({ L: 'Lesson', E: 'Exercise', C: 'Challenge', G: 'Game', F: 'Free play' })[id[0]] || '';
+
+  if (!url || !key || !window.supabase) {
+    main.replaceChildren(el('div', { class: 'card' }, el('h2', {}, 'Online saving is not set up'), el('p', { class: 'sub' }, 'Add your Supabase URL and key to CLOUD_CONFIG in index.html first.')));
+    return;
+  }
+  const sb = window.supabase.createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true } });
+  let days = 30, sortKey = 'stuck', sortDir = -1, lastStats = null;
+
+  function signInView(message) {
+    $('who').replaceChildren();
+    const email = el('input', { type: 'email', id: 'em', autocomplete: 'email' });
+    const pass = el('input', { type: 'password', id: 'pw', autocomplete: 'current-password' });
+    const msg = el('p', { class: 'msg', role: 'status' }, message || '');
+    const form = el('form', { class: 'signin', novalidate: '' },
+      el('label', { for: 'em' }, 'Email', email), el('label', { for: 'pw' }, 'Password', pass),
+      el('button', { class: 'btn', type: 'submit' }, 'Sign in'), msg);
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const { error } = await sb.auth.signInWithPassword({ email: email.value.trim(), password: pass.value });
+      if (error) msg.textContent = 'That email and password do not match.'; else load();
+    });
+    main.replaceChildren(el('div', { class: 'card' }, el('h2', {}, 'Sign in'), el('p', { class: 'sub' }, 'Use the same email and password as your R Quest family account.'), form));
+  }
+
+  function notAdminView(email) {
+    main.replaceChildren(el('div', { class: 'card' },
+      el('h2', {}, 'This account is not an admin yet'),
+      el('p', { class: 'sub' }, 'In Supabase, open SQL Editor and run this line once. Then reload this page.'),
+      el('pre', {}, `insert into public.admins (user_id)\nselect id from auth.users where email = '${email}';`)));
+  }
+
+  async function load() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return signInView();
+    $('who').replaceChildren(el('small', {}, session.user.email + '  '), el('button', { class: 'btn ghost small', type: 'button', onclick: async () => { await sb.auth.signOut(); signInView(); } }, 'Sign out'));
+    main.classList.add('loading');
+    const { data, error } = await sb.rpc('admin_stats', { p_days: days });
+    main.classList.remove('loading');
+    if (error) {
+      if (/admin/i.test(error.message)) return notAdminView(session.user.email);
+      main.replaceChildren(el('div', { class: 'card' }, el('h2', {}, 'Could not load the numbers'), el('p', { class: 'sub' }, error.message)));
+      return;
+    }
+    lastStats = data; render(data);
+  }
+
+  function filledDays(daily) {
+    const map = new Map(daily.map(d => [String(d.day).slice(0, 10), d]));
+    const out = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - i);
+      const k = d.toISOString().slice(0, 10);
+      const row = map.get(k) || {};
+      out.push({ day: k, learners: +row.learners || 0, completions: +row.completions || 0 });
+    }
+    return out;
+  }
+
+  function niceMax(v) {
+    const raw = Math.max(1, v / 4), p = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / p;
+    const step = Math.max(1, (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p);
+    return step * 4;
+  }
+
+  function columnChart(rows, field, label) {
+    const box = el('div', { class: 'chart' });
+    const tip = el('div', { class: 'tip', hidden: '' });
+    box.append(tip);
+    const draw = () => {
+      box.querySelector('svg')?.remove();
+      const W = Math.max(280, box.clientWidth), H = 240, L = 34, R = 6, T = 10, B = 26;
+      const max = niceMax(Math.max(...rows.map(r => r[field]), 1));
+      const NS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', label);
+      const y = (v) => T + (H - T - B) * (1 - v / max);
+      for (let i = 0; i <= 4; i++) {
+        const v = (max / 4) * i, yy = y(v);
+        const ln = document.createElementNS(NS, 'line'); ln.setAttribute('class', 'gridline'); ln.setAttribute('x1', L); ln.setAttribute('x2', W - R); ln.setAttribute('y1', yy); ln.setAttribute('y2', yy); svg.append(ln);
+        const tx = document.createElementNS(NS, 'text'); tx.setAttribute('x', L - 6); tx.setAttribute('y', yy + 4); tx.setAttribute('text-anchor', 'end'); tx.textContent = fmt(v); svg.append(tx);
+      }
+      const band = (W - L - R) / rows.length, cw = Math.max(2, Math.min(24, band - 2));
+      const every = Math.ceil(rows.length / Math.max(2, Math.floor((W - L - R) / 64)));
+      rows.forEach((r, i) => {
+        const x = L + band * i + (band - cw) / 2, top = y(r[field]), base = y(0), h = Math.max(0, base - top);
+        const g = document.createElementNS(NS, 'g');
+        const hit = document.createElementNS(NS, 'rect'); hit.setAttribute('class', 'hit'); hit.setAttribute('x', L + band * i); hit.setAttribute('y', T); hit.setAttribute('width', band); hit.setAttribute('height', H - T - B);
+        hit.setAttribute('tabindex', '0'); hit.setAttribute('aria-label', `${r.day}: ${r[field]} ${label.toLowerCase()}`);
+        const col = document.createElementNS(NS, 'path'); col.setAttribute('class', 'col');
+        const rr = Math.min(4, h, cw / 2);
+        col.setAttribute('d', h <= 0 ? '' : `M${x},${base} V${top + rr} Q${x},${top} ${x + rr},${top} H${x + cw - rr} Q${x + cw},${top} ${x + cw},${top + rr} V${base} Z`);
+        const show = () => {
+          g.classList.add('on'); tip.hidden = false;
+          tip.replaceChildren(el('b', {}, fmt(r[field])), new Date(r.day + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }));
+          tip.style.left = `${((x + cw / 2) / W) * 100}%`; tip.style.top = `${(Math.min(top, base - 2) / H) * 100}%`;
+        };
+        const hide = () => { g.classList.remove('on'); tip.hidden = true; };
+        hit.addEventListener('pointerenter', show); hit.addEventListener('pointerleave', hide); hit.addEventListener('focus', show); hit.addEventListener('blur', hide);
+        g.append(hit, col); svg.append(g);
+        if (i % every === 0 || i === rows.length - 1) {
+          const tx = document.createElementNS(NS, 'text'); tx.setAttribute('x', L + band * i + band / 2); tx.setAttribute('y', H - 8); tx.setAttribute('text-anchor', 'middle');
+          tx.textContent = new Date(r.day + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); svg.append(tx);
+        }
+      });
+      box.prepend(svg);
+    };
+    requestAnimationFrame(draw);
+    new ResizeObserver(() => requestAnimationFrame(draw)).observe(box);
+    const table = el('div', { class: 'tbl-wrap' }, el('table', {}, el('thead', {}, el('tr', {}, el('th', {}, 'Day'), el('th', { class: 'num' }, label))),
+      el('tbody', {}, rows.slice().reverse().map(r => el('tr', {}, el('td', {}, r.day), el('td', { class: 'num' }, fmt(r[field])))))));
+    return [box, el('details', {}, el('summary', {}, 'Show as a table'), table)];
+  }
+
+  const triesOf = (r) => r.completed + r.played + r.not_yet + r.run_errors;
+  function stuckOf(r) { const tries = triesOf(r); return tries ? (r.not_yet + r.run_errors) / tries : 0; }
+
+  function itemsTable(items) {
+    const rows = items.map(r => ({ ...r, completed: +r.completed, not_yet: +r.not_yet, run_errors: +r.run_errors, played: +r.played, wins: +r.wins }))
+      .map(r => ({ ...r, stuck: stuckOf(r), title: titles[r.item]?.title || r.item, icon: titles[r.item]?.icon || '', kind: titles[r.item]?.exercise ? 'Exercise' : kindOf(r.item) }));
+    rows.sort((a, b) => { const va = a[sortKey], vb = b[sortKey]; return (typeof va === 'string' ? va.localeCompare(vb) : va - vb) * sortDir; });
+    const head = (key, text, num) => el('th', { class: num ? 'num' : '', 'aria-sort': sortKey === key ? (sortDir > 0 ? 'ascending' : 'descending') : 'none' },
+      el('button', { type: 'button', onclick: () => { if (sortKey === key) sortDir = -sortDir; else { sortKey = key; sortDir = key === 'title' ? 1 : -1; } render(lastStats); } }, text + (sortKey === key ? (sortDir > 0 ? ' ↑' : ' ↓') : '')));
+    const status = (r) => {
+      const tries = triesOf(r);
+      if (tries < 5) return el('span', { class: 'kind' }, 'Too few to tell');
+      if (r.stuck >= 0.6) return el('span', { class: 'chip bad' }, '⚠ Children get stuck');
+      if (r.stuck >= 0.35) return el('span', { class: 'chip warn' }, '◐ Some struggle');
+      return el('span', { class: 'chip ok' }, '✓ Going well');
+    };
+    if (!rows.length) return el('p', { class: 'empty' }, 'No activity in this period yet.');
+    return el('div', { class: 'tbl-wrap' }, el('table', {},
+      el('thead', {}, el('tr', {}, head('title', 'Activity'), head('completed', 'Finished', true), head('played', 'Played', true), head('not_yet', 'Not yet', true), head('run_errors', 'Code errors', true), head('stuck', 'Stuck rate', true), el('th', {}, 'Status'))),
+      el('tbody', {}, rows.map(r => el('tr', {},
+        el('td', {}, `${r.icon} ${r.title} `, el('span', { class: 'kind' }, `${r.kind} · ${r.item}`)),
+        el('td', { class: 'num' }, fmt(r.completed)), el('td', { class: 'num' }, fmt(r.played)), el('td', { class: 'num' }, fmt(r.not_yet)),
+        el('td', { class: 'num' }, fmt(r.run_errors)), el('td', { class: 'num' }, Math.round(r.stuck * 100) + '%'), el('td', {}, status(r)))))));
+  }
+
+  function errorsTable(errors) {
+    if (!errors.length) return el('p', { class: 'empty' }, 'No errors reported in this period. 🎉');
+    return el('div', { class: 'tbl-wrap' }, el('table', {},
+      el('thead', {}, el('tr', {}, el('th', {}, 'Message'), el('th', { class: 'num' }, 'Times'), el('th', {}, 'Last seen'), el('th', {}, 'App version'))),
+      el('tbody', {}, errors.map(e => el('tr', {},
+        el('td', {}, el('div', { class: 'err-msg' }, e.message), e.example_browser ? el('div', { class: 'kind' }, e.example_browser.slice(0, 90)) : ''),
+        el('td', { class: 'num' }, fmt(e.n)), el('td', {}, new Date(e.last_seen).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })), el('td', {}, e.version || '—'))))));
+  }
+
+  function render(d) {
+    const t = d.totals || {};
+    const rows = filledDays(d.daily || []);
+    const tile = (label, value, note, hero) => el('div', { class: 'tile' + (hero ? ' hero' : '') }, el('div', { class: 'label' }, label), el('div', { class: 'value' }, fmt(value)), note ? el('div', { class: 'note' }, note) : '');
+    const seg = el('div', { class: 'seg', role: 'group', 'aria-label': 'Time range' },
+      [7, 30, 90].map(n => el('button', { type: 'button', 'aria-pressed': String(days === n), onclick: () => { days = n; load(); } }, `Last ${n} days`)));
+    const clearBtn = el('button', { class: 'btn ghost small', type: 'button' }, 'Clear all error reports');
+    clearBtn.addEventListener('click', async () => {
+      if (clearBtn.dataset.sure !== '1') { clearBtn.dataset.sure = '1'; clearBtn.textContent = 'Click again to delete them'; return; }
+      await sb.from('app_errors').delete().gte('id', 0); load();
+    });
+    main.replaceChildren(
+      el('div', { class: 'filters' }, seg, el('span', { class: 'updated' }, 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' · '),
+        el('button', { class: 'btn ghost small', type: 'button', onclick: load }, 'Refresh')),
+      el('section', { class: 'tiles', 'aria-label': 'Summary' },
+        tile('Learners today', t.learners_today, 'Devices that opened R Quest today', true),
+        tile(`Learners, last ${days} days`, t.learners_period),
+        tile('Learners, last 7 days', t.learners_7d),
+        tile(`Activities finished, last ${days} days`, t.completions_period, 'Lessons, exercises and challenges'),
+        tile('Using Yorùbá', t.yoruba_learners, `Learners in the last ${days} days`),
+        tile('Family accounts', t.families),
+        tile('Children in families', t.children)),
+      el('section', { class: 'charts' },
+        el('div', { class: 'card' }, el('h2', {}, 'Learners each day'), el('p', { class: 'sub' }, 'Different devices that used R Quest'), ...columnChart(rows, 'learners', 'Learners')),
+        el('div', { class: 'card' }, el('h2', {}, 'Activities finished each day'), el('p', { class: 'sub' }, 'Lessons, exercises and challenges completed'), ...columnChart(rows, 'completions', 'Activities finished'))),
+      el('section', { class: 'card' }, el('h2', {}, 'Where children get stuck'),
+        el('p', { class: 'sub' }, '"Not yet" means a challenge or exercise answer was not right. The stuck rate is not-yets and code errors divided by all attempts. Click a column heading to sort.'),
+        itemsTable(d.items || [])),
+      el('section', { class: 'card' }, el('div', { class: 'row-head' }, el('div', {}, el('h2', {}, 'Error reports'), el('p', { class: 'sub' }, 'Problems in the app itself, sent automatically without names.')), clearBtn),
+        errorsTable(d.errors || [])),
+      el('p', { class: 'updated' }, 'Counts come from anonymous device ids, so one child on two phones counts twice, and a cleared browser counts as a new learner.'));
+  }
+
+  sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT') signInView(); });
+  load();
+})();
+</script>
+</body>
+</html>
