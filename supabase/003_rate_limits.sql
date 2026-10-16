@@ -70,6 +70,7 @@ revoke all on function public.limit_app_errors() from public, anon, authenticate
 
 -- Keep the tables small: delete usage events older than 400 days and errors older than 90 days.
 -- The admin dashboard calls this each time it opens, so no scheduled job is needed.
+-- NOTE: 004_all_time_totals.sql replaces this so usage events are kept for good (for all-time totals).
 create or replace function public.admin_prune()
 returns void
 language plpgsql

@@ -58,7 +58,7 @@
   pre { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; overflow-x: auto; font-family: var(--font-code); font-size: 13px; }
   .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 99px; overflow: hidden; background: var(--surface); }
-  .seg button { border: 0; background: transparent; padding: 7px 14px; font-weight: 800; font-size: 14px; cursor: pointer; color: var(--muted); }
+  .seg button { border: 0; background: transparent; padding: 7px 14px; font-weight: 800; font-size: 14px; cursor: pointer; color: var(--muted); white-space: nowrap; }
   .seg button[aria-pressed="true"] { background: var(--series); color: #fff; }
   .updated { color: var(--muted); font-size: 13px; }
   .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
@@ -67,6 +67,13 @@
   .tile .value { font-weight: 800; font-size: 30px; line-height: 1.15; font-variant-numeric: tabular-nums; }
   .tile.hero { grid-column: span 2; }
   .tile.hero .value { font-size: 52px; }
+  .tile.date .value { font-size: 22px; padding-top: 6px; }
+  .tile.total { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .tile.total .label, .tile.total .note { color: rgba(255,255,255,.78); }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: -6px; }
+  .section-head p { margin: 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+  .hint { background: var(--warn-bg); color: var(--warn); border-radius: 12px; padding: 10px 14px; font-weight: 700; font-size: 14px; }
+  .hint code { font-family: var(--font-code); font-size: 13px; }
   .tile .note { color: var(--faint); font-size: 12px; font-weight: 700; }
   .charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .chart { position: relative; height: 240px; }
@@ -100,7 +107,7 @@
   .row-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
   .loading { opacity: .55; transition: opacity .2s; }
   @media (max-width: 860px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .charts { grid-template-columns: minmax(0, 1fr); } }
-  @media (max-width: 420px) { .tile.hero .value { font-size: 42px; } }
+  @media (max-width: 420px) { .seg button { padding: 7px 10px; font-size: 13px; } .tile.hero .value { font-size: 42px; } }
 </style>
 </head>
 <body>
@@ -181,16 +188,27 @@
     sb.rpc('admin_prune').then(() => {}, () => {});
   }
 
-  function filledDays(daily) {
-    const map = new Map(daily.map(d => [String(d.day).slice(0, 10), d]));
+  // One bar per day for short ranges; one bar per week (starting Monday) when the range is longer than 120 days.
+  const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  function chartRows(d) {
+    const today = new Date(); today.setHours(12, 0, 0, 0);
+    let start = new Date(today);
+    if (days > 0) start.setDate(start.getDate() - (days - 1));
+    else if (d.first_event) { start = new Date(String(d.first_event).slice(0, 10) + 'T12:00:00'); if (isNaN(start)) start = new Date(today); }
+    const span = Math.round((today - start) / 864e5) + 1;
+    const weekly = span > 120 && Array.isArray(d.weekly);
+    const src = weekly ? d.weekly : (d.daily || []);
+    const map = new Map(src.map(r => [String(r.week || r.day).slice(0, 10), r]));
+    if (weekly) start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+    const longRange = span > 300;
     const out = [];
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - i);
-      const k = d.toISOString().slice(0, 10);
-      const row = map.get(k) || {};
-      out.push({ day: k, learners: +row.learners || 0, completions: +row.completions || 0 });
+    for (const cur = new Date(start); cur <= today; cur.setDate(cur.getDate() + (weekly ? 7 : 1))) {
+      const k = isoDay(cur), row = map.get(k) || {};
+      const short = cur.toLocaleDateString('en-GB', longRange ? { month: 'short', year: '2-digit' } : { day: 'numeric', month: 'short' });
+      const long = cur.toLocaleDateString('en-GB', weekly ? { day: 'numeric', month: 'short', year: 'numeric' } : { weekday: 'short', day: 'numeric', month: 'short', year: longRange ? 'numeric' : undefined });
+      out.push({ day: k, tick: short, when: weekly ? 'Week of ' + long : long, learners: +row.learners || 0, completions: +row.completions || 0 });
     }
-    return out;
+    return { rows: out, unit: weekly ? 'week' : 'day' };
   }
 
   function niceMax(v) {
@@ -221,29 +239,30 @@
         const x = L + band * i + (band - cw) / 2, top = y(r[field]), base = y(0), h = Math.max(0, base - top);
         const g = document.createElementNS(NS, 'g');
         const hit = document.createElementNS(NS, 'rect'); hit.setAttribute('class', 'hit'); hit.setAttribute('x', L + band * i); hit.setAttribute('y', T); hit.setAttribute('width', band); hit.setAttribute('height', H - T - B);
-        hit.setAttribute('tabindex', '0'); hit.setAttribute('aria-label', `${r.day}: ${r[field]} ${label.toLowerCase()}`);
+        hit.setAttribute('tabindex', '0'); hit.setAttribute('aria-label', `${r.when}: ${r[field]} ${label.toLowerCase()}`);
         const col = document.createElementNS(NS, 'path'); col.setAttribute('class', 'col');
         const rr = Math.min(4, h, cw / 2);
         col.setAttribute('d', h <= 0 ? '' : `M${x},${base} V${top + rr} Q${x},${top} ${x + rr},${top} H${x + cw - rr} Q${x + cw},${top} ${x + cw},${top + rr} V${base} Z`);
         const show = () => {
           g.classList.add('on'); tip.hidden = false;
-          tip.replaceChildren(el('b', {}, fmt(r[field])), new Date(r.day + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }));
+          tip.replaceChildren(el('b', {}, fmt(r[field])), r.when);
           tip.style.left = `${((x + cw / 2) / W) * 100}%`; tip.style.top = `${(Math.min(top, base - 2) / H) * 100}%`;
         };
         const hide = () => { g.classList.remove('on'); tip.hidden = true; };
         hit.addEventListener('pointerenter', show); hit.addEventListener('pointerleave', hide); hit.addEventListener('focus', show); hit.addEventListener('blur', hide);
         g.append(hit, col); svg.append(g);
-        if (i % every === 0 || i === rows.length - 1) {
+        const lastTick = Math.floor((rows.length - 1) / every) * every;
+        if (i % every === 0 || (i === rows.length - 1 && i - lastTick >= every * 0.7)) {
           const tx = document.createElementNS(NS, 'text'); tx.setAttribute('x', L + band * i + band / 2); tx.setAttribute('y', H - 8); tx.setAttribute('text-anchor', 'middle');
-          tx.textContent = new Date(r.day + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); svg.append(tx);
+          tx.textContent = r.tick; svg.append(tx);
         }
       });
       box.prepend(svg);
     };
     requestAnimationFrame(draw);
     new ResizeObserver(() => requestAnimationFrame(draw)).observe(box);
-    const table = el('div', { class: 'tbl-wrap' }, el('table', {}, el('thead', {}, el('tr', {}, el('th', {}, 'Day'), el('th', { class: 'num' }, label))),
-      el('tbody', {}, rows.slice().reverse().map(r => el('tr', {}, el('td', {}, r.day), el('td', { class: 'num' }, fmt(r[field])))))));
+    const table = el('div', { class: 'tbl-wrap' }, el('table', {}, el('thead', {}, el('tr', {}, el('th', {}, 'When'), el('th', { class: 'num' }, label))),
+      el('tbody', {}, rows.slice().reverse().map(r => el('tr', {}, el('td', {}, r.when), el('td', { class: 'num' }, fmt(r[field])))))));
     return [box, el('details', {}, el('summary', {}, 'Show as a table'), table)];
   }
 
@@ -283,10 +302,25 @@
 
   function render(d) {
     const t = d.totals || {};
-    const rows = filledDays(d.daily || []);
-    const tile = (label, value, note, hero) => el('div', { class: 'tile' + (hero ? ' hero' : '') }, el('div', { class: 'label' }, label), el('div', { class: 'value' }, fmt(value)), note ? el('div', { class: 'note' }, note) : '');
+    const a = d.all_time;   // missing until supabase/004_all_time_totals.sql has been run
+    const { rows, unit } = chartRows(d);
+    const tile = (label, value, note, cls) => el('div', { class: 'tile' + (cls ? ' ' + cls : '') }, el('div', { class: 'label' }, label), el('div', { class: 'value' }, typeof value === 'string' ? value : fmt(value)), note ? el('div', { class: 'note' }, note) : '');
+    const ranges = a ? [[7, '7 days'], [30, '30 days'], [90, '90 days'], [365, '1 year'], [0, 'All time']] : [[7, '7 days'], [30, '30 days'], [90, '90 days'], [365, '1 year']];
     const seg = el('div', { class: 'seg', role: 'group', 'aria-label': 'Time range' },
-      [7, 30, 90].map(n => el('button', { type: 'button', 'aria-pressed': String(days === n), onclick: () => { days = n; load(); } }, `Last ${n} days`)));
+      ranges.map(([n, text]) => el('button', { type: 'button', 'aria-pressed': String(days === n), onclick: () => { days = n; load(); } }, text)));
+    const period = days > 0 ? (days === 365 ? 'last year' : `last ${days} days`) : 'all time';
+    const started = d.first_event ? new Date(d.first_event).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    const perLearner = (+t.learners_period) ? (+t.completions_period / +t.learners_period).toFixed(1) : '0';
+    const allTime = a
+      ? el('section', { class: 'tiles', 'aria-label': 'All-time totals' },
+          tile('Learners ever', a.learners, 'Every device that has opened R Quest', 'hero total'),
+          tile('Activities finished', a.completions, 'Lessons, exercises and challenges', 'total'),
+          tile('Visits', a.visits, 'Times R Quest was opened', 'total'),
+          tile('Lessons finished', a.lessons), tile('Exercises finished', a.exercises),
+          tile('Challenges finished', a.challenges), tile('Games played', a.game_plays, `${fmt(a.game_wins)} won`),
+          tile('Ever used Yorùbá', a.yoruba_learners), tile('Family accounts', a.families), tile('Children in families', a.children),
+          tile('Counting since', d.first_event ? new Date(d.first_event).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—', d.first_event ? 'First recorded visit' : 'No activity yet', 'date'))
+      : el('div', { class: 'hint' }, 'To see all-time totals, open Supabase › SQL Editor and run ', el('code', {}, 'supabase/004_all_time_totals.sql'), ' once, then refresh.');
     const clearBtn = el('button', { class: 'btn ghost small', type: 'button' }, 'Clear all error reports');
     clearBtn.addEventListener('click', async () => {
       if (clearBtn.dataset.sure !== '1') { clearBtn.dataset.sure = '1'; clearBtn.textContent = 'Click again to delete them'; return; }
@@ -295,23 +329,26 @@
     main.replaceChildren(
       el('div', { class: 'filters' }, seg, el('span', { class: 'updated' }, 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' · '),
         el('button', { class: 'btn ghost small', type: 'button', onclick: load }, 'Refresh')),
-      el('section', { class: 'tiles', 'aria-label': 'Summary' },
-        tile('Learners today', t.learners_today, 'Devices that opened R Quest today', true),
-        tile(`Learners, last ${days} days`, t.learners_period),
+      el('div', { class: 'section-head' }, el('h2', {}, 'Since R Quest started'), el('p', {}, started ? `Running totals since ${started}` : 'Running totals')),
+      allTime,
+      el('div', { class: 'section-head' }, el('h2', {}, days > 0 ? `Recent activity · ${period}` : 'Activity · all time'), el('p', {}, 'Pick a range above')),
+      el('section', { class: 'tiles', 'aria-label': 'Summary for the chosen range' },
+        tile('Learners today', t.learners_today, 'Devices that opened R Quest today', 'hero'),
         tile('Learners, last 7 days', t.learners_7d),
-        tile(`Activities finished, last ${days} days`, t.completions_period, 'Lessons, exercises and challenges'),
-        tile('Using Yorùbá', t.yoruba_learners, `Learners in the last ${days} days`),
-        tile('Family accounts', t.families),
-        tile('Children in families', t.children)),
+        tile(`Learners, ${period}`, t.learners_period),
+        tile(`Activities finished, ${period}`, t.completions_period, 'Lessons, exercises and challenges'),
+        tile('Activities per learner', perLearner, period),
+        tile(`Using Yorùbá, ${period}`, t.yoruba_learners),
+        tile(`Error reports, ${period}`, t.errors_period, 'Errors are kept for 90 days')),
       el('section', { class: 'charts' },
-        el('div', { class: 'card' }, el('h2', {}, 'Learners each day'), el('p', { class: 'sub' }, 'Different devices that used R Quest'), ...columnChart(rows, 'learners', 'Learners')),
-        el('div', { class: 'card' }, el('h2', {}, 'Activities finished each day'), el('p', { class: 'sub' }, 'Lessons, exercises and challenges completed'), ...columnChart(rows, 'completions', 'Activities finished'))),
+        el('div', { class: 'card' }, el('h2', {}, `Learners each ${unit}`), el('p', { class: 'sub' }, 'Different devices that used R Quest'), ...columnChart(rows, 'learners', 'Learners')),
+        el('div', { class: 'card' }, el('h2', {}, `Activities finished each ${unit}`), el('p', { class: 'sub' }, 'Lessons, exercises and challenges completed'), ...columnChart(rows, 'completions', 'Activities finished'))),
       el('section', { class: 'card' }, el('h2', {}, 'Where children get stuck'),
         el('p', { class: 'sub' }, '"Not yet" means a challenge or exercise answer was not right. The stuck rate is not-yets and code errors divided by all attempts. Click a column heading to sort.'),
         itemsTable(d.items || [])),
       el('section', { class: 'card' }, el('div', { class: 'row-head' }, el('div', {}, el('h2', {}, 'Error reports'), el('p', { class: 'sub' }, 'Problems in the app itself, sent automatically without names.')), clearBtn),
         errorsTable(d.errors || [])),
-      el('p', { class: 'updated' }, 'Counts come from anonymous device ids, so one child on two phones counts twice, and a cleared browser counts as a new learner. Usage older than 400 days and errors older than 90 days are deleted automatically.'),
+      el('p', { class: 'updated' }, 'Counts come from anonymous device ids, so one child on two phones counts twice, and a cleared browser counts as a new learner. Usage is kept for good so the totals keep adding up; error reports are deleted after 90 days.'),
       el('p', { class: 'updated' }, 'R Quest by Olatunde Akanbi · ', el('a', { href: 'https://github.com/Exelegch/rquest' }, 'Source code'), ' · Code: AGPL-3.0 · Lessons: CC BY-NC-SA 4.0'));
   }
 

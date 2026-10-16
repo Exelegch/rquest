@@ -86,6 +86,7 @@ flowchart LR
 | `supabase/001_family_accounts.sql` | Family accounts, children and their privacy rules |
 | `supabase/002_usage_monitoring.sql` | Anonymous usage events, error reports, admin access |
 | `supabase/003_rate_limits.sql` | Limits that stop anyone flooding the database, and automatic clean-up |
+| `supabase/004_all_time_totals.sql` | All-time running totals on the dashboard; usage is kept for good |
 | `tests/` | Automated browser tests (Playwright) |
 | `tools/screenshots.js` | Regenerates the screenshots in this README |
 | `.github/workflows/` | Tests, keep-Supabase-awake, weekly encrypted backup |
@@ -103,7 +104,7 @@ The tests use a pretend Supabase, so they never touch real data. One test opens 
 ## Setting up Supabase (one time)
 
 1. **Create the project:** create a free project at [supabase.com](https://supabase.com).
-2. **Create the tables:** in **SQL Editor**, run `supabase/001_family_accounts.sql`, then `supabase/002_usage_monitoring.sql`, then `supabase/003_rate_limits.sql`.
+2. **Create the tables:** in **SQL Editor**, run `supabase/001_family_accounts.sql`, then `supabase/002_usage_monitoring.sql`, then `supabase/003_rate_limits.sql`, then `supabase/004_all_time_totals.sql`.
 3. **Connect the app:** in **Project Settings → API**, copy the **Project URL** and the **publishable** key into `CLOUD_CONFIG` in `index.html`. Both are safe to publish, because row-level security keeps each family's data private. Never put the secret key in this repository.
 4. **Point sign-in emails at the site:** in **Authentication → URL Configuration**, set **Site URL** to `https://exelegch.github.io/rquest/` and add `https://exelegch.github.io/rquest/**` under **Redirect URLs**.
 5. **Make yourself an admin:** sign up in the app, then run this in SQL Editor, using your email:
@@ -115,7 +116,8 @@ The tests use a pretend Supabase, so they never touch real data. One test opens 
 ### The usage dashboard
 
 `admin.html` shows:
-- learners today and over the last 7, 30 or 90 days
+- running totals since R Quest started: learners ever, activities, lessons, exercises, challenges, games, families
+- learners today and over the last 7, 30 or 90 days, the last year, or all time
 - activities finished each day
 - how many children use Yorùbá
 - family and child counts
@@ -156,7 +158,7 @@ Then add the new `id` to a unit's `ids` list in `UNITS`, and run `npm test`.
 
 - **Public key:** the key in `index.html` is Supabase's public *publishable* key. It's meant to be visible. Row-level security decides what each request may read or write.
 - **Families:** a family can only see and change its own children, and can have at most 10.
-- **Usage counts and error reports:** the app can add them but can't read them back. The database quietly drops anything above 300 events or 20 error reports per device per hour, and above 20,000 events or 1,000 reports per hour in total, so nobody can fill the free plan on purpose. Usage older than 400 days and errors older than 90 days are deleted automatically.
+- **Usage counts and error reports:** the app can add them but can't read them back. The database quietly drops anything above 300 events or 20 error reports per device per hour, and above 20,000 events or 1,000 reports per hour in total, so nobody can fill the free plan on purpose. Usage events are kept for good so the all-time totals never go down (each is about 100 bytes, so even a million fit easily in the free plan); error reports are deleted after 90 days.
 - **Copies:** online saving switches itself off when a copy of the app runs at another address with the official Supabase project still in `CLOUD_CONFIG`.
 
 ## Running your own copy
