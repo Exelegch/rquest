@@ -11,6 +11,12 @@
 <meta property="og:title" content="R Quest">
 <meta property="og:description" content="Learn to code in R by drawing, playing games and solving puzzles. Free, in English and Yorùbá.">
 <meta property="og:image" content="https://exelegch.github.io/rquest/docs/screenshots/path.png">
+<!--
+  R Quest - a free, bilingual R coding playground for children.
+  Copyright (C) 2026 Olatunde Akanbi. Official site: https://exelegch.github.io/rquest/
+  Source code: https://github.com/Exelegch/rquest
+  SPDX-License-Identifier: AGPL-3.0-or-later (code). Lesson content: CC-BY-NC-SA-4.0 (see LICENSE-CONTENT).
+-->
 <title>R Quest</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -698,6 +704,7 @@
         <div class="stat"><b id="p-badges">0</b><span id="p-badges-l">badges</span></div>
       </div>
       <button class="btn btn-2" id="edit-profile" type="button">✏️ Edit</button>
+      <p class="fine" id="about-line"></p>
       <div id="reset-area">
         <button class="danger" id="reset-progress" type="button">Start over</button>
       </div>
@@ -811,6 +818,8 @@ const I18N = {
     stars_short: 'stars',
     offline_r: 'You are offline. R needs the internet to start. Your lessons and progress are still here, and R will start by itself as soon as you are back online.',
     retry: 'Try again', no_wasm: 'This browser is too old to run R. Please open R Quest in a recent Chrome, Edge or Firefox.',
+    copy_note: 'Online saving is switched off on this copy of R Quest. Progress is still saved on this device. The official site is exelegch.github.io/rquest.',
+    about_by: 'R Quest by Olatunde Akanbi', source_code: 'Source code', license_line: 'Code: AGPL-3.0 · Lessons: CC BY-NC-SA 4.0',
     tab_parents: '👪 Parents', back_path: '← Path', continue: 'Continue', start: 'START', daily_goal: "Today's goal", goal_done: 'Goal reached! 🎉',
     greet_path: 'Hi {n}! Ready to learn something new today?', greet_done: 'Wow {n}, you finished every lesson! Try the challenges and games next.',
     try_ch: 'Try a challenge', try_ch_s: 'Puzzles that check your code', play_game: 'Play a game', play_game_s: 'Games you can change', unit: 'Unit',
@@ -873,6 +882,8 @@ const I18N = {
     stars_short: 'ìràwọ̀',
     offline_r: 'O kò sí lórí íntánẹ́ẹ̀tì. R nílò íntánẹ́ẹ̀tì láti bẹ̀rẹ̀. Àwọn ẹ̀kọ́ àti ìlọsíwájú rẹ ṣì wà níbí, R yóò sì bẹ̀rẹ̀ fúnra rẹ̀ ní kété tí o bá padà sórí íntánẹ́ẹ̀tì.',
     retry: 'Gbìyànjú lẹ́ẹ̀kan sí', no_wasm: 'Aṣàwákiri yìí ti gbó jù láti ṣe R. Jọ̀wọ́ ṣí R Quest nínú Chrome, Edge tàbí Firefox tuntun.',
+    copy_note: 'A ti pa ìfipamọ́ orí íntánẹ́ẹ̀tì lórí ẹ̀dà R Quest yìí. Ìlọsíwájú ṣì wà ní ìpamọ́ lórí ẹ̀rọ yìí. Ìkànnì àṣẹ ni exelegch.github.io/rquest.',
+    about_by: 'R Quest láti ọwọ́ Olatunde Akanbi', source_code: 'Kóòdù orísun', license_line: 'Kóòdù: AGPL-3.0 · Ẹ̀kọ́: CC BY-NC-SA 4.0',
     tab_parents: '👪 Àwọn òbí', back_path: '← Ọ̀nà', continue: 'Tẹ̀síwájú', start: 'BẸ̀RẸ̀', daily_goal: 'Àfojúsùn òní', goal_done: 'O ti dé àfojúsùn! 🎉',
     greet_path: 'Báwo ni {n}! Ṣé o ṣetán láti kọ́ nǹkan tuntun lónìí?', greet_done: 'Háà {n}, o ti parí gbogbo ẹ̀kọ́! Gbìyànjú àwọn ìdíje àti eré báyìí.',
     try_ch: 'Gbìyànjú ìdíje', try_ch_s: 'Àdìtú tí ó ń ṣàyẹ̀wò kóòdù rẹ', play_game: 'Ṣe eré kan', play_game_s: 'Eré tí o lè yí padà', unit: 'Ìpín',
@@ -2165,6 +2176,7 @@ function renderStuff() {
     ? gallery.map((g, i) => `<figure><img src="${g.img}" alt="${esc(g.title)}"><figcaption><span>${esc(g.title)}</span><button type="button" data-delpic="${i}" aria-label="Delete picture">✕</button></figcaption></figure>`).join('')
     : `<p class="empty-note">${esc(tr('gallery_empty'))}</p>`;
   $('reset-area').innerHTML = `<button class="danger" id="reset-progress" type="button">${esc(tr('start_over'))}</button>`;
+  $('about-line').innerHTML = aboutLine();
 }
 $('gallery').addEventListener('click', (e) => {
   const d = e.target.closest('[data-delpic]'); if (!d) return;
@@ -2188,8 +2200,14 @@ const CLOUD_CONFIG = {
   key: 'sb_publishable_QnrIjns33DQHoyfBG2jrdQ_-s57Smo4',
 };
 const SB_LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.3/dist/umd/supabase.js';
+// Copies of R Quest hosted somewhere else must not use the official project's database.
+// If you run your own copy, put your own Supabase project in CLOUD_CONFIG above (see the README).
+const OFFICIAL_PROJECT = 'https://fivtlyastykrocirzqgh.supabase.co';
+const OFFICIAL_HOSTS = ['exelegch.github.io', 'localhost'];
+const SOURCE_URL = 'https://github.com/Exelegch/rquest';
 const cloudCfg = window.RQ_CLOUD || CLOUD_CONFIG;
-const cloudOn = !!(cloudCfg.url && cloudCfg.key);
+const isUnofficialCopy = !window.RQ_CLOUD && cloudCfg.url === OFFICIAL_PROJECT && !OFFICIAL_HOSTS.includes(location.hostname);
+const cloudOn = !!(cloudCfg.url && cloudCfg.key) && !isUnofficialCopy;
 const APP_VERSION = '2026.10.16';
 const DEVICE = (() => {
   let d = store.get('rq-device', null);
@@ -2381,7 +2399,7 @@ function authError(err) {
 }
 function familyPanel() {
   const msg = famMsg ? `<p class="msg ${famMsgOk ? 'ok' : 'bad'}" role="status">${esc(famMsg)}</p>` : '';
-  if (!cloudOn) return `<div class="panel wide family"><h2>☁️ ${esc(tr('cloud_title'))}</h2><p class="fine">${esc(tr('cloud_soon'))}</p></div>`;
+  if (!cloudOn) return `<div class="panel wide family"><h2>☁️ ${esc(tr('cloud_title'))}</h2><p class="fine">${esc(tr(isUnofficialCopy ? 'copy_note' : 'cloud_soon'))}</p></div>`;
   if (recovery) return `<div class="panel wide family"><h2>☁️ ${esc(tr('new_pass'))}</h2>
     <form id="pw-form" novalidate><label for="pw-new">${esc(tr('password'))}<input type="password" id="pw-new" minlength="6" autocomplete="new-password"></label>
     <div class="actions"><button class="btn btn-run" type="submit">${esc(tr('save_pass'))}</button></div>${msg}</form></div>`;
@@ -2475,6 +2493,10 @@ function wireFamily() {
   });
 }
 
+function aboutLine() {
+  return `${esc(tr('about_by'))} · <a href="${SOURCE_URL}" target="_blank" rel="noopener">${esc(tr('source_code'))}</a> · ${esc(tr('license_line'))}`;
+}
+
 /* ---------- parents ---------- */
 let parentOpen = false, gateA = 7, gateB = 8;
 function renderParents() {
@@ -2534,7 +2556,8 @@ function renderParents() {
       <ul class="tips"><li>${esc(tr('tip1'))}</li><li>${esc(tr('tip2'))}</li><li>${esc(tr('tip3'))}</li></ul>
       <p class="fine">🔒 ${esc(tr(cloudOn && session ? 'privacy_cloud' : 'privacy'))}</p>
     </div>
-    <div class="panel plus wide"><h2>✨ ${esc(tr('plus_title'))}</h2><p>${esc(tr('plus_body'))}</p></div>`;
+    <div class="panel plus wide"><h2>✨ ${esc(tr('plus_title'))}</h2><p>${esc(tr('plus_body'))}</p></div>
+    <p class="fine wide">${aboutLine()}</p>`;
   el.insertAdjacentHTML('afterbegin', familyPanel());
   wireFamily();
   $('lock-parents').onclick = () => { parentOpen = false; renderParents(); };

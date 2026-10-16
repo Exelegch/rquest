@@ -2,6 +2,7 @@
   "name": "rquest",
   "private": true,
   "description": "R Quest: a free, bilingual R coding playground for children.",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "node tests/server.js",
     "test": "playwright test"

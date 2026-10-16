@@ -178,6 +178,7 @@
       return;
     }
     lastStats = data; render(data);
+    sb.rpc('admin_prune').then(() => {}, () => {});
   }
 
   function filledDays(daily) {
@@ -310,7 +311,8 @@
         itemsTable(d.items || [])),
       el('section', { class: 'card' }, el('div', { class: 'row-head' }, el('div', {}, el('h2', {}, 'Error reports'), el('p', { class: 'sub' }, 'Problems in the app itself, sent automatically without names.')), clearBtn),
         errorsTable(d.errors || [])),
-      el('p', { class: 'updated' }, 'Counts come from anonymous device ids, so one child on two phones counts twice, and a cleared browser counts as a new learner.'));
+      el('p', { class: 'updated' }, 'Counts come from anonymous device ids, so one child on two phones counts twice, and a cleared browser counts as a new learner. Usage older than 400 days and errors older than 90 days are deleted automatically.'),
+      el('p', { class: 'updated' }, 'R Quest by Olatunde Akanbi · ', el('a', { href: 'https://github.com/Exelegch/rquest' }, 'Source code'), ' · Code: AGPL-3.0 · Lessons: CC BY-NC-SA 4.0'));
   }
 
   sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT') signInView(); });
