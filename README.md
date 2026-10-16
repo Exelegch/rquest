@@ -186,5 +186,6 @@ R Quest is © 2026 Olatunde Akanbi.
 
 - **Code** (the app, dashboard, service worker, SQL, tests and tools) is licensed under the [GNU Affero General Public License v3.0 or later](LICENSE). You may use, change and share it, but if you run a changed version for others, including as a website, you must offer them your source code under the same licence and keep the credit.
 - **Educational content** (lesson, exercise, challenge and game texts and their example R code, hints, English and Yorùbá translations, the dove mascot, icons and screenshots) is licensed under [Creative Commons Attribution-NonCommercial-ShareAlike 4.0](LICENSE-CONTENT). You may share and adapt it for non-commercial purposes with credit, under the same licence.
+- **Which licence covers what** is summarised in [NOTICE](NOTICE).
 - **Earlier versions:** versions published before 16 October 2026 (up to commit `1339b21`) were released under the MIT licence, and copies made from those versions keep it.
 - **Third-party parts:** Bible verses are from the King James Version (public domain). webR, Supabase and the fonts keep their own licences.

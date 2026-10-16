@@ -1,0 +1,13 @@
+R Quest
+Copyright (C) 2026 Olatunde Akanbi
+
+The software in this repository (the app's code, styles, the admin dashboard, the service
+worker, the SQL files, the tests and the tools) is licensed under the GNU Affero General
+Public License, version 3 or (at your option) any later version, whose full text follows.
+
+The educational content (lesson, exercise, challenge and game texts and their example R code,
+hints, translations, mascot artwork, icons and screenshots) is licensed separately under
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0. See LICENSE-CONTENT.
+
+Versions published before 16 October 2026 (up to commit 1339b21) were released under the MIT
+licence, and copies made from those versions keep that licence.
