@@ -7,7 +7,8 @@ const BASE = 'http://localhost:8080/';
   const b = await chromium.launch();
   const init = (process.env.WEBR_DIR ? 'window.RQ_WEBR_BASE="/webr/";' : '') + 'window.RQ_CLOUD={url:"",key:""};';
   const day = (d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)(new Date());
-  const progress = { name: 'Kemi', avatar: '🐑', stars: 46, streak: 4, lastDay: new Date().toDateString(), done: { L1: 1, L2: 1, L3: 1, E1: 1, E2: 1, L4: 1, L5: 1, L15: 1, L16: 1, L17: 1, E3: 1, E4: 1 }, badges: { first_run: 1, first_plot: 1, five_lessons: 1, unit_done: 1 }, day: { date: day, stars: 14 }, hist: { [day]: 14 } };
+  const progress = { name: 'Kemi', avatar: '🐑', stars: 46, streak: 4, lastDay: new Date().toDateString(), done: { L1: 1, L2: 1, L3: 1, E1: 1, E2: 1, B1: 1, P1: 1, L4: 1, L5: 1, L15: 1, L16: 1, L17: 1, E3: 1, E4: 1, B2: 1, P2: 1 }, stepAt: { L6: 3 }, certs: { u1: day, u2: day },
+    badges: { first_run: 1, first_plot: 1, five_lessons: 1, unit_done: 1, bug_hunter: 1, builder: 1 }, daily: {}, day: { date: day, stars: 14 }, hist: { [day]: 14 } };
   async function page(opts) {
     const ctx = await b.newContext(opts); await ctx.addInitScript(init);
     await ctx.addInitScript((st) => { if (!localStorage.getItem('rq2-state')) localStorage.setItem('rq2-state', JSON.stringify(st)); }, progress);
@@ -22,6 +23,11 @@ const BASE = 'http://localhost:8080/';
   await ready(p);
   await p.click('.node[data-id="L6"]'); await runIt(p); await p.waitForTimeout(400);
   await p.screenshot({ path: OUT + 'lesson.png' });
+  await p.click('[data-step="2"]'); await p.click('.qopt[data-qopt="0"]'); await p.waitForTimeout(700);
+  await p.screenshot({ path: OUT + 'predict.png' });
+  await p.click('#back-path'); await p.click('.unit .cert-btn'); await p.waitForTimeout(900);
+  await p.locator('#cert .sheet').screenshot({ path: OUT + 'certificate.png' });
+  await p.click('#cert-close');
   await p.click('[data-tab="games"]'); await p.click('[data-id="G15"]'); await runIt(p);
   await p.screenshot({ path: OUT + 'game.png' });
   await p.click('[data-tab="parents"]');

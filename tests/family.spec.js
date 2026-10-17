@@ -1,7 +1,7 @@
 // Family accounts: sign up, save a child's progress, pick the child on a second device,
 // and merge progress earned on two devices without losing any.
 const { test, expect } = require('@playwright/test');
-const { makeBackend, setupContext, onboard, waitForR, run, closeCelebrations, openParents } = require('./helpers');
+const { makeBackend, setupContext, onboard, waitForR, run, closeCelebrations, openParents, finishLesson } = require('./helpers');
 
 test('progress follows a child across two devices', async ({ browser }) => {
   test.setTimeout(600_000);
@@ -13,7 +13,7 @@ test('progress follows a child across two devices', async ({ browser }) => {
   // Phone: a child learns first, then a parent creates the family account.
   await onboard(phone, 'Kemi', '🐑');
   await waitForR(phone);
-  await phone.click('#continue-btn'); await run(phone); await closeCelebrations(phone);
+  await phone.click('#continue-btn'); await finishLesson(phone); await closeCelebrations(phone);
   await openParents(phone);
   await phone.fill('#au-email', 'mum@example.com'); await phone.fill('#au-pass', '123');
   await phone.click('#au-create');
@@ -26,7 +26,7 @@ test('progress follows a child across two devices', async ({ browser }) => {
   await expect(phone.locator('#cloud-pill')).toHaveText('☁️✓');
   await phone.fill('#kid-name', 'Tobi'); await phone.click('[data-nava="🦁"]'); await phone.click('#kid-form button[type=submit]');
   await expect(phone.locator('.family .kids')).toContainText('Tobi');
-  expect(backend.rows.find(r => r.name === 'Kemi').state.stars).toBe(5);
+  expect(backend.rows.find(r => r.name === 'Kemi').state.stars).toBe(7);
 
   // Laptop: a wrong password is explained; then the child is picked from the list.
   await laptop.goto('/');
@@ -43,14 +43,14 @@ test('progress follows a child across two devices', async ({ browser }) => {
 
   // Both devices earn stars before syncing; the totals must add up, not overwrite each other.
   await waitForR(laptop);
-  await laptop.click('#continue-btn'); await run(laptop); await closeCelebrations(laptop);
+  await laptop.click('#continue-btn'); await finishLesson(laptop); await closeCelebrations(laptop);
   await phone.click('[data-tab="challenge"]'); await phone.click('[data-id="C2"]'); await phone.fill('#code', '50 + 50'); await run(phone); await closeCelebrations(phone);
   await laptop.waitForTimeout(3500); await phone.waitForTimeout(3500);
   await phone.reload(); await phone.waitForTimeout(2500);
   const kemi = backend.rows.find(r => r.name === 'Kemi').state;
   expect(Object.keys(kemi.done).sort()).toEqual(['C2', 'L1', 'L2']);
-  expect(kemi.stars).toBe(25);
-  await expect(phone.locator('#stars')).toHaveText('25', { timeout: 5000 });
+  expect(kemi.stars).toBe(29);
+  await expect(phone.locator('#stars')).toHaveText('29', { timeout: 5000 });
 
   // Signing out keeps the device usable.
   await openParents(phone);

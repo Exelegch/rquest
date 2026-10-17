@@ -8,10 +8,11 @@
  * - Requests to Supabase (accounts, saving, usage counts) are never cached.
  * Bump CACHE_VERSION whenever this file's caching rules change.
  */
-const CACHE_VERSION = 'rq-v1';
+const CACHE_VERSION = 'rq-v2';
 const APP_CACHE = `${CACHE_VERSION}-app`;
 const LIB_CACHE = `${CACHE_VERSION}-libs`;
-const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
+const APP_SHELL = ['./', './index.html', './content/lesson-steps.js', './content/new-activities.js', './fonts/fonts.css', './privacy.html',
+  './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 const LIB_HOSTS = ['webr.r-wasm.org', 'cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com'];
 
 self.addEventListener('install', (event) => {

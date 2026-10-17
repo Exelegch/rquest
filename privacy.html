@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>R Quest privacy</title>
+<meta name="description" content="What R Quest collects, why, who can see it, and how to delete it.">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<!--
+  R Quest privacy notice. SPDX-License-Identifier: CC-BY-NC-SA-4.0
+  If you run your own copy of R Quest, you are responsible for your own privacy notice:
+  change the names, links and contact details below to yours.
+-->
+<style>
+  :root {
+    --indigo: #1E2A78; --indigo-2: #2E3FA3; --sun: #FFC233; --leaf: #1F9D63; --ink: #1A1D33; --muted: #565C80;
+    --paper: #F3F5FC; --card: #FFFFFF; --line: #D8DDF0; --soft: #E9ECFA;
+    --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+    --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+  :focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+  a { color: var(--indigo-2); font-weight: 800; }
+  .band { background: var(--indigo); color: #fff; }
+  .wrap { max-width: 820px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .band .wrap { padding-block: 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  h1 { margin: 0; font-family: var(--font-display); font-size: 30px; line-height: 1.1; }
+  h1 span { color: var(--sun); }
+  .langs { display: inline-flex; border: 1px solid rgba(255,255,255,.4); border-radius: 99px; overflow: hidden; }
+  .langs button { border: 0; background: transparent; color: #fff; font: inherit; font-weight: 800; padding: 6px 14px; cursor: pointer; }
+  .langs button[aria-pressed="true"] { background: var(--sun); color: var(--indigo); }
+  main.wrap { padding-block: 22px 48px; }
+  h2 { font-family: var(--font-display); color: var(--indigo); font-size: 23px; line-height: 1.2; margin: 28px 0 8px; text-wrap: balance; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
+  .short { background: #EAF8F0; border-color: #BFE5CF; }
+  .short h2 { margin-top: 0; }
+  ul { padding-left: 22px; margin: 6px 0; }
+  li { margin: 4px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { font-size: 13px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); }
+  .tbl { overflow-x: auto; }
+  .fine { color: var(--muted); font-size: 14px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <h1>R <span>Quest</span> · <span id="h-title">Privacy</span></h1>
+  <div class="langs" role="group" aria-label="Language">
+    <button type="button" data-lang="en" aria-pressed="true">English</button>
+    <button type="button" data-lang="yo" aria-pressed="false" lang="yo">Yorùbá</button>
+  </div>
+</div></header>
+
+<main class="wrap">
+<article lang="en" id="en">
+  <p class="fine">Last updated: 17 October 2026</p>
+  <section class="card short">
+    <h2>The short version</h2>
+    <ul>
+      <li>R Quest is free. There are no adverts, no tracking cookies, and we never sell or share data.</li>
+      <li>You can use everything without an account. Then your child's progress stays on your own device.</li>
+      <li>We count anonymous usage (for example "someone finished lesson 3") with no names, to make the lessons better. You can switch this off.</li>
+      <li>A family account is optional. It stores a grown-up's email address and each child's first name, animal picture and progress, so progress works on several devices.</li>
+      <li>You can delete everything yourself, at any time, on the Parents page under <b>Your data</b>.</li>
+    </ul>
+  </section>
+
+  <h2>Who runs R Quest</h2>
+  <p>R Quest is a free, volunteer project made by Olatunde Akanbi. The official site is <a href="https://exelegch.github.io/rquest/">exelegch.github.io/rquest</a>. If you have a question about privacy, please open an issue at <a href="https://github.com/Exelegch/rquest/issues">github.com/Exelegch/rquest/issues</a>. Issues there are public, so please do not write personal details in them.</p>
+
+  <h2>If you do not make an account</h2>
+  <p>Your child's name (or nickname), animal picture, stars, badges, code and saved pictures are stored only in this browser, on this device. They are never sent to us. Clearing the browser's site data, or pressing <b>Delete R Quest data on this device</b> on the Parents page, removes them.</p>
+
+  <h2>What is sent to us, and why</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>What</th><th>Why</th><th>How long we keep it</th></tr></thead>
+    <tbody>
+      <tr><td><b>Anonymous usage counts</b>: a random code for the device (not linked to any name), what happened (opened the app, finished lesson L3, got a "not yet", had a code error), the language and the app version.</td><td>To see how many children use R Quest and which lessons are too hard, so we can fix them.</td><td>Kept, so we can count totals over the years. They cannot be linked to a child.</td></tr>
+      <tr><td><b>Error reports</b>: the error message, the browser type and the app version.</td><td>To find and fix problems in the app.</td><td>90 days</td></tr>
+      <tr><td><b>Feedback</b> from the 💬 button: a face (fun, too hard, too easy, confusing, broken), which activity, and an optional short message. Email addresses and phone numbers are removed from messages automatically before sending.</td><td>To hear what children and parents think.</td><td>1 year</td></tr>
+      <tr><td><b>Family account</b> (only if a grown-up makes one): the grown-up's email address and password, and each child's first name, animal picture and progress.</td><td>To keep progress the same on every phone and computer the family uses.</td><td>Until you delete the child or the account.</td></tr>
+    </tbody>
+  </table></div>
+  <p>To stop sending anonymous usage counts and error reports from a device, open the Parents page and switch off <b>Share anonymous usage counts</b>.</p>
+
+  <h2>Who can see it</h2>
+  <ul>
+    <li>A family can only see its own children. Row-level security in the database enforces this.</li>
+    <li>Passwords are stored scrambled (hashed). Nobody, including us, can read them.</li>
+    <li>The R Quest dashboard shows only totals, such as "120 learners this month" and which lessons are hard. Because the person who runs R Quest manages the database, he could technically see the family table, but he does not look at individual families and never shares or sells anything.</li>
+  </ul>
+
+  <h2>Services R Quest uses</h2>
+  <ul>
+    <li><b>GitHub Pages</b> hosts the website. Like every website host, GitHub receives your device's IP address when pages load.</li>
+    <li><b>Supabase</b> runs the database and family accounts.</li>
+    <li><b>webR</b> (webr.r-wasm.org) and <b>jsDelivr</b> provide the R engine and the Supabase code. Your browser downloads files from them, so they also receive your IP address.</li>
+    <li>Fonts are stored with R Quest itself, so no request goes to Google Fonts.</li>
+  </ul>
+
+  <h2>Children</h2>
+  <p>R Quest is made for children, ideally with a grown-up nearby. Children never need an email address. Only a grown-up can make a family account, and the Parents page asks a small maths question before it opens. Please remind children not to type their full name, address or phone number into the feedback box.</p>
+
+  <h2>Your choices</h2>
+  <ul>
+    <li><b>Delete data on one device:</b> Parents page → Your data → <b>Delete R Quest data on this device</b>.</li>
+    <li><b>Remove one child:</b> Parents page → Family account → <b>Remove</b> next to the child's name.</li>
+    <li><b>Delete the whole family account:</b> Parents page → Your data → <b>Delete our family account</b>. This deletes the grown-up's account, every child in it and all their progress straight away.</li>
+    <li><b>Stop usage counts:</b> Parents page → Your data → switch off <b>Share anonymous usage counts</b>.</li>
+  </ul>
+
+  <h2>Laws we follow</h2>
+  <p>We try to follow the principles of the Nigeria Data Protection Act 2023, the UK and EU GDPR, and the US Children's Online Privacy Protection Act (COPPA): collect as little as possible, explain it clearly, keep it safe, and let families delete it. If you think we have got something wrong, please tell us.</p>
+
+  <h2>Changes</h2>
+  <p>If this notice changes, the new version will appear on this page with a new date at the top.</p>
+  <p class="fine"><a href="./">← Back to R Quest</a></p>
+</article>
+
+<article lang="yo" id="yo" hidden>
+  <p class="fine">Ìgbà tí a ṣàtúnṣe kẹ́yìn: 17 October 2026</p>
+  <section class="card short">
+    <h2>Ní ṣókí</h2>
+    <ul>
+      <li>R Quest jẹ́ ọ̀fẹ́. Kò sí ìpolówó, kò sí kúkì tí ń tọpinpin, a kò sì ń ta dátà tàbí pín in fún ẹnikẹ́ni.</li>
+      <li>O lè lo gbogbo nǹkan láìsí àkáǹtì. Nígbà náà ìlọsíwájú ọmọ rẹ á wà lórí ẹ̀rọ rẹ nìkan.</li>
+      <li>A ń ka ìlò láìsí orúkọ (fún àpẹẹrẹ "ẹnìkan parí ẹ̀kọ́ kẹta") láti mú àwọn ẹ̀kọ́ dára sí i. O lè pa èyí.</li>
+      <li>Àkáǹtì ìdílé kò pọn dandan. Ó ń tọ́jú ímeèlì àgbà kan, àti orúkọ àkọ́kọ́, àwòrán ẹranko àti ìlọsíwájú ọmọ kọ̀ọ̀kan, kí ìlọsíwájú lè ṣiṣẹ́ lórí ẹ̀rọ púpọ̀.</li>
+      <li>O lè pa gbogbo rẹ̀ rẹ́ fúnra rẹ, nígbàkigbà, lójú-ìwé Àwọn òbí, lábẹ́ <b>Dátà rẹ</b>.</li>
+    </ul>
+  </section>
+
+  <h2>Ta ló ń ṣe R Quest</h2>
+  <p>R Quest jẹ́ iṣẹ́ ọ̀fẹ́ tí Olatunde Akanbi ṣe láìgba owó. Ìkànnì àṣẹ ni <a href="https://exelegch.github.io/rquest/">exelegch.github.io/rquest</a>. Bí o bá ní ìbéèrè nípa àṣírí, jọ̀wọ́ ṣí ọ̀rọ̀ kan (issue) ní <a href="https://github.com/Exelegch/rquest/issues">github.com/Exelegch/rquest/issues</a>. Gbogbo ènìyàn ló lè rí ohun tí a kọ síbẹ̀, nítorí náà jọ̀wọ́ má ṣe kọ àlàyé ara ẹni síbẹ̀.</p>
+
+  <h2>Bí o kò bá ṣe àkáǹtì</h2>
+  <p>Orúkọ ọmọ rẹ (tàbí orúkọ ìnagijẹ), àwòrán ẹranko, ìràwọ̀, àmì-ẹ̀yẹ, kóòdù àti àwòrán tí ó fi pamọ́ wà nínú aṣàwákiri yìí nìkan, lórí ẹ̀rọ yìí. A kì í gbà wọ́n. Pípa dátà ìkànnì nínú aṣàwákiri, tàbí títẹ <b>Pa dátà R Quest rẹ́ lórí ẹ̀rọ yìí</b> lójú-ìwé Àwọn òbí, máa ń pa wọ́n rẹ́.</p>
+
+  <h2>Ohun tí a ń gbà, àti ìdí rẹ̀</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Kí ni</th><th>Ìdí</th><th>Bí a ṣe ń pẹ́ tó pẹ̀lú rẹ̀</th></tr></thead>
+    <tbody>
+      <tr><td><b>Kíka ìlò láìsí orúkọ</b>: kóòdù àìròtẹ́lẹ̀ fún ẹ̀rọ náà (kò so mọ́ orúkọ kankan), ohun tí ó ṣẹlẹ̀ (ṣí ìkànnì, parí ẹ̀kọ́ L3, "kò tíì tó", àṣìṣe kóòdù), èdè àti ẹ̀yà ìkànnì.</td><td>Láti mọ iye ọmọdé tí ń lo R Quest àti àwọn ẹ̀kọ́ tí ó le jù, kí a lè tún wọn ṣe.</td><td>A ń pa á mọ́ láti ka àpapọ̀ lọ́dọọdún. A kò lè so ó mọ́ ọmọ kankan.</td></tr>
+      <tr><td><b>Ìjábọ̀ àṣìṣe</b>: ọ̀rọ̀ àṣìṣe, irú aṣàwákiri àti ẹ̀yà ìkànnì.</td><td>Láti rí àti tún ìṣòro inú ìkànnì ṣe.</td><td>Ọjọ́ 90</td></tr>
+      <tr><td><b>Èrò</b> láti bọ́tìnnì 💬: ojú kan (ó dùn, ó le jù, ó rọrùn jù, ó rú mi lójú, ó bàjẹ́), iṣẹ́ wo, àti ọ̀rọ̀ kúkúrú tí kò pọn dandan. A máa ń yọ àdírẹ́sì ímeèlì àti nọ́mbà fóònù kúrò fúnra wa kí a tó fi ránṣẹ́.</td><td>Láti gbọ́ èrò àwọn ọmọdé àti òbí.</td><td>Ọdún 1</td></tr>
+      <tr><td><b>Àkáǹtì ìdílé</b> (bí àgbà kan bá ṣe é nìkan): ímeèlì àti ọ̀rọ̀ aṣínà àgbà náà, àti orúkọ àkọ́kọ́, àwòrán ẹranko àti ìlọsíwájú ọmọ kọ̀ọ̀kan.</td><td>Kí ìlọsíwájú lè rí bákan náà lórí gbogbo fóònù àti kọ̀ǹpútà ìdílé náà.</td><td>Títí o fi pa ọmọ náà tàbí àkáǹtì náà rẹ́.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Láti dá fífi kíka ìlò àti ìjábọ̀ àṣìṣe ránṣẹ́ dúró lórí ẹ̀rọ kan, ṣí ojú-ìwé Àwọn òbí kí o sì pa <b>Pín kíka ìlò láìsí orúkọ</b>.</p>
+
+  <h2>Ta ló lè rí i</h2>
+  <ul>
+    <li>Ìdílé kan lè rí àwọn ọmọ tirẹ̀ nìkan. Ààbò ìlà (row-level security) inú ibi ìpamọ́ dátà ló ń rí sí èyí.</li>
+    <li>A ń tọ́jú ọ̀rọ̀ aṣínà ní ọ̀nà tí a ti dà rú (hashed). Kò sí ẹnìkan, títí kan àwa, tí ó lè kà á.</li>
+    <li>Pátákó ìṣàkóso R Quest ń fi àpapọ̀ hàn nìkan, bíi "akẹ́kọ̀ọ́ 120 ní oṣù yìí" àti àwọn ẹ̀kọ́ tí ó le. Nítorí pé ẹni tí ń ṣe R Quest ló ń bójú tó ibi ìpamọ́ dátà, ó lè rí tábìlì ìdílé, ṣùgbọ́n kì í wo ìdílé kọ̀ọ̀kan, kì í sì í pín tàbí ta nǹkan kankan.</li>
+  </ul>
+
+  <h2>Àwọn iṣẹ́ tí R Quest ń lò</h2>
+  <ul>
+    <li><b>GitHub Pages</b> ló gbé ìkànnì náà. Bí gbogbo ilé ìkànnì, GitHub ń rí àdírẹ́sì IP ẹ̀rọ rẹ nígbà tí ojú-ìwé bá ń ṣí.</li>
+    <li><b>Supabase</b> ló ń ṣe ibi ìpamọ́ dátà àti àkáǹtì ìdílé.</li>
+    <li><b>webR</b> (webr.r-wasm.org) àti <b>jsDelivr</b> ló ń pèsè ẹ̀rọ R àti kóòdù Supabase. Aṣàwákiri rẹ ń gba fáìlì láti ọ̀dọ̀ wọn, nítorí náà àwọn náà ń rí àdírẹ́sì IP rẹ.</li>
+    <li>Àwọn fọ́ǹtì wà pẹ̀lú R Quest fúnra rẹ̀, nítorí náà kò sí ìbéèrè kankan tí ń lọ sí Google Fonts.</li>
+  </ul>
+
+  <h2>Àwọn ọmọdé</h2>
+  <p>A ṣe R Quest fún àwọn ọmọdé, ó dára jù kí àgbà kan wà nítòsí. Àwọn ọmọdé kò nílò ímeèlì rárá. Àgbà nìkan ló lè ṣe àkáǹtì ìdílé, ojú-ìwé Àwọn òbí sì máa ń béèrè ìbéèrè ìṣirò kékeré kan kí ó tó ṣí. Jọ̀wọ́ rán àwọn ọmọdé létí pé kí wọ́n má ṣe kọ orúkọ kíkún, àdírẹ́sì tàbí nọ́mbà fóònù sínú àpótí èrò.</p>
+
+  <h2>Àṣàyàn rẹ</h2>
+  <ul>
+    <li><b>Pa dátà rẹ́ lórí ẹ̀rọ kan:</b> Àwọn òbí → Dátà rẹ → <b>Pa dátà R Quest rẹ́ lórí ẹ̀rọ yìí</b>.</li>
+    <li><b>Yọ ọmọ kan kúrò:</b> Àwọn òbí → Àkáǹtì ìdílé → <b>Yọ ọ́ kúrò</b> lẹ́gbẹ̀ẹ́ orúkọ ọmọ náà.</li>
+    <li><b>Pa gbogbo àkáǹtì ìdílé rẹ́:</b> Àwọn òbí → Dátà rẹ → <b>Pa àkáǹtì ìdílé wa rẹ́</b>. Èyí máa ń pa àkáǹtì àgbà náà, gbogbo ọmọ inú rẹ̀ àti gbogbo ìlọsíwájú wọn rẹ́ lẹ́sẹ̀kẹsẹ̀.</li>
+    <li><b>Dá kíka ìlò dúró:</b> Àwọn òbí → Dátà rẹ → pa <b>Pín kíka ìlò láìsí orúkọ</b>.</li>
+  </ul>
+
+  <h2>Àwọn òfin tí a ń tẹ̀lé</h2>
+  <p>A ń gbìyànjú láti tẹ̀lé ìlànà Òfin Ààbò Dátà Nàìjíríà 2023 (Nigeria Data Protection Act), GDPR ti UK àti EU, àti òfin COPPA ti Amẹ́ríkà fún àṣírí àwọn ọmọdé: gba díẹ̀ bí ó ti ṣeé ṣe, ṣàlàyé rẹ̀ kedere, pa á mọ́ láìléwu, kí o sì jẹ́ kí ìdílé lè pa á rẹ́. Bí o bá rò pé a ṣe nǹkan kan ní àṣìṣe, jọ̀wọ́ sọ fún wa.</p>
+
+  <h2>Àwọn àyípadà</h2>
+  <p>Bí àlàyé yìí bá yí padà, ẹ̀yà tuntun á hàn lójú-ìwé yìí pẹ̀lú ọjọ́ tuntun lókè.</p>
+  <p class="fine"><a href="./">← Padà sí R Quest</a></p>
+</article>
+</main>
+<script>
+  // Show the language chosen in the app, and let the reader switch.
+  (function () {
+    let lang = 'en';
+    try { const s = JSON.parse(localStorage.getItem('rq2-state') || 'null'); if (s && s.lang === 'yo') lang = 'yo'; } catch (e) {}
+    if (location.hash === '#yo') lang = 'yo';
+    const show = (l) => {
+      document.getElementById('en').hidden = l !== 'en';
+      document.getElementById('yo').hidden = l !== 'yo';
+      document.documentElement.lang = l;
+      document.getElementById('h-title').textContent = l === 'yo' ? 'Àṣírí' : 'Privacy';
+      document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
+    };
+    document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => show(b.dataset.lang)));
+    show(lang);
+  })();
+</script>
+</body>
+</html>

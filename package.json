@@ -5,9 +5,12 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "start": "node tests/server.js",
-    "test": "playwright test"
+    "test": "playwright test",
+    "guide": "node tools/teacher-guide.js",
+    "yoruba": "node tools/export-yoruba.js"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
     "@playwright/test": "1.56.0"
   }
 }

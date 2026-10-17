@@ -13,6 +13,7 @@ const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json',
   '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.wasm': 'application/wasm',
   '.css': 'text/css', '.sql': 'text/plain; charset=utf-8', '.md': 'text/plain; charset=utf-8',
+  '.woff2': 'font/woff2', '.pdf': 'application/pdf', '.csv': 'text/csv; charset=utf-8',
 };
 
 http.createServer((req, res) => {

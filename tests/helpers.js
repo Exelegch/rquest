@@ -30,15 +30,25 @@ window.supabase = { createClient() {
     };
     return b;
   }
-  return { auth, from };
+  async function rpc(name, args) { return window.__sb('rpc', { name, args, uid: session && session.user.id }); }
+  return { auth, from, rpc };
 } };`;
 
 /** A pretend Supabase backend shared by every page in one test (so two "devices" see the same data). */
 function makeBackend() {
-  const users = {}; const rows = []; const events = []; const errors = []; let n = 0;
+  const users = {}; const rows = []; const events = []; const errors = []; const feedback = []; let n = 0;
   const handle = (op, a) => {
     if (op === 'signup') { if (users[a.email]) return { error: 'User already registered' }; users[a.email] = { id: 'u' + (++n), password: a.password }; return { id: users[a.email].id }; }
     if (op === 'signin') { const u = users[a.email]; if (!u || u.password !== a.password) return { error: 'Invalid login credentials' }; return { id: u.id }; }
+    if (op === 'rpc') {
+      if (!a.uid) return { data: null, error: { message: 'Please sign in first' } };
+      if (a.name === 'delete_my_account') {
+        for (let i = rows.length - 1; i >= 0; i--) if (rows[i].parent_id === a.uid) rows.splice(i, 1);
+        for (const e of Object.keys(users)) if (users[e].id === a.uid) delete users[e];
+        return { data: null, error: null };
+      }
+      return { data: null, error: { message: 'unknown function' } };
+    }
     const { q, uid } = a; if (!uid) return { data: null, error: { message: 'not authenticated' } };
     const mine = rows.filter(r => r.parent_id === uid && q.filters.every(([c, v]) => r[c] === v));
     if (q.op === 'select') return { data: JSON.parse(JSON.stringify(mine)), error: null };
@@ -47,7 +57,7 @@ function makeBackend() {
     if (q.op === 'delete') { mine.forEach(r => rows.splice(rows.indexOf(r), 1)); return { data: null, error: null }; }
     return { data: null, error: { message: 'unknown' } };
   };
-  return { users, rows, events, errors, handle };
+  return { users, rows, events, errors, feedback, handle };
 }
 
 /** Prepare a browser context: pretend Supabase, optional local webR, captured usage events. */
@@ -60,6 +70,7 @@ async function setupContext(context, backend) {
     const body = req.postDataJSON();
     if (req.url().includes('app_events')) backend.events.push(...[].concat(body));
     if (req.url().includes('app_errors')) backend.errors.push(body);
+    if (req.url().includes('/feedback')) backend.feedback.push(body);
     await route.fulfill({ status: 201, body: '' });
   });
 }
@@ -82,6 +93,24 @@ async function run(page) {
   await page.waitForTimeout(150);
 }
 
+/** The id of the activity open in the studio. */
+const currentId = (page) => page.getAttribute('#list .item[aria-current="true"]', 'data-id');
+
+/** Finish the open lesson: try it, answer the Predict question right first time, then solve the mission with its hint. */
+async function finishLesson(page) {
+  await run(page);
+  await page.click('#next-btn');
+  const id = await currentId(page);
+  const answer = await page.evaluate((i) => window.__RQ__.STEPS[i].quiz.answer, id);
+  await page.click(`.qopt[data-qopt="${answer}"]`);
+  await page.click('#next-btn');
+  await page.click('#hint');
+  const hint = await page.innerText('#hint-box code');
+  await page.fill('#code', (await page.inputValue('#code')) + '\n' + hint);
+  await run(page);
+  await expect(page.locator('#oops')).toBeHidden();
+}
+
 async function closeCelebrations(page) {
   await page.waitForTimeout(2400);
   if (await page.locator('#levelup').isVisible()) await page.click('#lu-ok');
@@ -95,4 +124,4 @@ async function openParents(page) {
   await page.click('#gate-form button[type=submit]');
 }
 
-module.exports = { makeBackend, setupContext, onboard, waitForR, run, closeCelebrations, openParents, FAKE_SUPABASE };
+module.exports = { makeBackend, setupContext, onboard, waitForR, run, closeCelebrations, openParents, finishLesson, currentId, FAKE_SUPABASE };

@@ -6,9 +6,7 @@
 <meta name="robots" content="noindex">
 <title>R Quest Dashboard</title>
 <link rel="icon" href="icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@500;700;800&family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
   /* Layout: indigo header band, one filter row, stat tiles, two single-series column charts, then two tables. */
   :root {
@@ -106,6 +104,8 @@
   .empty { color: var(--muted); }
   .row-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
   .loading { opacity: .55; transition: opacity .2s; }
+  .moods { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .fb-msg { overflow-wrap: anywhere; white-space: pre-wrap; }
   @media (max-width: 860px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .charts { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 420px) { .seg button { padding: 7px 10px; font-size: 13px; } .tile.hero .value { font-size: 42px; } }
 </style>
@@ -131,16 +131,18 @@
   const fmt = (n) => { n = +n || 0; return n >= 10000 ? (n / 1000).toFixed(n >= 100000 ? 0 : 1).replace(/\.0$/, '') + 'K' : n.toLocaleString('en-GB'); };
 
   // Read the Supabase settings and the lesson names from the app itself, so there is one source of truth.
-  let appSrc = '';
+  let appSrc = '', moreSrc = '';
   try { appSrc = await (await fetch('index.html', { cache: 'no-store' })).text(); } catch {}
+  try { moreSrc = await (await fetch('content/new-activities.js', { cache: 'no-store' })).text(); } catch {}
   const cfgBlock = (appSrc.match(/const CLOUD_CONFIG = \{([\s\S]*?)\};/) || [])[1] || '';
   const url = (cfgBlock.match(/url:\s*'([^']*)'/) || [])[1];
   const key = (cfgBlock.match(/key:\s*'([^']*)'/) || [])[1];
   const titles = {};
-  for (const m of appSrc.matchAll(/\{ id: '([A-Z]\d+)', icon: '([^']*)',([^\n]*?)title: (?:'((?:[^'\\]|\\.)*)'|"([^"]*)")/g)) {
+  for (const m of (appSrc + '\n' + moreSrc).matchAll(/\{ id: '([A-Z]\d+)', icon: '([^']*)',([^\n]*?)title: (?:'((?:[^'\\]|\\.)*)'|"([^"]*)")/g)) {
     titles[m[1]] = { icon: m[2], title: (m[4] || m[5] || '').replace(/\\'/g, "'"), exercise: /exercise: true/.test(m[3]) };
   }
-  const kindOf = (id) => ({ L: 'Lesson', E: 'Exercise', C: 'Challenge', G: 'Game', F: 'Free play' })[id[0]] || '';
+  titles.SQ = { icon: '⚡', title: 'Speed quiz' };
+  const kindOf = (id) => id === 'SQ' ? 'Quiz' : ({ L: 'Lesson', E: 'Exercise', C: 'Challenge', G: 'Game', F: 'Free play', B: 'Bug fix', P: 'Project', D: 'Daily puzzle' })[id[0]] || '';
 
   if (!url || !key || !window.supabase) {
     main.replaceChildren(el('div', { class: 'card' }, el('h2', {}, 'Online saving is not set up'), el('p', { class: 'sub' }, 'Add your Supabase URL and key to CLOUD_CONFIG in index.html first.')));
@@ -300,6 +302,19 @@
         el('td', { class: 'num' }, fmt(e.n)), el('td', {}, new Date(e.last_seen).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })), el('td', {}, e.version || '—'))))));
   }
 
+  const MOODS = { fun: ['😀', 'Fun'], hard: ['😣', 'Too hard'], easy: ['😴', 'Too easy'], confusing: ['😕', 'Confusing'], broken: ['🐞', 'Broken'] };
+  function feedbackView(d) {
+    if (!d.feedback) return el('p', { class: 'hint' }, 'To see feedback, run ', el('code', {}, 'supabase/005_feedback_and_privacy.sql'), ' once in Supabase › SQL Editor, then refresh.');
+    const counts = el('div', { class: 'moods' }, Object.entries(MOODS).map(([k, [e, label]]) => el('span', { class: 'chip ' + (k === 'fun' ? 'ok' : k === 'broken' ? 'bad' : 'warn') }, `${e} ${label}: ${fmt((d.moods || {})[k] || 0)}`)));
+    if (!d.feedback.length) return el('div', {}, counts, el('p', { class: 'empty' }, 'No feedback in this period yet.'));
+    return el('div', {}, counts, el('div', { class: 'tbl-wrap' }, el('table', {},
+      el('thead', {}, el('tr', {}, el('th', {}, 'When'), el('th', {}, 'Activity'), el('th', {}, 'Feeling'), el('th', {}, 'Message'))),
+      el('tbody', {}, d.feedback.map(f => el('tr', {},
+        el('td', {}, new Date(f.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })),
+        el('td', {}, f.item ? `${titles[f.item]?.icon || ''} ${titles[f.item]?.title || f.item} ` : 'General', f.item ? el('span', { class: 'kind' }, `${kindOf(f.item)} · ${f.item}`) : ''),
+        el('td', {}, (MOODS[f.mood] || ['', f.mood]).join(' ')),
+        el('td', {}, f.message ? el('div', { class: 'fb-msg' }, f.message) : el('span', { class: 'kind' }, '—'), f.lang === 'yo' ? el('span', { class: 'kind' }, ' · Yorùbá') : '')))))));
+  }
   function render(d) {
     const t = d.totals || {};
     const a = d.all_time;   // missing until supabase/004_all_time_totals.sql has been run
@@ -319,8 +334,14 @@
           tile('Lessons finished', a.lessons), tile('Exercises finished', a.exercises),
           tile('Challenges finished', a.challenges), tile('Games played', a.game_plays, `${fmt(a.game_wins)} won`),
           tile('Ever used Yorùbá', a.yoruba_learners), tile('Family accounts', a.families), tile('Children in families', a.children),
-          tile('Counting since', d.first_event ? new Date(d.first_event).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—', d.first_event ? 'First recorded visit' : 'No activity yet', 'date'))
+          tile('Counting since', d.first_event ? new Date(d.first_event).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—', d.first_event ? 'First recorded visit' : 'No activity yet', 'date'),
+          ...(a.projects !== undefined ? [tile('Projects finished', a.projects), tile('Bugs fixed', a.bug_fixes), tile('Daily puzzles solved', a.daily_puzzles), tile('Speed quizzes played', a.speed_quizzes)] : []))
       : el('div', { class: 'hint' }, 'To see all-time totals, open Supabase › SQL Editor and run ', el('code', {}, 'supabase/004_all_time_totals.sql'), ' once, then refresh.');
+    const fbClear = el('button', { class: 'btn ghost small', type: 'button' }, 'Clear all feedback');
+    fbClear.addEventListener('click', async () => {
+      if (fbClear.dataset.sure !== '1') { fbClear.dataset.sure = '1'; fbClear.textContent = 'Click again to delete it'; return; }
+      await sb.from('feedback').delete().gte('id', 0); load();
+    });
     const clearBtn = el('button', { class: 'btn ghost small', type: 'button' }, 'Clear all error reports');
     clearBtn.addEventListener('click', async () => {
       if (clearBtn.dataset.sure !== '1') { clearBtn.dataset.sure = '1'; clearBtn.textContent = 'Click again to delete them'; return; }
@@ -346,6 +367,9 @@
       el('section', { class: 'card' }, el('h2', {}, 'Where children get stuck'),
         el('p', { class: 'sub' }, '"Not yet" means a challenge or exercise answer was not right. The stuck rate is not-yets and code errors divided by all attempts. Click a column heading to sort.'),
         itemsTable(d.items || [])),
+      el('section', { class: 'card' }, el('div', { class: 'row-head' }, el('div', {}, el('h2', {}, 'Feedback from children and parents'),
+          el('p', { class: 'sub' }, 'Sent with the 💬 button. Email addresses and phone numbers are removed before sending. Kept for one year.')), d.feedback ? fbClear : ''),
+        feedbackView(d)),
       el('section', { class: 'card' }, el('div', { class: 'row-head' }, el('div', {}, el('h2', {}, 'Error reports'), el('p', { class: 'sub' }, 'Problems in the app itself, sent automatically without names.')), clearBtn),
         errorsTable(d.errors || [])),
       el('p', { class: 'updated' }, 'Counts come from anonymous device ids, so one child on two phones counts twice, and a cleared browser counts as a new learner. Usage is kept for good so the totals keep adding up; error reports are deleted after 90 days.'),

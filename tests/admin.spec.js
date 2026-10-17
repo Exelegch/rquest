@@ -16,8 +16,9 @@ window.supabase = { createClient() {
       if (name === 'admin_stats') (window.__calls = window.__calls || []).push(args.p_days);
       const today = new Date().toISOString().slice(0, 10);
       const old = localStorage.getItem('old-sql') === '1';
-      const allTime = old ? {} : { all_time: { learners: 1234, completions: 5678, lessons: 4000, exercises: 1200, challenges: 478, game_plays: 900, game_wins: 300, visits: 9000, yoruba_learners: 77, families: 4, children: 6 },
-        first_event: '2025-01-06T10:00:00Z', is_all_time: args.p_days === 0, weekly: [{ week: '2025-01-06', learners: 5, completions: 9 }] };
+      const allTime = old ? {} : { all_time: { learners: 1234, completions: 5678, lessons: 4000, exercises: 1200, challenges: 478, game_plays: 900, game_wins: 300, visits: 9000, yoruba_learners: 77, families: 4, children: 6, projects: 41, bug_fixes: 88, daily_puzzles: 120, speed_quizzes: 64, feedback: 9 },
+        first_event: '2025-01-06T10:00:00Z', is_all_time: args.p_days === 0, weekly: [{ week: '2025-01-06', learners: 5, completions: 9 }],
+        moods: { fun: 6, confusing: 2 }, feedback: [{ created_at: new Date().toISOString(), item: 'L5', mood: 'confusing', message: 'What does length mean?', lang: 'en' }, { created_at: new Date().toISOString(), item: null, mood: 'fun', message: null, lang: 'yo' }] };
       return { data: { ...allTime, totals: { learners_today: 3, learners_period: 12, learners_7d: 9, completions_period: 40, yoruba_learners: 2, families: 4, children: 6, errors_period: 1 },
         daily: [{ day: today, learners: 3, completions: 7 }],
         items: [{ item: 'E4', completed: 2, played: 0, wins: 0, run_errors: 4, not_yet: 6 }, { item: 'L1', completed: 12, played: 0, wins: 0, run_errors: 0, not_yet: 0 }],
@@ -47,6 +48,11 @@ test('admins see learners, stuck points and errors', async ({ page }) => {
   await expect(page.locator('[aria-label="All-time totals"] .tile.hero .value')).toHaveText('1,234');
   await expect(page.locator('[aria-label="All-time totals"]')).toContainText('5,678');
   await expect(page.locator('main')).toContainText('6 January 2025');
+  await expect(page.locator('[aria-label="All-time totals"]')).toContainText('Projects finished');
+  await expect(page.locator('main')).toContainText('Feedback from children and parents');
+  await expect(page.locator('main')).toContainText('What does length mean?');
+  await expect(page.locator('main')).toContainText('Words too!');
+  await expect(page.locator('main')).toContainText('😕 Confusing: 2');
   await expect(page.locator('.chart .col').first()).toBeAttached();
   await expect(page.locator('main')).toContainText('Top score');
   await expect(page.locator('main')).toContainText('Children get stuck');
@@ -67,7 +73,8 @@ test('before the all-time SQL is run, the dashboard says what to do', async ({ p
   await page.addInitScript(() => localStorage.setItem('old-sql', '1'));
   await page.goto('/admin.html');
   await page.fill('#em', 'admin@example.com'); await page.fill('#pw', 'pw123456'); await page.click('form.signin button');
-  await expect(page.locator('.hint')).toContainText('004_all_time_totals.sql');
+  await expect(page.locator('.hint').first()).toContainText('004_all_time_totals.sql');
+  await expect(page.locator('main')).toContainText('005_feedback_and_privacy.sql');
   await expect(page.getByRole('button', { name: 'All time' })).toHaveCount(0);
   await expect(page.locator('[aria-label="Summary for the chosen range"] .tile.hero .value')).toHaveText('3');
 });

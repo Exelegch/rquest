@@ -5,9 +5,12 @@ The software in this repository (the app's code, styles, the admin dashboard, th
 worker, the SQL files, the tests and the tools) is licensed under the GNU Affero General
 Public License, version 3 or (at your option) any later version, whose full text follows.
 
-The educational content (lesson, exercise, challenge and game texts and their example R code,
-hints, translations, mascot artwork, icons and screenshots) is licensed separately under
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0. See LICENSE-CONTENT.
+The educational content (lesson, exercise, challenge, game, project and puzzle texts and their
+example R code, hints, Predict questions and missions, translations, the files in content/, the
+teacher's guide and the privacy notice text, mascot artwork, icons and screenshots) is licensed
+separately under Creative Commons Attribution-NonCommercial-ShareAlike 4.0. See LICENSE-CONTENT.
+
+The fonts in fonts/ are third-party works under the SIL Open Font License 1.1. See fonts/LICENSES.md.
 
 Versions published before 16 October 2026 (up to commit 1339b21) were released under the MIT
 licence, and copies made from those versions keep that licence.
