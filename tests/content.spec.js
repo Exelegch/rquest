@@ -13,7 +13,7 @@ test('every lesson step and activity can be solved, and has Yorùbá', async ({ 
   test.setTimeout(1_800_000);
   await setupContext(context, makeBackend());
   await page.goto('/');
-  const ids = await page.evaluate(() => [...document.querySelectorAll('.node')].map(n => n.dataset.id));
+  const ids = await page.evaluate(() => window.__RQ__.CONTENT.learn.map(it => it.id));
   expect(ids.length).toBeGreaterThan(60);
   // Mark everything done so every node and step is open.
   // Predict answers are marked as already answered, so no bonus stars (and no level-up pop-ups) get in the way.

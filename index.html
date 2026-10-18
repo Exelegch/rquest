@@ -118,6 +118,17 @@
   }
   .tab:hover { background: rgba(255,255,255,.22); }
   .tab[aria-selected="true"] { background: var(--paper); color: var(--indigo); }
+  .parents-pill[aria-pressed="true"] { background: var(--sun); border-color: var(--sun); color: var(--indigo); }
+  @media (max-width: 640px) {
+    .hud { gap: 6px; }
+    .pill { padding: 4px 9px; font-size: 13px; gap: 4px; }
+    .level-bar { display: none; }
+    .tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; overflow: visible; }
+    .tab { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 2px 8px; font-size: 11.5px; border-radius: 12px 12px 0 0; min-width: 0; }
+    .tab-ic { font-size: 20px; line-height: 1.1; }
+    .tab-tx { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .kbd { display: none; }
+  }
 
   /* ---------- Studio ---------- */
   .studio {
@@ -645,9 +656,14 @@
   .uage { display: inline-block; margin-top: 4px; font-size: 12px; font-weight: 800; background: rgba(255,255,255,.22); border-radius: 99px; padding: 2px 10px; }
   .uright { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
   .cert-btn { border: 0; background: #fff; color: var(--indigo); font-weight: 800; font-size: 13px; border-radius: 99px; padding: 5px 12px; box-shadow: 0 3px 0 rgba(0,0,0,.2); }
-  .uout { margin: 10px 4px 0; font-size: 14px; }
-  .uout summary { cursor: pointer; font-weight: 800; color: var(--muted); }
-  .uout ul { margin: 6px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 2px; }
+  .uout { margin: 10px 0 0; font-size: 14px; background: var(--card); border: 1px solid var(--line); border-left: 5px solid var(--u); border-radius: 14px; padding: 10px 14px; }
+  .uout summary { cursor: pointer; font-weight: 800; color: var(--indigo); list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .uout summary::-webkit-details-marker { display: none; }
+  .uout summary::after { content: "▾"; font-size: 16px; transition: transform .15s; }
+  .uout:not([open]) summary::after { transform: rotate(-90deg); }
+  .uout ul { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; }
+  .unit.locked { background-color: #6E7397; }
+  .ulock { margin: 10px 4px 0; font-weight: 800; color: var(--muted); font-size: 14px; }
   .tile.solved { border-color: var(--leaf); background: #F0FAF4; }
   .grad { margin: 26px auto 0; display: flex; justify-content: center; }
 
@@ -670,6 +686,8 @@
   .moods button[aria-checked="true"] { border-color: var(--sun); background: #FFF3CF; }
   .sheet textarea { width: 100%; border: 2px solid var(--line); border-radius: var(--r-md); padding: 10px 12px; font-size: 15px; resize: vertical; min-height: 80px; }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .pn-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; text-align: left; font-weight: 700; }
+  .pn-list li { display: flex; gap: 10px; align-items: flex-start; }
   .fine-link { font-size: 13px; color: var(--indigo-2); font-weight: 800; text-align: center; }
   @media (max-width: 480px) { .moods { grid-template-columns: repeat(3, minmax(0,1fr)); } }
 
@@ -733,9 +751,8 @@
         <span class="pill" title="Stars">⭐ <span id="stars">0</span></span>
         <span class="pill" id="streak-pill" title="Streak"><span class="flame">🔥</span> <span id="streak">0</span></span>
         <span class="pill cloud-pill" id="cloud-pill" hidden>☁️</span>
-        <button class="pill" id="sound-btn" type="button" aria-label="Sound on or off">🔊</button>
-        <button class="pill" id="big-btn" type="button" aria-pressed="false" aria-label="Bigger text">A+</button>
         <button class="pill" id="lang-btn" type="button">Yorùbá</button>
+        <button class="pill parents-pill" id="parents-btn" data-tab="parents" type="button" aria-pressed="false">👪 Parents</button>
       </div>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
@@ -744,7 +761,6 @@
       <button class="tab" role="tab" data-tab="games" aria-selected="false">🎮 Games</button>
       <button class="tab" role="tab" data-tab="free" aria-selected="false">🎨 Free play</button>
       <button class="tab" role="tab" data-tab="stuff" aria-selected="false">🏅 My stuff</button>
-      <button class="tab" role="tab" data-tab="parents" aria-selected="false">👪 Parents</button>
     </nav>
   </div>
 </header>
@@ -875,6 +891,18 @@
   <div class="cbox"><div class="big" id="c-emoji">🎉</div><div class="msg" id="c-msg"></div><div class="pts" id="c-pts"></div></div>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
+<div class="scrim" id="privacy-note" hidden>
+  <div class="sheet center" role="dialog" aria-modal="true" aria-labelledby="pn-title">
+    <span class="sq-big" aria-hidden="true">🔒</span>
+    <h2 id="pn-title">A quick note about privacy</h2>
+    <ul class="pn-list" id="pn-list"></ul>
+    <div class="actions center">
+      <button class="btn btn-run" type="button" id="pn-ok">OK, got it</button>
+      <a class="btn btn-2" href="privacy.html" target="_blank" rel="noopener" id="pn-more">Read more</a>
+    </div>
+    <button class="linkbtn" type="button" id="pn-off">Turn off usage counts</button>
+  </div>
+</div>
 <div class="scrim" id="speedquiz" hidden>
   <div class="sheet wide" role="dialog" aria-modal="true" aria-labelledby="sq-h" id="sq-body"></div>
 </div>
@@ -1008,6 +1036,10 @@ const I18N = {
     del_done: 'Your family account has been deleted.', del_fail: 'Could not delete the account. Please try again, or see the privacy page for help.',
     ob_privacy: "How we protect children's privacy", rep_projects: 'Projects', rep_puzzle: 'puzzle streak',
     usage_switch: 'Share anonymous usage counts (no names) to help improve the lessons',
+    unit_locked: 'Finish Unit {n} to open this unit.',
+    pn_title: 'A quick note about privacy', pn_1: 'Your progress is saved on this device.',
+    pn_2: 'R Quest counts finished lessons, with no names, to make the lessons better.', pn_3: 'No adverts, and we never sell anything.',
+    pn_ok: 'OK, got it', pn_more: 'Read more', pn_off: 'Turn off usage counts', pn_off_done: 'Usage counts are off ✓',
   },
   yo: {
     tab_learn: '📚 Ẹ̀kọ́', tab_challenge: '🎯 Ìdíje', tab_games: '🎮 Eré', tab_free: '🎨 Eré ọ̀fẹ́', tab_stuff: '🏅 Tèmi',
@@ -1099,6 +1131,10 @@ const I18N = {
     del_done: 'A ti pa àkáǹtì ìdílé rẹ rẹ́.', del_fail: 'A kò lè pa àkáǹtì náà rẹ́. Jọ̀wọ́ gbìyànjú lẹ́ẹ̀kan sí, tàbí wo ojú-ìwé àṣírí fún ìrànlọ́wọ́.',
     ob_privacy: 'Bí a ṣe ń dáàbò bo àṣírí àwọn ọmọdé', rep_projects: 'Iṣẹ́ àkànṣe', rep_puzzle: 'àdìtú léraléra',
     usage_switch: 'Pín kíka ìlò láìsí orúkọ láti ràn wá lọ́wọ́ láti mú àwọn ẹ̀kọ́ dára sí i',
+    unit_locked: 'Parí Ìpín {n} láti ṣí ìpín yìí.',
+    pn_title: 'Ọ̀rọ̀ kúkúrú nípa àṣírí', pn_1: 'Ìlọsíwájú rẹ wà ní ìpamọ́ lórí ẹ̀rọ yìí.',
+    pn_2: 'R Quest ń ka àwọn ẹ̀kọ́ tí a parí, láìsí orúkọ, láti mú àwọn ẹ̀kọ́ dára sí i.', pn_3: 'Kò sí ìpolówó, a kò sì ń ta nǹkan kankan.',
+    pn_ok: 'Ó dáa, mo gbọ́', pn_more: 'Kà sí i', pn_off: 'Pa kíka ìlò', pn_off_done: 'A ti pa kíka ìlò ✓',
   }
 };
 
@@ -2086,6 +2122,7 @@ function showView(v) {
 function switchTab(name) {
   tab = name;
   document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', String(x.dataset.tab === name)));
+  $('parents-btn').setAttribute('aria-pressed', String(name === 'parents'));
   if (hasTTS) { try { speechSynthesis.cancel(); } catch {} }
   if (name === 'stuff') { showView('stuff'); renderStuff(); return; }
   if (name === 'parents') { showView('parents'); renderParents(); return; }
@@ -2114,9 +2151,15 @@ function renderPath() {
   const name = S.name || '';
   const greet = (cur ? tr('greet_path') : tr('greet_done')).replace('{n}', name).replace(/\s+([!,])/, '$1');
   let i = 0;
+  const closed = store.get('rq-closed-units', []) || [];
   const units = UNITS.map((u, ui) => {
     const items = u.ids.map(id => CONTENT.learn.find(x => x.id === id));
     const n = items.filter(x => S.done[x.id]).length;
+    if (!isUnlocked(items[0])) {
+      // A unit opens only when the unit before it is finished.
+      return `<div class="unit locked" style="--u:${u.color}"><div><small>${esc(tr('unit'))} ${ui + 1}</small><h3>${esc(u[S.lang] || u.en)}</h3>${u.age ? `<span class="uage">${esc(tr('age'))} ${esc(u.age)}</span>` : ''}</div><span class="uprog" aria-label="locked">🔒</span></div>`
+        + `<p class="ulock">🔒 ${esc(tr('unit_locked').replace('{n}', ui))}</p>`;
+    }
     const rows = items.map((it) => {
       const idx = CONTENT.learn.indexOf(it);
       const state = S.done[it.id] ? 'done' : (cur && cur.id === it.id) ? 'current' : isUnlocked(it) ? 'open' : 'locked';
@@ -2132,7 +2175,7 @@ function renderPath() {
     const outs = (S.lang === 'yo' && u.outcomes_yo) ? u.outcomes_yo : (u.outcomes || []);
     return `<div class="unit" style="--u:${u.color}"><div><small>${esc(tr('unit'))} ${ui + 1}</small><h3>${esc(u[S.lang] || u.en)}</h3>${u.age ? `<span class="uage">${esc(tr('age'))} ${esc(u.age)}</span>` : ''}</div>`
       + `<div class="uright"><span class="uprog ${full ? 'full' : ''}">${full ? '🏆 ' : ''}${n}/${items.length}</span>${full ? `<button type="button" class="cert-btn" data-cert="${u.id}">${esc(tr('unit_cert'))}</button>` : ''}</div></div>`
-      + (outs.length ? `<details class="uout"><summary>${esc(tr('outcomes'))}</summary><ul>${outs.map(o => `<li>${esc(o)}</li>`).join('')}</ul></details>` : '')
+      + (outs.length ? `<details class="uout" data-unit="${u.id}" style="--u:${u.color}"${closed.includes(u.id) ? '' : ' open'}><summary>📘 ${esc(tr('outcomes'))}</summary><ul>${outs.map(o => `<li>${esc(o)}</li>`).join('')}</ul></details>` : '')
       + `<div class="nodes">${rows}</div>`;
   }).join('');
   $('pathview').innerHTML = `
@@ -2149,12 +2192,16 @@ function renderPath() {
       </div>
       ${dailyTile()}
       <button type="button" class="tile" data-speed="1"><span class="ti" aria-hidden="true">⚡</span><span>${esc(tr('speed_title'))}<small>${esc(tr('speed_s'))}</small></span></button>
-      <button type="button" class="tile" data-go="challenge"><span class="ti" aria-hidden="true">🎯</span><span>${esc(tr('try_ch'))}<small>${esc(tr('try_ch_s'))}</small></span></button>
-      <button type="button" class="tile" data-go="games"><span class="ti" aria-hidden="true">🎮</span><span>${esc(tr('play_game'))}<small>${esc(tr('play_game_s'))}</small></span></button>
     </aside>`;
   requestAnimationFrame(() => requestAnimationFrame(() => { const r = $('goal-ring'); if (r) r.style.strokeDashoffset = String(100 - pct); }));
   const c = $('continue-btn'); if (c) c.onclick = () => { sfx.tap(); openLesson(cur); };
 }
+$('pathview').addEventListener('toggle', (e) => {   // remember which "What you will learn" boxes were closed
+  const d = e.target.closest && e.target.closest('details[data-unit]'); if (!d) return;
+  const set = new Set(store.get('rq-closed-units', []) || []);
+  if (d.open) set.delete(d.dataset.unit); else set.add(d.dataset.unit);
+  store.set('rq-closed-units', [...set]);
+}, true);
 $('pathview').addEventListener('click', (e) => {
   const g = e.target.closest('[data-go]'); if (g) { sfx.tap(); switchTab(g.dataset.go); return; }
   if (e.target.closest('[data-daily]')) { sfx.tap(); openDaily(); return; }
@@ -2453,7 +2500,7 @@ function afterSuccess(code, out, nImages, rres) {
     if (item.daily) solveDaily();
     else if (st) {
       S.stepAt[item.id] = 3;
-      if (first) { track('lesson_done', item.id); S.done[item.id] = true; S.earned[item.id] = 5; addStars(5, unitJustDone(item) ? tr('unit_done') : tr('mission_done')); }
+      if (first) { track('lesson_done', item.id); S.done[item.id] = true; S.earned[item.id] = 5; addStars(5, unitJustDone(item) ? tr('unit_done') : tr('mission_done')); maybePrivacyNote(); }
       else { happy(); sfx.ok(); }
       renderPrompt();
     } else if (first) {
@@ -2531,12 +2578,9 @@ function updateHud() {
   $('lvl-label').textContent = `${S.lang === 'yo' ? 'Ìp' : 'Lv'} ${lvl}`;
   $('lvl-bar').style.width = `${(S.stars % 50) * 2}%`;
   $('who').textContent = S.name ? `${tr('hello')}, ${S.name} ${S.avatar} · ${levelName()}` : '';
-  $('sound-btn').textContent = S.sound ? '🔊' : '🔇';
   S.big = S.textSize >= 1;
   document.body.classList.toggle('big', S.textSize >= 1); document.body.classList.toggle('bigger', S.textSize >= 2);
   document.body.classList.toggle('contrast', !!S.contrast); document.body.classList.toggle('calm', !!S.calm);
-  $('big-btn').setAttribute('aria-pressed', String(S.textSize > 0)); $('big-btn').title = tr('big_text');
-  $('big-btn').textContent = S.textSize >= 2 ? 'A++' : 'A+';
   $('lang-btn').textContent = S.lang === 'en' ? 'Yorùbá' : 'English';
 }
 const levelName = () => { const names = tr('lvl_names'); return names[Math.min(Math.floor(S.stars / 50), names.length - 1)]; };
@@ -3040,7 +3084,11 @@ $('onboard-form').addEventListener('submit', (e) => {
 /* ---------- language ---------- */
 function applyLang() {
   document.documentElement.lang = S.lang === 'yo' ? 'yo' : 'en';
-  document.querySelectorAll('.tab').forEach(t => { t.textContent = tr('tab_' + t.dataset.tab); });
+  document.querySelectorAll('.tab').forEach(t => {
+    const [ic, ...words] = tr('tab_' + t.dataset.tab).split(' ');
+    t.innerHTML = `<span class="tab-ic" aria-hidden="true">${ic}</span> <span class="tab-tx">${esc(words.join(' '))}</span>`;
+  });
+  $('parents-btn').textContent = tr('tab_parents');
   $('mode-code').textContent = tr('mode_code'); $('mode-blocks').textContent = tr('mode_blocks');
   $('reset').textContent = tr('reset'); $('kbd').textContent = tr('kbd'); $('out-title').textContent = tr('out_title');
   renderPalette();
@@ -3061,8 +3109,7 @@ function applyLang() {
   if (mode === 'blocks') renderBlocks();
 }
 $('lang-btn').addEventListener('click', () => { S.lang = S.lang === 'en' ? 'yo' : 'en'; save(); applyLang(); sfx.tap(); });
-$('sound-btn').addEventListener('click', () => { S.sound = !S.sound; save(); updateHud(); sfx.tap(); });
-$('big-btn').addEventListener('click', () => { S.textSize = (S.textSize + 1) % 3; save(); updateHud(); if (tab === 'stuff') renderSettings(); sfx.tap(); });
+$('parents-btn').addEventListener('click', () => { sfx.tap(); switchTab('parents'); });
 $('prompt').addEventListener('click', (e) => { if (e.target.closest('[data-speak]')) { const el = $('prompt').querySelector('.prompt-row > div'); speak(el ? el.innerText : ''); } });
 $('speak-out').addEventListener('click', () => { const oo = $('oops'); speak((oo.hidden ? '' : oo.innerText.split('\n').slice(0, 2).join('. ') + '. ') + $('out').textContent); });
 
@@ -3078,6 +3125,27 @@ function celebrate(pts, msg) {
   box.hidden = false; happy(); sfx.win();
   setTimeout(() => { box.hidden = true; }, 2100);
 }
+
+/* ---------- a short privacy note, shown once after the first finished lesson ---------- */
+function maybePrivacyNote() {
+  if (store.get('rq-privacy-seen', false)) return;
+  store.set('rq-privacy-seen', true);
+  setTimeout(showPrivacyNote, 2300);
+}
+function showPrivacyNote() {
+  lastFocus = document.activeElement;
+  $('pn-title').textContent = tr('pn_title');
+  $('pn-list').innerHTML = [['💾', 'pn_1'], ...(cloudOn ? [['📊', 'pn_2']] : []), ['🚫', 'pn_3']].map(([e, k]) => `<li><span aria-hidden="true">${e}</span><span>${esc(tr(k))}</span></li>`).join('');
+  $('pn-ok').textContent = tr('pn_ok'); $('pn-more').textContent = tr('pn_more');
+  $('pn-off').textContent = tr('pn_off'); $('pn-off').hidden = !cloudOn || usageOff(); $('pn-off').disabled = false;
+  $('privacy-note').hidden = false; $('pn-ok').focus();
+}
+function closePrivacyNote() { $('privacy-note').hidden = true; lastFocus?.focus?.(); }
+$('pn-ok').addEventListener('click', () => { sfx.tap(); closePrivacyNote(); });
+$('pn-off').addEventListener('click', () => {
+  store.set('rq-no-usage', true); evq = []; store.set('rq-evq', evq);
+  $('pn-off').textContent = tr('pn_off_done'); $('pn-off').disabled = true; sfx.tap();
+});
 
 /* ---------- daily puzzle ---------- */
 let lastFocus = null;
@@ -3320,7 +3388,7 @@ $('feedback').addEventListener('click', (e) => { if (e.target.id === 'feedback')
 $('fb-btn').addEventListener('click', () => openFeedback(item && item.id));
 addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
-  if (!$('speedquiz').hidden) closeSpeed(); else if (!$('cert').hidden) closeCert(); else if (!$('feedback').hidden) closeFeedback();
+  if (!$('speedquiz').hidden) closeSpeed(); else if (!$('cert').hidden) closeCert(); else if (!$('feedback').hidden) closeFeedback(); else if (!$('privacy-note').hidden) closePrivacyNote();
 });
 
 /* Read-only view of the content, for the tests and the translation tools. */

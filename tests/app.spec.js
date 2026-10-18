@@ -19,6 +19,49 @@ test('onboarding needs a name, then shows the learning path @phone', async ({ pa
   await expect(page.locator('.hero .bubble')).toContainText('Kemi');
   const [scrollWidth, width] = await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
   expect(scrollWidth).toBeLessThanOrEqual(width);
+  // Every tab and the Parents button fit on the screen without scrolling sideways.
+  for (const sel of ['[data-tab="learn"]', '[data-tab="stuff"]', '#parents-btn', '#lang-btn']) {
+    const box = await page.locator(sel).boundingBox();
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(width);
+  }
+});
+
+test('units open one at a time, and "What you will learn" is open but can be closed', async ({ page }) => {
+  await onboard(page);
+  await expect(page.locator('.unit.locked')).toHaveCount(7);
+  await expect(page.locator('.ulock').first()).toHaveText('🔒 Finish Unit 1 to open this unit.');
+  await expect(page.locator('.node[data-id="L4"]')).toHaveCount(0);
+  const learn = page.locator('details.uout[data-unit="u1"]');
+  await expect(learn).toHaveAttribute('open', '');
+  await expect(learn).toContainText('Use R as a calculator');
+  await learn.locator('summary').click();
+  await expect(learn).not.toHaveAttribute('open', '');
+  await page.reload();
+  await expect(page.locator('details.uout[data-unit="u1"]')).not.toHaveAttribute('open', '');
+  await page.evaluate(() => { const s = JSON.parse(localStorage.getItem('rq2-state')); ['L1', 'L2', 'L3', 'E1', 'E2', 'B1'].forEach(i => { s.done[i] = 1; }); localStorage.setItem('rq2-state', JSON.stringify(s)); });
+  await page.reload();
+  await expect(page.locator('.unit.locked')).toHaveCount(6);
+  await expect(page.locator('.node[data-id="L4"]')).not.toHaveClass(/locked/);
+});
+
+test('a short privacy note appears once, after the first lesson', async ({ page, context }) => {
+  await context.addInitScript('localStorage.removeItem("rq-privacy-seen");');
+  await onboard(page);
+  await waitForR(page);
+  await page.click('#continue-btn');
+  await finishLesson(page);
+  await expect(page.locator('#privacy-note')).toBeVisible({ timeout: 6000 });
+  await expect(page.locator('#pn-list')).toContainText('saved on this device');
+  await page.click('#pn-off');
+  await expect(page.locator('#pn-off')).toHaveText(/off/);
+  expect(await page.evaluate(() => localStorage.getItem('rq-no-usage'))).toBe('true');
+  await page.click('#pn-ok');
+  await expect(page.locator('#privacy-note')).toBeHidden();
+  await page.click('#next-btn');
+  await finishLesson(page);
+  await page.waitForTimeout(3000);
+  await expect(page.locator('#privacy-note')).toBeHidden();
 });
 
 test('locked lessons stay locked until the one before is finished', async ({ page }) => {
@@ -284,7 +327,8 @@ test('settings change text size, contrast and motion, and are remembered', async
   await expect(page.locator('body')).toHaveClass(/calm/);
   await page.reload();
   await expect(page.locator('body')).toHaveClass(/contrast/);
-  await expect(page.locator('#big-btn')).toHaveText('A++');
+  await page.click('[data-tab="stuff"]');
+  await expect(page.locator('[data-ts="2"]')).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('feedback is sent with emails and phone numbers removed', async ({ page }) => {

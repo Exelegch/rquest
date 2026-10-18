@@ -64,7 +64,9 @@ function makeBackend() {
 async function setupContext(context, backend) {
   await context.exposeFunction('__sb', (op, args) => backend.handle(op, args));
   const webr = process.env.WEBR_DIR ? 'window.RQ_WEBR_BASE = "/webr/";' : '';
-  await context.addInitScript(webr + FAKE_SUPABASE);
+  // The one-time privacy note is tested on its own; elsewhere it is marked as already seen.
+  const seen = 'try { if (!window.RQ_PRIVACY_TEST) localStorage.setItem("rq-privacy-seen", "true"); } catch (e) {}';
+  await context.addInitScript(webr + seen + FAKE_SUPABASE);
   await context.route('https://fake-project.supabase.co/rest/v1/**', async (route) => {
     const req = route.request();
     const body = req.postDataJSON();
