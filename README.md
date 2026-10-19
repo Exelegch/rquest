@@ -111,7 +111,7 @@ flowchart LR
 | `supabase/004_all_time_totals.sql` | All-time running totals on the dashboard; usage is kept for good |
 | `supabase/005_feedback_and_privacy.sql` | Feedback, "delete our family account", totals for the new activities |
 | `docs/teacher-guide.pdf` | The guide for teachers and parents (built from `docs/teacher-guide.template.html`) |
-| `docs/yoruba-review.csv`, `docs/TRANSLATING.md` | Every English and Yorùbá text, for native-speaker review |
+| `docs/yoruba-review.csv`, `docs/TRANSLATING.md` | Every English and Yorùbá text side by side, and how to suggest a better word |
 | `tests/` | Automated browser tests (Playwright and axe-core) |
 | `tools/` | Rebuilds the screenshots, the teacher's guide and the Yorùbá review sheet |
 | `.github/workflows/` | Tests, keep-Supabase-awake, weekly encrypted backup |
@@ -229,7 +229,6 @@ You're welcome to run R Quest for your school, church or community, within the l
 - Fonts: Baloo 2, Nunito and JetBrains Mono (SIL Open Font License), served from this repository via [Fontsource](https://fontsource.org); see `fonts/LICENSES.md`
 - Accessibility checks: [axe-core](https://github.com/dequelabs/axe-core)
 - Bible verses from the King James Version (public domain)
-- Yorùbá translations still need review by a native speaker. Corrections are very welcome: see [docs/TRANSLATING.md](docs/TRANSLATING.md).
 
 ## License
 

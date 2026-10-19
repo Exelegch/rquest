@@ -1,6 +1,6 @@
 # Checking and improving the Yorùbá
 
-Every word a child sees in R Quest is written in English and in Yorùbá. The Yorùbá was written carefully, but it has not yet been checked by a native-speaker teacher. If you can help, thank you. Corrections from native speakers are the single most useful contribution to R Quest.
+Every word a child sees in R Quest is written in English and in Yorùbá. If you spot a word that could be better, suggestions are always welcome.
 
 ## The review sheet
 

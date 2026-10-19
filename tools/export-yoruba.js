@@ -1,4 +1,4 @@
-// Exports every English / Yorùbá text pair to docs/yoruba-review.csv for a native speaker to check.
+// Exports every English / Yorùbá text pair to docs/yoruba-review.csv so the texts can be read side by side.
 //   npm run yoruba
 // Open the CSV in Excel, Google Sheets or LibreOffice. See docs/TRANSLATING.md.
 const fs = require('fs');
